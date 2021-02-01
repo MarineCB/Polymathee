@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public enum BucketName {
 
-    PROFILE_NAME("polymathee");
+    BUCKET_NAME("polymathee");
 
     private final String bucketName;
 
@@ -15,8 +15,7 @@ public enum BucketName {
         this.bucketName = bucketName;
     }
 
-    /* public String getBucketName() {
+    public String getBucketName() {
         return bucketName;
     }
-     */
 }
