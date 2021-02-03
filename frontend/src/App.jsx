@@ -1,7 +1,7 @@
 import './App.css';
 import { Switch, Route } from "react-router-dom";
-import Login from '../pages/login/Login';
-import AppBar from '../components/header/NavBar';
+import Login from './pages/login/Login';
+import AppBar from './components/header/NavBar';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, CssBaseline } from '@material-ui/core';
