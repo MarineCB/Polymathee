@@ -25,7 +25,7 @@ cache:
   untracked: true
   key: "$CI_BUILD_REF_NAME"
   paths:
-    - node_modules/
+    - frontend/node_modules/
     - target/
 
 
@@ -37,7 +37,8 @@ postgres:
   artifacts:
     when: always
     paths:
-      - ./frontend/coverage/lcov.info
+      - target/
+      - frontend/coverage/lcov.info
     expire_in: 1 week
   script:
     - if [ -z "$HEROKU_GIT" ]; then echo "Env variable not set HEROKU_GIT"; exit 1 ; fi
@@ -63,7 +64,9 @@ postgres:
     - java -version
     - echo 'Compiling java classes'
     - sh mvnw compile
-    - echo 'Running tests & creating coverage report'
+    - echo 'Folder structure after compile'
+    - ls -a
+    - echo 'Running tests & creating coverage report for frontend'
     - cd frontend
     - npm install
     #- npm i -g nyc
