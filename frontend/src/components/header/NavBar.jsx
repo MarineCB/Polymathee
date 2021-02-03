@@ -1,6 +1,5 @@
 import { withRouter } from "react-router-dom";
-import { Toolbar, IconButton, Grid, Typography, AppBar, Tab} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu'
+import { Toolbar, Grid, Typography, AppBar} from '@material-ui/core';
 import logo from './logo.png';
 
 function NavBar() {
