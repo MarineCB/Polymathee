@@ -9,9 +9,6 @@ variables:
   #MYSQL_DATABASE: $MYSQL_DB
   #MYSQL_ROOT_PASSWORD: $MYSQL_PASS
 
-services:
-  - mysql:latest
-
 stages:
   - setup
   - sonarcloud
