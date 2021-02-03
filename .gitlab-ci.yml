@@ -62,7 +62,7 @@ postgres:
     - apt install -y default-jre
     - java -version
     - echo 'Compiling java classes'
-    - sh mvnw
+    - sh mvnw compile
     - echo 'Running tests & creating coverage report'
     - cd frontend
     - npm install
