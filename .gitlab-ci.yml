@@ -59,7 +59,7 @@ postgres:
    # - psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "postgres" -c "SELECT datname FROM pg_database WHERE datistemplate = false;"
     #- psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 'OK' AS status;"
     - echo 'Installing java'
-    - apt install default-jre
+    - apt install -y default-jre
     - java -version
     - echo 'Compiling java classes'
     - sh mvnw
