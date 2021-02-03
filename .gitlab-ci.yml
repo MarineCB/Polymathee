@@ -52,11 +52,9 @@ setup:
     - node --version
     - echo 'Installing java'
     - mkdir -p /usr/share/man/man1
-    - apt-get update -y && apt-get install -y \
-      unzip \
-      wget \
-      default-jre \
     - apt install -y default-jre
+    - apt-get update -y && apt-get install -y \
+      default-jre \
     - java -version
     - echo 'Compiling java classes'
     - sh mvnw compile
