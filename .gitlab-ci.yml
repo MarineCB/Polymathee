@@ -1,22 +1,21 @@
 # This file is a template, and might need editing before it works on your project.
 # Official framework image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/node/tags/
-image: postgres:latest
+image: mysql:latest
 
 
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
   GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-  POSTGRES_HOST_AUTH_METHOD: trust
+  #MYSQL_DATABASE: $MYSQL_DB
+  #MYSQL_ROOT_PASSWORD: $MYSQL_PASS
 
 services:
-  - postgres
-
+  - mysql:latest
 
 stages:
-  - postgres
+  - setup
   - sonarcloud
-  - heroku
   - test
 
 # This folder is cached between builds
@@ -29,10 +28,8 @@ cache:
     - target/
 
 
-
-
-postgres:
-  stage: postgres
+setup:
+  stage: setup
   allow_failure: false
   artifacts:
     when: always
@@ -41,8 +38,9 @@ postgres:
       - frontend/coverage/lcov.info
     expire_in: 1 week
   script:
-    - if [ -z "$HEROKU_GIT" ]; then echo "Env variable not set HEROKU_GIT"; exit 1 ; fi
-    - if [ -z "$HEROKU_API_KEY" ]; then echo "Env variable not set HEROKU_API_KEY"; exit 1 ; fi
+    #- if [ -z "$MYSQL_DATABASE" ]; then echo "Env variable not set MYSQL_DATABASE"; exit 1 ; fi
+    #- if [ -z "$MYSQL_PASS" ]; then echo "Env variable not set MYSQL_PASS"; exit 1 ; fi
+    - mysql -V
     - echo "Execute this script in all jobs that don't already have a before_script section."
     - apt -y update 
     - apt-get install -y build-essential
@@ -52,13 +50,6 @@ postgres:
     - apt-get install -y nodejs
     - npm --version
     - node --version
-    - export PGPASSWORD=$POSTGRES_PASSWORD
-    - psql -V
-    - echo 'Trying to create the database ${POSTGRES_HOST}'
-    - echo 'Trying to connect to the database $POSTGRES_HOST $POSTGRES_USER $POSTGRES_DB'
-   # - psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "postgres" -c "CREATE DATABASE $POSTGRES_DB;"
-   # - psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "postgres" -c "SELECT datname FROM pg_database WHERE datistemplate = false;"
-    #- psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 'OK' AS status;"
     - echo 'Installing java'
     - apt install -y default-jre
     - java -version
@@ -90,28 +81,10 @@ sonarcloud:
     - ls -a
     - sonar-scanner
 
-.heroku:
-  stage: heroku
-  image:
-    name: alpine/git:latest
-    entrypoint: [""]
-  script:
-    - echo 'Pushing to Heroku!'
-    - git config --global user.email "francoisgillioen@live.fr"
-    - git config --global user.name "françois"
-    # - git remote add heroku $HEROKU_GIT
-    - git add .
-    - git commit --allow-empty -m "Heroku commit from Gitlab CI/CD"
-   # - git remote rm heroku
-    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/polymathee.git
-    - git push -f heroku HEAD:main
-  only:
-    - main
-    - master
 
 # Security scans
 include:
 - template: Security/SAST.gitlab-ci.yml
 sast:
     rules:
-      - if: '$CI_COMMIT_BRANCH == "main"'
+      - if: '$CI_COMMIT_BRANCH == "master"'
