@@ -26,6 +26,7 @@ cache:
   key: "$CI_BUILD_REF_NAME"
   paths:
     - node_modules/
+    - target/
 
 
 
@@ -57,6 +58,8 @@ postgres:
    # - psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "postgres" -c "CREATE DATABASE $POSTGRES_DB;"
    # - psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "postgres" -c "SELECT datname FROM pg_database WHERE datistemplate = false;"
     #- psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 'OK' AS status;"
+    - echo 'Compiling java classes'
+    - sh mvnw
     - echo 'Running tests & creating coverage report'
     - cd frontend
     - npm install
