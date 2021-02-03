@@ -15,6 +15,7 @@ services:
 stages:
   - setup
   - sonarcloud
+  - test
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ee/ci/yaml/README.html#cache
