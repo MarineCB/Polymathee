@@ -1,0 +1,81 @@
+CREATE OR REPLACE TYPE user_type AS OBJECT ( 
+    username VARCHAR2(50), 
+    password VARCHAR2 (50),
+    email VARCHAR2(50), 
+    birthdate DATE
+) NOT INSTANTIABLE NOT FINAL;
+
+
+CREATE OR REPLACE TYPE student_type UNDER user_type ( 
+) NOT FINAL;
+
+CREATE OR REPLACE TYPE admin_type UNDER user_type ( 
+) NOT FINAL;
+
+CREATE OR REPLACE TYPE moderator_type UNDER user_type ( 
+) NOT FINAL;
+
+CREATE TABLE student OF student_type(
+    CONSTRAINT pk_student PRIMARY KEY(id_student),
+    CONSTRAINT nn_studentusername   CHECK(username IS NOT NULL),
+    CONSTRAINT nn_studentpassword    CHECK(password IS NOT NULL),
+    CONSTRAINT nn_studentemail   CHECK(email IS NOT NULL),
+    CONSTRAINT nn_studentbirthdate    CHECK(birthdate IS NOT NULL),
+);
+
+CREATE TABLE moderator OF moderator_type(
+    CONSTRAINT pk_moderator PRIMARY KEY(id_moderator),
+    CONSTRAINT nn_moderatorusername   CHECK(username IS NOT NULL),
+    CONSTRAINT nn_moderatorpassword    CHECK(password IS NOT NULL),
+    CONSTRAINT nn_moderatoremail   CHECK(email IS NOT NULL),
+    CONSTRAINT nn_moderatorbirthdate    CHECK(birthdate IS NOT NULL),
+);
+
+CREATE TABLE admin OF admin_type(
+    CONSTRAINT pk_admin PRIMARY KEY(id_admin),
+    CONSTRAINT nn_adminusername   CHECK(username IS NOT NULL),
+    CONSTRAINT nn_adminpassword    CHECK(password IS NOT NULL),
+    CONSTRAINT nn_adminemail   CHECK(email IS NOT NULL),
+    CONSTRAINT nn_adminbirthdate    CHECK(birthdate IS NOT NULL),
+);
+
+
+CREATE TABLE publication (
+    id_publication INT PRIMARY KEY,
+    title VARCHAR2(50) NOT NULL,
+    content VARCHAR(100) NOT NULL,
+    filename VARCHAR2(50) NOT NULL,
+    statut VARCHAR2(40) CHECK( name IN ('brouillon','a valider','valide','supprime') ),
+    author_id INT,
+    views_number INT DEFAULT 0
+);
+
+CREATE OR REPLACE TRIGGER publication_student_identity
+    BEFORE INSERT OR UPDATE ON publication
+    FOR EACH ROW
+DECLARE 
+    num_student INT;
+BEGIN
+    SELECT COUNT(*) INTO num_student FROM student WHERE id_student = :NEW.author_id;
+    IF num_student = 0 THEN
+        RAISE_APPLICATION_ERROR( -1000, 'No student corresponding');
+    END IF;
+END;
+/
+
+
+CREATE TABLE commentaire (
+    id_comment INT PRIMARY KEY,
+    content VARCHAR(100) NOT NULL,
+    upvote INT,
+    downvote INT,
+    popularity INT,
+    author_id INT,
+    root_comment INT
+);
+
+CREATE TABLE like_table (
+	id_like INT PRIMARY KEY,
+	id_student INT,
+	id_publication INT
+);
