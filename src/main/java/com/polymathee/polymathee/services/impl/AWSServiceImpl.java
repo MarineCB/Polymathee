@@ -28,8 +28,6 @@ public class AWSServiceImpl implements AWSService {
     private AmazonS3 amazonS3;
     @Value("${aws.s3.bucket}")
     private String bucketName;
-    @Value("${aws.s3.key}")
-    private String key;
 
 
     @Override
