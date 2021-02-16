@@ -1,9 +1,6 @@
 package com.polymathee.polymathee.controller;
 
-import com.polymathee.polymathee.dao.Commentary;
-import com.polymathee.polymathee.dao.LikeTable;
-import com.polymathee.polymathee.dao.Publication;
-import com.polymathee.polymathee.dao.User;
+import com.polymathee.polymathee.dao.*;
 import com.polymathee.polymathee.services.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
@@ -18,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 @Controller
@@ -36,11 +35,7 @@ public class PolymatheeController {
     private static final String GET_FAVORIS_BY_ID_USER = "/api/favoris/{id}";
     private static final String GET_USER_ID = "/api/user/{id}";
 
-    //Admin
-    private static final String GET_PUBLI_STATUS = "/api/publication/{status}";
-
-    //Filter
-    private static final String GET_PUBLICATIONS = "/api/publications/?Filter={filter}"; //A vérifier
+    private static final String GET_PUBLICATION = "/api/publication";
 
     @Autowired
     private AWSService awsService;
@@ -104,6 +99,7 @@ public class PolymatheeController {
         return new ResponseEntity<>(commentlist, HttpStatus.OK);
     }
 
+
     @GetMapping(GET_LIKES)
     @ApiOperation(value = "get all likes", consumes = "application/json")
     public ResponseEntity<List<LikeTable>> AllLike() {
@@ -141,4 +137,12 @@ public class PolymatheeController {
         return new ResponseEntity<>(likelist, HttpStatus.OK);
     }
 
+    @GetMapping(GET_PUBLICATION)
+    @ApiOperation(value = "get Publications Filter", consumes = "application/json")
+    public ResponseEntity<List<Publication>> getAllPublication(Filter publicationFilter)
+            throws UnsupportedEncodingException {
+        String filter = URLDecoder.decode(publicationFilter.getFilter(), "utf-8");
+        List<Publication> publiList = publicationService.getPublicationsFilter(filter);
+        return new ResponseEntity<>(publiList, HttpStatus.OK);
+    }
 }
