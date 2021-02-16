@@ -17,4 +17,6 @@ public class UsersServiceImpl implements UsersService {
     public List<User> getUserList(){
        return userRepository.findAll();
     }
+
+
 }

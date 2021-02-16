@@ -1,9 +1,10 @@
 package com.polymathee.polymathee.controller;
 
-import com.polymathee.polymathee.dao.DBconnect;
+import com.polymathee.polymathee.dao.Commentary;
+import com.polymathee.polymathee.dao.LikeTable;
+import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dao.User;
-import com.polymathee.polymathee.services.AWSService;
-import com.polymathee.polymathee.services.UsersService;
+import com.polymathee.polymathee.services.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
@@ -26,15 +27,26 @@ public class PolymatheeController {
     private static final String UPLOAD_FILE = "/upload";
     private static final String GET_FILE = "/download/{fileName}";
     private static final String GET_USER = "/user";
-    private static final String GET_PUBLI_USER = "/user/{id}";
-
-    DBconnect conn = new DBconnect();
+    private static final String GET_PUBLICATION = "/Publi";
+    private static final String GET_PUBLI_ID = "/publi/{id}";
+    private static final String GET_COMMENTARY = "/comment";
+    private static final String GET_LIKE = "/like";
 
     @Autowired
     private AWSService awsService;
 
     @Autowired
     private UsersService usersService;
+
+    @Autowired
+    private PublicationService publicationService;
+
+    @Autowired
+    private CommentaryService commentaryService;
+
+    @Autowired
+    private LikeTableService likeService;
+
 
 
     @PostMapping(UPLOAD_FILE)
@@ -64,4 +76,25 @@ public class PolymatheeController {
         List<User> userList = usersService.getUserList();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
+
+    @GetMapping(GET_PUBLICATION)
+    @ApiOperation(value = "get Publication", consumes = "application/json")
+    public ResponseEntity<List<Publication>> AllPublication() {
+        List<Publication> publiList = publicationService.getPublicationList();
+        return new ResponseEntity<>(publiList, HttpStatus.OK);
+    }
+
+    @GetMapping(GET_COMMENTARY)
+    @ApiOperation(value = "get commentary", consumes = "application/json")
+    public ResponseEntity<List<Commentary>> AllCommentary() {
+        List<Commentary> commentlist = commentaryService.getCommentaryList();
+        return new ResponseEntity<>(commentlist, HttpStatus.OK);
+    }
+    @GetMapping(GET_LIKE)
+    @ApiOperation(value = "get like", consumes = "application/json")
+    public ResponseEntity<List<LikeTable>> AllLike() {
+        List<LikeTable> likelist = likeService.getLikeTable();
+        return new ResponseEntity<>(likelist, HttpStatus.OK);
+    }
+
 }
