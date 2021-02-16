@@ -4,9 +4,13 @@ import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dao.User;
 import com.polymathee.polymathee.repositories.PublicationRepository;
 import com.polymathee.polymathee.repositories.UserRepository;
+import com.polymathee.polymathee.rsql.CustomRsqlVisitor;
 import com.polymathee.polymathee.services.PublicationService;
 import com.polymathee.polymathee.services.UsersService;
+import cz.jirutka.rsql.parser.RSQLParser;
+import cz.jirutka.rsql.parser.ast.Node;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,5 +27,15 @@ public class PublicationServiceImpl implements PublicationService {
     }
 
     @Override
-    public List<Publication> getPublicationsByUserId(Integer id){return publicationRepository.findPublicationByIdUser(id);}
+    public List<Publication> getPublicationsByUserId(Integer id){
+        return publicationRepository.findPublicationByIdUser(id);
+    }
+
+    @Override
+    public List<Publication> getPublicationsFilter(String filter){
+        Node rootNode = new RSQLParser().parse(filter);
+        Specification<Publication> spec = rootNode.accept(new CustomRsqlVisitor<>());
+
+        return publicationRepository.findAll(spec);
+    }
 }
