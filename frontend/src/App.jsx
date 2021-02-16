@@ -1,5 +1,6 @@
 import './App.css';
 import { Switch, Route } from "react-router-dom";
+import Homepage from './pages/homepage/Homepage';
 import Login from './pages/login/Login';
 import AppBar from './components/header/NavBar';
 
@@ -8,6 +9,9 @@ import { createMuiTheme, CssBaseline } from '@material-ui/core';
 
 const theme = createMuiTheme({
   palette: {
+    light: {
+      main: '#FFFAFA'
+    },
     primary: {
       main: '#116466'
     },
@@ -19,7 +23,7 @@ const theme = createMuiTheme({
   typography: {
     h3: {
       color: "#FFFAFA",
-    }
+    },
   }
 });
 
@@ -30,6 +34,7 @@ export default function App() {
       <div className="App">
         <AppBar/>
         <Switch>
+          <Route exact path='/'component={Homepage}/>
           <Route exact path='/login'component={Login}/>
         </Switch>
       </div>
