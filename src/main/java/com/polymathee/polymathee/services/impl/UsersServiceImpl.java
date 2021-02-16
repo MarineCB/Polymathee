@@ -18,5 +18,10 @@ public class UsersServiceImpl implements UsersService {
        return userRepository.findAll();
     }
 
+    @Override
+    public User getUserByID(Integer id){
+        return userRepository.findUserById(id);
+    }
+
 
 }

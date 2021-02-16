@@ -8,4 +8,6 @@ import java.util.List;
 public interface LikeTableService {
 
     List<LikeTable> getLikeTable();
+
+    List<LikeTable> getFavorisByUserId(Integer id);
 }

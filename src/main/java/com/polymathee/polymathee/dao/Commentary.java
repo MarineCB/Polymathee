@@ -24,10 +24,10 @@ public class Commentary {
     private Integer report;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User user_id;
+    private User userId;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publication_id")
-    private Publication publication_id;
+    private Publication publicationId;
 
 
 }

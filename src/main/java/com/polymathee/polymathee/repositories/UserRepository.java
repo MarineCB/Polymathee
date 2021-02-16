@@ -10,6 +10,5 @@ import java.util.List;
 @Transactional
 public interface UserRepository extends CrudRepository<User, Integer>, JpaSpecificationExecutor<User> {
     List<User> findAll();
-
-
+    User findUserById(Integer id);
 }

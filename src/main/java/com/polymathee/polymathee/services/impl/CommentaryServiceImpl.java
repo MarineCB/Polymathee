@@ -21,4 +21,7 @@ public class CommentaryServiceImpl implements CommentaryService {
     public List<Commentary> getCommentaryList(){
         return commentaryRepository.findAll();
     }
+
+    @Override
+    public List<Commentary> getCommentaryByIdPublication(Integer id){return commentaryRepository.findAllByPublicationId(id);}
 }
