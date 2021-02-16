@@ -21,4 +21,7 @@ public class LikeTableServiceImpl implements LikeTableService {
     public List<LikeTable> getLikeTable() {
         return likeRepository.findAll();
     }
+
+    @Override
+    public List<LikeTable> getFavorisByUserId(Integer id){ return likeRepository.findAllByUserId(id);}
 }

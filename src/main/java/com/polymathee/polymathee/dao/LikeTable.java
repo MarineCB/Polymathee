@@ -14,11 +14,11 @@ public class LikeTable {
     @Column(name = "like_id")
     private Integer id;
     @Column(name = "like_post")
-    private String like_post;
+    private String likePost;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User user_id;
+    private User userId;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publication_id")
-    private Publication publication_id;
+    private Publication publicationId;
 }

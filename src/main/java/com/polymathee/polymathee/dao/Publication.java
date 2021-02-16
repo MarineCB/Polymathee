@@ -3,21 +3,24 @@ package com.polymathee.polymathee.dao;
 
 import com.polymathee.polymathee.enums.StateEnum;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
 @Data
 @Entity
 @Table(name = "publication")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Publication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @Column(name = "publication_id")
     private Integer id;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User User_id;
+    private User userId;
     @Column(name = "publication_title")
     private String title;
     @Column(name = "publication_content")

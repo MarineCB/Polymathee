@@ -22,5 +22,6 @@ public class PublicationServiceImpl implements PublicationService {
         return publicationRepository.findAll();
     }
 
-
+    @Override
+    public List<Publication> getPublicationsByUserId(Integer id){return publicationRepository.findPublicationByIdUser(id);}
 }

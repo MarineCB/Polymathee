@@ -8,5 +8,5 @@ import java.util.List;
 public interface PublicationService {
 
     List<Publication> getPublicationList();
-
+    List<Publication> getPublicationsByUserId(Integer id);
 }
