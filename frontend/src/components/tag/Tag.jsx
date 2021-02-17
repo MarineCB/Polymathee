@@ -8,7 +8,7 @@ function Tag(props) {
   return (
     <Chip
       style={{ margin: "2px" }}
-      variant={props.variant}
+      variant={props.variant || "outlined"}
       onDelete={props.onDelete}
       color={props.color || "secondary"}
       label={props.label || "outlined"}

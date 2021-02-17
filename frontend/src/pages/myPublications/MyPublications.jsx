@@ -105,7 +105,7 @@ function MyPublications() {
             </List>
           </Card>
           <Card raised style={{ marginTop: "30px" }}>
-            <Typography variant="h5">Favoris</Typography>
+            <Typography variant="h5" style={{ marginTop: 20 }}>Favoris</Typography>
             <List>
               <Card className={classes.publicationCard}>
                 <Grid alignItems="center" container item>
