@@ -18,4 +18,6 @@ public interface PublicationRepository extends CrudRepository<Publication, Integ
     @Query("SELECT sdto FROM Publication sdto WHERE sdto.userId.id=:id")
     List<Publication> findPublicationByIdUser(Integer id);
 
+    void deleteById(Integer id);
+
 }

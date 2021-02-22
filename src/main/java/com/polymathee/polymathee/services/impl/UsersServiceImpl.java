@@ -23,5 +23,9 @@ public class UsersServiceImpl implements UsersService {
         return userRepository.findUserById(id);
     }
 
+    @Override
+    public void DeleteUserById(int id){ userRepository.deleteById(id);}
+
+
 
 }

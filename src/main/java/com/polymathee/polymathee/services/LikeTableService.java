@@ -10,4 +10,8 @@ public interface LikeTableService {
     List<LikeTable> getLikeTable();
 
     List<LikeTable> getFavorisByUserId(Integer id);
+
+    void deleteLikeTable(int publicationId);
+
+    LikeTable saveLike(LikeTable like);
 }

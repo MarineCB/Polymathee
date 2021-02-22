@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -37,6 +38,8 @@ public class Publication {
     @Column(name = "publication_tags")
     private String tags;
     @Column(name = "publication_report")
-    private String report;
+    private Integer report;
+    @Column(name = "publication_date")
+    private Date date;
 
 }

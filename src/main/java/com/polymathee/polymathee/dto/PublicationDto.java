@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import java.io.Serializable;
+import java.sql.Date;
 
 @Data
 @NoArgsConstructor
@@ -36,7 +37,9 @@ public class PublicationDto implements Serializable {
     @JsonProperty("publication_tags")
     private String tags;
     @JsonProperty("publication_report")
-    private String report;
+    private Integer report;
+    @JsonProperty("publication-date")
+    private Date date;
 
 
 }

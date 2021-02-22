@@ -6,17 +6,23 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "liketable")
-public class LikeTable {
+@Table(name = "commentinteraction")
+public class CommentInteraction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "like_id")
+    @Column(name = "interaction_id")
     private Integer id;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User userId;
+    @Column(name = "vote")
+    private Boolean vote;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "publication_id")
-    private Publication publicationId;
+    @JoinColumn(name = "commentary_id")
+    private Commentary commentaryId;
+
+
+
+
 }

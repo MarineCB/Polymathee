@@ -20,6 +20,8 @@ public class User {
     private String name;
     @Column(name = "user_email")
     private String email;
+    @Column(name = "strike_number")
+    private String strikeNumber;
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role")
     private RoleEnum role;
