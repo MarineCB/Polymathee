@@ -24,4 +24,26 @@ public class CommentaryServiceImpl implements CommentaryService {
 
     @Override
     public List<Commentary> getCommentaryByIdPublication(Integer id){return commentaryRepository.findAllByPublicationId(id);}
+
+    @Override
+    public Commentary saveComment(Commentary comment) {
+        commentaryRepository.save(comment);
+        return comment;
+    }
+
+    @Override
+    public void deleteComment(int comment){
+
+        commentaryRepository.deleteComment(comment);
+
+    }
+
+    @Override
+    public void DeleteCommentById(int id){
+
+        commentaryRepository.deleteById(id);
+
+    }
+
+
 }

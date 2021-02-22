@@ -7,4 +7,5 @@ import java.util.List;
 public interface UsersService {
     List<User> getUserList();
     User getUserByID(Integer id);
+    void DeleteUserById(int id);
 }

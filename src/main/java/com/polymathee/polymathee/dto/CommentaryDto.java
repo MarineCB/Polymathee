@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -22,15 +23,17 @@ public class CommentaryDto implements Serializable {
     @JsonProperty("commentary_content")
     private User content;
     @JsonProperty("commentary_upvote")
-    private String upvote;
+    private Integer upvote;
     @JsonProperty("commentary_downvote")
-    private String downvote;
+    private Integer downvote;
     @JsonProperty("commentary_report")
-    private String report;
+    private Integer report;
     @JsonProperty("user_id")
     private User user_id;
     @JsonProperty("publication_id")
-    private Publication status;
+    private Publication idPubli;
+    @JsonProperty("commentary-date")
+    private Date date;
 
 
 }

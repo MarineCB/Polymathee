@@ -11,4 +11,10 @@ public interface CommentaryService {
     List<Commentary> getCommentaryList();
 
     List<Commentary> getCommentaryByIdPublication(Integer id);
+
+    Commentary saveComment(Commentary comment);
+
+    void deleteComment(int comment);
+
+    void DeleteCommentById(int id);
 }

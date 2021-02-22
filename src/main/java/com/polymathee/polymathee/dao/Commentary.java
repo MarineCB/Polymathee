@@ -4,6 +4,7 @@ import com.polymathee.polymathee.enums.StateEnum;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -22,6 +23,8 @@ public class Commentary {
     private Integer downvote;
     @Column(name = "commentary_report")
     private Integer report;
+    @Column(name = "commentary_date")
+    private Date date;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User userId;

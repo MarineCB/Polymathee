@@ -38,4 +38,17 @@ public class PublicationServiceImpl implements PublicationService {
 
         return publicationRepository.findAll(spec);
     }
+
+    @Override
+    public Publication savePubli(Publication publication) {
+        publicationRepository.save(publication);
+        return publication;
+    }
+
+    @Override
+    public void deletePubli(int id ){
+
+        publicationRepository.deleteById(id);
+
+    }
 }
