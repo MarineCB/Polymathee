@@ -18,8 +18,8 @@ public class LikeTableDto {
     @JsonProperty("like_id")
     private Integer id;
     @JsonProperty("user_id")
-    private User user_id;
+    private User userId;
     @JsonProperty("publication_id")
-    private String publication_id;
+    private Publication publiId;
 
 }

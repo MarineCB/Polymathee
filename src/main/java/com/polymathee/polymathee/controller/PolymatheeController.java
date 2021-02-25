@@ -1,6 +1,10 @@
 package com.polymathee.polymathee.controller;
 
 import com.polymathee.polymathee.dao.*;
+import com.polymathee.polymathee.dto.CommentInteractionDto;
+import com.polymathee.polymathee.dto.CommentaryDto;
+import com.polymathee.polymathee.dto.LikeTableDto;
+import com.polymathee.polymathee.dto.PublicationDto;
 import com.polymathee.polymathee.enums.StateEnum;
 import com.polymathee.polymathee.services.*;
 import io.swagger.annotations.ApiOperation;
@@ -168,8 +172,10 @@ public class PolymatheeController {
 
     @PostMapping(POST_PUBLICATION)
     @ApiOperation(value = "add publication", consumes = "application/json")
-    public ResponseEntity<Publication> addPubli(@RequestBody Publication publi){
+    public ResponseEntity<Publication> addPubli(@RequestBody PublicationDto publi){
         Publication publication = new Publication();
+
+
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 
@@ -191,7 +197,7 @@ public class PolymatheeController {
 
     @PostMapping(POST_COMMENTARY)
     @ApiOperation(value = "add commentary", consumes = "application/json")
-    public ResponseEntity<Commentary> addComment(@RequestBody Commentary comment){
+    public ResponseEntity<Commentary> addComment(@RequestBody CommentaryDto comment){
         Commentary commentary = new Commentary();
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
@@ -202,16 +208,16 @@ public class PolymatheeController {
         commentary.setReport(comment.getReport());
         commentary.setUserId(comment.getUserId());
         commentary.setDate(sqlDate);
-        commentary.setPublicationId(comment.getPublicationId());
+        commentary.setPublicationId(comment.getPubliID());
         commentaryService.saveComment(commentary);
         return new ResponseEntity<>(commentary, HttpStatus.OK);
     }
 
     @PostMapping(POST_FAVORIS)
     @ApiOperation(value = "add favoris", consumes = "application/json")
-    public ResponseEntity<LikeTable> addFavoris(@RequestBody LikeTable like){
+    public ResponseEntity<LikeTable> addFavoris(@RequestBody LikeTableDto like){
         LikeTable liketable = new LikeTable();
-        liketable.setPublicationId(like.getPublicationId());
+        liketable.setPublicationId(like.getPubliId());
         liketable.setUserId(like.getUserId());
         likeService.saveLike(liketable);
         return new ResponseEntity<>(liketable, HttpStatus.OK);
@@ -219,7 +225,7 @@ public class PolymatheeController {
 
     @PostMapping(POST_VOTE)
     @ApiOperation(value = "add vote", consumes = "application/json")
-    public ResponseEntity<CommentInteraction> addFavoris(@RequestBody CommentInteraction comment){
+    public ResponseEntity<CommentInteraction> addFavoris(@RequestBody CommentInteractionDto comment){
         CommentInteraction commentInteraction = new CommentInteraction();
         commentInteraction.setCommentaryId(comment.getCommentaryId());
         commentInteraction.setUserId(comment.getUserId());
