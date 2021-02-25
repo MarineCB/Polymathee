@@ -21,7 +21,7 @@ public class PublicationDto implements Serializable {
     @JsonProperty("publication_id")
     private Integer id;
     @JsonProperty("user_id")
-    private User user_id;
+    private User userId;
     @JsonProperty("publication_title")
     private String title;
     @JsonProperty("publication_content")
@@ -29,9 +29,9 @@ public class PublicationDto implements Serializable {
     @JsonProperty("publication_file")
     private String file;
     @JsonProperty("publication_like_number")
-    private String likeNumber;
+    private Integer likeNumber;
     @JsonProperty("publication_download_number")
-    private String downloadNumber;
+    private Integer downloadNumber;
     @JsonProperty("publication_status")
     private StateEnum status;
     @JsonProperty("publication_tags")

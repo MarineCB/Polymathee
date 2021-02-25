@@ -21,7 +21,7 @@ public class UserDto implements Serializable {
     @JsonProperty("user_email")
     private String email;
     @JsonProperty("strike_number")
-    private String strikeNumber;
+    private Integer strikeNumber;
     @JsonProperty("user_role")
     private RoleEnum role;
 }
