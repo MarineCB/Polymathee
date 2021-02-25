@@ -2,6 +2,7 @@ package com.polymathee.polymathee.services;
 
 import com.polymathee.polymathee.dao.LikeTable;
 import com.polymathee.polymathee.dao.Publication;
+import com.polymathee.polymathee.dto.LikeTableDto;
 
 import java.util.List;
 
@@ -13,5 +14,5 @@ public interface LikeTableService {
 
     void deleteLikeTable(int publicationId);
 
-    LikeTable saveLike(LikeTable like);
+    LikeTable saveLike(LikeTableDto likeTableDto);
 }

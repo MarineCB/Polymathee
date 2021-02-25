@@ -3,6 +3,7 @@ package com.polymathee.polymathee.services.impl;
 import com.polymathee.polymathee.dao.Commentary;
 import com.polymathee.polymathee.dao.LikeTable;
 import com.polymathee.polymathee.dao.Publication;
+import com.polymathee.polymathee.dto.LikeTableDto;
 import com.polymathee.polymathee.repositories.CommentaryRepository;
 import com.polymathee.polymathee.repositories.LikeTableRepository;
 import com.polymathee.polymathee.services.CommentaryService;
@@ -34,8 +35,13 @@ public class LikeTableServiceImpl implements LikeTableService {
     }
 
     @Override
-    public LikeTable saveLike(LikeTable like) {
-        likeRepository.save(like);
-        return like;
+    public LikeTable saveLike(LikeTableDto likeTableDto) {
+
+        LikeTable liketable = new LikeTable();
+        liketable.setPublicationId(likeTableDto.getPubliId());
+        liketable.setUserId(likeTableDto.getUserId());
+
+        likeRepository.save(liketable);
+        return liketable;
     }
 }
