@@ -1,6 +1,7 @@
 package com.polymathee.polymathee.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.polymathee.polymathee.dao.Publication;
@@ -15,11 +16,9 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LikeTableDto {
 
-    @JsonProperty("like_id")
-    private Integer id;
     @JsonProperty("user_id")
-    private User userId;
+    private Integer userId;
     @JsonProperty("publication_id")
-    private Publication publiId;
+    private Integer publiId;
 
 }

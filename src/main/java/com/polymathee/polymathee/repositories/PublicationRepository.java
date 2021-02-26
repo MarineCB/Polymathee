@@ -20,4 +20,6 @@ public interface PublicationRepository extends CrudRepository<Publication, Integ
 
     void deleteById(Integer id);
 
+    Publication findPublicationById(Integer id);
+
 }

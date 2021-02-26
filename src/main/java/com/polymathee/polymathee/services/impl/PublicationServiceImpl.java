@@ -24,6 +24,9 @@ public class PublicationServiceImpl implements PublicationService {
     @Autowired
     private PublicationRepository publicationRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public List<Publication> getPublicationList(){
         return publicationRepository.findAll();
@@ -46,11 +49,13 @@ public class PublicationServiceImpl implements PublicationService {
     public Publication savePubli(PublicationDto publicationDto) {
 
         Publication publication = new Publication();
+        User user = userRepository.findUserById(publicationDto.getUserId());
 
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 
-        publication.setUserId(publicationDto.getUserId());
+
+        publication.setUserId(user);
         publication.setTitle(publicationDto.getTitle());
         publication.setContent(publicationDto.getContent());
         publication.setFile(publicationDto.getFile());

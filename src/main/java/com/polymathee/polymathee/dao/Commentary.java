@@ -26,10 +26,10 @@ public class Commentary {
     @Column(name = "commentary_date")
     private Date date;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User userId;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "publication_id")
+    @JoinColumn(name = "publication_id", referencedColumnName = "publication_id")
     private Publication publicationId;
 
 

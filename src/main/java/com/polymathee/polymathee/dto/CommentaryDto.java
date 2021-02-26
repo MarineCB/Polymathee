@@ -1,5 +1,6 @@
 package com.polymathee.polymathee.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.polymathee.polymathee.dao.Publication;
@@ -18,8 +19,6 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentaryDto implements Serializable {
 
-    @JsonProperty("commentary_id")
-    private Integer id;
     @JsonProperty("commentary_content")
     private String content;
     @JsonProperty("commentary_upvote")
@@ -29,9 +28,9 @@ public class CommentaryDto implements Serializable {
     @JsonProperty("commentary_report")
     private Integer report;
     @JsonProperty("user_id")
-    private User userId;
+    private Integer userId;
     @JsonProperty("publication_id")
-    private Publication publiID;
+    private Integer publiID;
     @JsonProperty("commentary-date")
     private Date date;
 

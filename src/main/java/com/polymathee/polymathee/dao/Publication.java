@@ -20,7 +20,7 @@ public class Publication {
     @Column(name = "publication_id")
     private Integer id;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User userId;
     @Column(name = "publication_title")
     private String title;
