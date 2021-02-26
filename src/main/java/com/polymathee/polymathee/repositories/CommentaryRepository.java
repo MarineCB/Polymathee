@@ -24,5 +24,7 @@ public interface CommentaryRepository extends CrudRepository<Commentary, Integer
     @Query("DELETE FROM Commentary com  WHERE com.publicationId.id =:commentId ")
     void deleteComment(int commentId);
 
+    Commentary findCommentaryById(Integer id);
+
 
 }

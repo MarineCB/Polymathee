@@ -14,12 +14,12 @@ public class CommentInteraction {
     @Column(name = "interaction_id")
     private Integer id;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User userId;
     @Column(name = "vote")
     private Boolean vote;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "commentary_id")
+    @JoinColumn(name = "commentary_id", referencedColumnName = "commentary_id")
     private Commentary commentaryId;
 
 
