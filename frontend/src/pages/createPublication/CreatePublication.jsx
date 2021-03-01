@@ -21,7 +21,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Tag from "../../components/tag/Tag";
 import PolymatheeEditor from "../../components/polymatheeEditor/PolymatheeEditor";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-let text = "first text"
+let text = ""
 const useStyles = makeStyles((theme) => ({
   center: {
     display: "flex",
@@ -496,6 +496,15 @@ function CreatePublicationContent(props) {
 
 function CreatePublication() {
 
+  const [tags, setTags] = React.useState([
+    {
+      label: "EFREI",
+    },
+    {
+      label: "Long à lire",
+    },
+  ])
+
   return (
     <div className="App">
       <CreatePublicationStepper />
@@ -511,7 +520,7 @@ function CreatePublication() {
         <Card raised className={classes.card}>
           <Grid container>
             <Grid item xs={12} md={6} xl={6}>
-              <CreatePublicationForm />
+              <CreatePublicationForm tags={tags} setTags={setTags}/>
             </Grid>
             <Grid item xs={12} md={6} xl={6}>
               <AttachmentArea />

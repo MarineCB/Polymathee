@@ -7,8 +7,8 @@ import {
   TextField,
   CardContent,
   CardHeader,
+  Link,
 } from "@material-ui/core";
-import Link from "@material-ui/core/Link";
 import "./Login.css";
 import { useHistory } from "react-router-dom";
 
@@ -16,7 +16,6 @@ function Login() {
   const history = useHistory();
 
   function GoToSignup(e) {
-    console.log("click");
     history.push("/signup");
   }
 
@@ -24,13 +23,11 @@ function Login() {
     <div className="center">
       <Card
         color="primary"
-        alignItems="center"
         raised
         style={{ borderRadius: 30 }}
       >
         <CardHeader
           style={{ marginBottom: 0 }}
-          variant="contained"
           color="inherit"
           title="Connexion"
         />
@@ -52,7 +49,7 @@ function Login() {
               justify="space-between"
               alignItems="flex-end"
             >
-              <Link variant="contained" color="primary">
+              <Link color="primary">
                 Mot de passe oublié ?{" "}
               </Link>
               <Button variant="contained" color="secondary">
