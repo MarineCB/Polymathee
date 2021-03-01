@@ -27,6 +27,26 @@ const theme = createMuiTheme({
     h3: {
       color: "#FFFAFA",
     },
+  },
+  overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        '*': {
+          'scrollbar-width': 'thin',
+        },
+        '*::-webkit-scrollbar': {
+          width: '5px',
+          height: '5px',
+        },
+'*::-webkit-scrollbar-thumb': {
+  background: "#888"
+},
+
+'*::-webkit-scrollbar-thumb:hover': {
+  background: "#555"
+}
+      }
+    }
   }
 });
 

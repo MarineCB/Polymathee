@@ -7,8 +7,8 @@ import {
   TextField,
   CardContent,
   CardHeader,
+  Link,
 } from "@material-ui/core";
-import Link from "@material-ui/core/Link";
 import "./Login.css";
 import { useHistory } from "react-router-dom";
 
@@ -16,7 +16,6 @@ function Login() {
   const history = useHistory();
 
   function GoToSignup(e) {
-    console.log("click");
     history.push("/signup");
   }
 
