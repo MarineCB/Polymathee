@@ -4,7 +4,11 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
+import axios from 'axios';
 
+axios.defaults.baseURL = 'http://localhost:8080/';
+axios.defaults.headers.post['content-Type'] = 'application/json';
+axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
 
 
 ReactDOM.render(

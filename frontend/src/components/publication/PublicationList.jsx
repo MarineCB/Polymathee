@@ -1,5 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
+import Moment from 'moment';
 import {
   Box,
   Card,
@@ -34,25 +35,27 @@ const useStyles = makeStyles((theme) => ({
 function PublicationList({ publications }) {
   const classes = useStyles();
   
-  //const pdfFile;
   const listItems = publications.map((publication, index) => (
-    <Box key={index} m={2}>
+    <Box flexGrow={1} key={index} m={2}>
       <Card>
         <ListItem>
           <ListItemText
             primary={publication.title}
             secondary={
               <React.Fragment>
-                {publication.date}
-                <br />
+                {Moment(publication.date).format('DD-MM-YYYY hh:mm')}
+                <br/>
                 <Typography
                   component="span"
                   variant="body2"
                   className={classes.inline}
                   color="textPrimary"
                 >
-                  {publication.description}
+                  {publication.content}
                 </Typography>
+                <br/>
+                <br/>
+                {publication.userId.name}
               </React.Fragment>
             }
           />

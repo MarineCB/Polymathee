@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import { withRouter } from "react-router-dom";
 import {
   Box,
@@ -10,6 +11,7 @@ import {
   Button,
   Divider,
 } from "@material-ui/core";
+import { useCallback, useEffect } from "react";
 
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
@@ -37,10 +39,21 @@ function Homepage() {
     setOpen(false);
   };
 
-  const publications = [];
-
+  const [publications, setPublications] = React.useState([]);
   const [tags, setTags] = React.useState([]);
   const [users, setUsers] = React.useState([]);
+
+  const loadPublications = useCallback(() => {
+    axios
+    .get("api/publications")
+    .then((res) => {
+      setPublications(res.data);
+    })
+  }, []);
+
+  useEffect(() => {
+    loadPublications();
+  }, [loadPublications]);
 
   return (
     <Grid style={{ maxHeight: "10vh" }} container justify="center">
@@ -99,7 +112,7 @@ function Homepage() {
           </Card>
         </Slide>
       </Box>
-      <Box maxWidth="70%">
+      <Box flexGrow={1} maxWidth="60%" id="test">
         <PublicationList publications={publications} />
       </Box>
     </Grid>
