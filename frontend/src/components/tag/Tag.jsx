@@ -12,6 +12,7 @@ function Tag(props) {
       onDelete={props.onDelete}
       color={props.color || "secondary"}
       label={props.label || "outlined"}
+      size={props.tagSize}
     ></Chip>
   );
 }

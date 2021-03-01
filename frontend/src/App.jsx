@@ -1,5 +1,6 @@
 import './App.css';
 import { Switch, Route } from "react-router-dom";
+import Homepage from './pages/homepage/Homepage';
 import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup'
 import CreatePublication from './pages/createPublication/CreatePublication'
@@ -11,6 +12,9 @@ import { createMuiTheme, CssBaseline } from '@material-ui/core';
 
 const theme = createMuiTheme({
   palette: {
+    light: {
+      main: '#FFFAFA'
+    },
     primary: {
       main: '#116466'
     },
@@ -22,6 +26,26 @@ const theme = createMuiTheme({
   typography: {
     h3: {
       color: "#FFFAFA",
+    },
+  },
+  overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        '*': {
+          'scrollbar-width': 'thin',
+        },
+        '*::-webkit-scrollbar': {
+          width: '5px',
+          height: '5px',
+        },
+'*::-webkit-scrollbar-thumb': {
+  background: "#888"
+},
+
+'*::-webkit-scrollbar-thumb:hover': {
+  background: "#555"
+}
+      }
     }
   }
 });
@@ -33,6 +57,7 @@ export default function App() {
       <div className="App">
         <AppBar/>
         <Switch>
+          <Route exact path='/'component={Homepage}/>
           <Route exact path='/login'component={Login}/>
           <Route exact path='/signup'component={Signup}/>
           <Route exact path='/createPublication'component={CreatePublication}/>
