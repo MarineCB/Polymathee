@@ -226,7 +226,7 @@ function CreatePublicationSummary(props) {
                 ) {
                   msg += "\n> Pas de tags";
                 }
-                if (title === undefined) {
+                if (title === undefined || title === "") {
                   msg += "\n> Pas de titre";
                 }
                 if (msg !== "") {
