@@ -8,7 +8,7 @@ import AppBar from './components/header/NavBar';
 import ViewPublication from './pages/viewPublication/ViewPublication';
 import MyPublication from './pages/myPublications/MyPublications'
 import { ThemeProvider } from '@material-ui/styles';
-import { createMuiTheme, CssBaseline } from '@material-ui/core';
+import { Box, createMuiTheme, CssBaseline } from '@material-ui/core';
 
 const theme = createMuiTheme({
   palette: {
@@ -54,7 +54,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline/>
-      <div className="App">
+      <Box height="100%">
         <AppBar/>
         <Switch>
           <Route exact path='/'component={Homepage}/>
@@ -64,7 +64,7 @@ export default function App() {
           <Route exact path='/viewPublication'component={ViewPublication}/>
           <Route exact path='/myPublications'component={MyPublication}/>
         </Switch>
-      </div>
+      </Box>
     </ThemeProvider>
   );
 }

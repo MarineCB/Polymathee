@@ -34,10 +34,9 @@ function MyPublications() {
         <Grid
           direction="column"
           container
-          style={{ width: "50%", marginTop: 140 }}
         >
           {" "}
-          <Card raised>
+          <Card raised >
             <Typography variant="h5" style={{ marginTop: 20 }}>
               Publications
             </Typography>
