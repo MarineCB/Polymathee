@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 function TagsCard(props) {
   let { tags, setTags } = props;
-  const [text, setText] = React.useState("");
+  const [ setText] = React.useState("");
   const handleKeyPress = (data) => {
     if (data.event.key === "Enter") {
       if (data.text !== "") {
@@ -496,7 +496,7 @@ function CreatePublicationContent(props) {
 
 function CreatePublication() {
 
-  const [tags, setTags] = React.useState([
+  const [ setTags] = React.useState([
     {
       label: "EFREI",
     },
