@@ -16,7 +16,6 @@ function Login() {
   const history = useHistory();
 
   function GoToSignup(e) {
-    console.log("click");
     history.push("/signup");
   }
 

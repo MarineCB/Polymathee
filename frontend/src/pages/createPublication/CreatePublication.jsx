@@ -115,6 +115,7 @@ function AttachmentArea(props) {
   const [, setSize] = React.useState(12);
   return (
     <div>
+      <div>
       {pdfFile !== undefined && (
         <Box display="flex" justifyContent="center">
           <Box mr={2} alignContent="flex-end">
@@ -168,6 +169,7 @@ function AttachmentArea(props) {
           acceptedFiles={["application/pdf"]}
         />
       )}
+      </div>
     </div>
   );
 }
@@ -495,7 +497,6 @@ function CreatePublicationContent(props) {
 }
 
 function CreatePublication() {
-
   return (
     <div className="App">
       <CreatePublicationStepper />
