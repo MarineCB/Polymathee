@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 function TagsCard(props) {
   let { tags, setTags } = props;
-  const [text, setText] = React.useState("");
+  const [setText] = React.useState("");
   const handleKeyPress = (data) => {
     if (data.event.key === "Enter") {
       if (data.text !== "") {
@@ -123,7 +123,6 @@ function AttachmentArea(props) {
               <Page height={250} pageNumber={pageNumber} />
             </Document>
             <Typography>Nombre de pages : {numPages}</Typography>
-            {/* <PdfCover file={publicationData.pdf !== undefined ? publicationData.pdf.path : undefined}/> */}
           </Box>
           <Box ml={2} alignContent="flex-start">
             <DropzoneAreaBase
@@ -500,27 +499,6 @@ function CreatePublication() {
   return (
     <div className="App">
       <CreatePublicationStepper />
-      {/* 
-      <Grid
-        container
-        id="grid1"
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justify="center"
-      >
-        <Card raised className={classes.card}>
-          <Grid container>
-            <Grid item xs={12} md={6} xl={6}>
-              <CreatePublicationForm />
-            </Grid>
-            <Grid item xs={12} md={6} xl={6}>
-              <AttachmentArea />
-            </Grid>
-          </Grid>
-        </Card>
-      </Grid>
-    */}
     </div>
   );
 }
