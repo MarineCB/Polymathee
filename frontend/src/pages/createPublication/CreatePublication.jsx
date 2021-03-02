@@ -1,8 +1,9 @@
 import React from "react";
-import RichTextEditor from "react-rte"
+import RichTextEditor from "react-rte";
 import { withRouter } from "react-router-dom";
 import { DropzoneAreaBase } from "material-ui-dropzone";
 import { Document, Page, pdfjs } from "react-pdf";
+import axios from "axios";
 import "./CreatePublication.css";
 import {
   Button,
@@ -20,8 +21,10 @@ import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Tag from "../../components/tag/Tag";
 import PolymatheeEditor from "../../components/polymatheeEditor/PolymatheeEditor";
+import {useEffect} from "react";
+
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-let text = ""
+let descriptionText = "";
 const useStyles = makeStyles((theme) => ({
   center: {
     display: "flex",
@@ -47,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 function TagsCard(props) {
   let { tags, setTags } = props;
-  const [ setText] = React.useState("");
+  const [text, setText] = React.useState("");
   const handleKeyPress = (data) => {
     if (data.event.key === "Enter") {
       if (data.text !== "") {
@@ -97,7 +100,7 @@ function TagsCard(props) {
 }
 
 function AttachmentArea(props) {
-  let { pdfFile, setPdfFile, pageNumber, setNumPages, numPages } = props.form;
+  let { pdfFile, setPdfFile, pageNumber, setNumPages, numPages, pdfStream, setPdfStream } = props.form;
   const classes = useStyles();
 
   function loadPdf(file) {
@@ -106,6 +109,7 @@ function AttachmentArea(props) {
       const result = reader.result;
       setPdfFile(result);
     });
+    setPdfStream(file)
     reader.readAsDataURL(file);
   }
 
@@ -125,7 +129,7 @@ function AttachmentArea(props) {
           </Box>
           <Box ml={2} alignContent="flex-start">
             <DropzoneAreaBase
-              showPreviews={true}
+          showPreviews={true}
               showPreviewsInDropzone={false}
               filesLimit={1}
               maxFileSize={60000000}
@@ -171,9 +175,80 @@ function AttachmentArea(props) {
   );
 }
 
+function savePublication(pdfFile,description,tags,title,pdfStream,setSubmitButtonLocked,isDraft)
+{
+    // Check submit
+    var msg = "";
+    if (pdfFile === undefined) {
+      msg += "\n> Pas de pdf";
+    }
+    if (description === "") {
+      msg += "\n> Pas de description";
+    }
+    if (tags === undefined || tags.length === 0) {
+      msg += "\n> Pas de tags";
+    }
+    if (title === undefined || title === "") {
+      msg += "\n> Pas de titre";
+    }
+    if (msg !== "") {
+      msg =
+        "Elements incorrects pour l'envoi de votre publication" +
+        msg;
+    }
+    if (msg !== "") {
+      alert(msg);
+    } else {
+      alert("Success");
+
+      const formData = new FormData();
+      formData.append("file", pdfStream);
+      const config = {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      };
+      console.log(formData)
+      console.log("Description text :", descriptionText)
+      const UPLOAD_URL = "http://localhost:8080/api/upload"
+      const PUBLICATION_URL = "http://localhost:8080/api/publication"
+      axios
+        .post(UPLOAD_URL, formData, config)
+        .then((resUpload) => {
+          console.log("PDF uploaded ", resUpload);
+          axios
+            .post(PUBLICATION_URL, {
+              publication_content: descriptionText,
+              publication_date: Date.now,
+              publication_download_number: 0,
+              publication_file: title,
+              publication_like_number: 0,
+              publication_report: 0,
+              publication_status:  (isDraft) ? "Saved" : "To_Treat", // Precise enum values
+              publication_tags: tags.map(t => t.label).join(","), // separate with "," each tag
+              publication_title: "string",
+              user_id: 2,
+            })
+            .then((res) => {
+              console.log(res.status, res.statusText);
+              if (!isDraft) {
+                setSubmitButtonLocked(true)
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        })
+        .catch((errUpload) => {
+          console.error("Failed to upload pdf", errUpload);
+        });
+    }
+}
+
 function CreatePublicationSummary(props) {
   const classes = useStyles();
-  let { title, pdfFile, description, setDescription, tags } = props.form;
+  let { title, pdfFile, description, setDescription, tags, pdfStream } = props.form;
+  const [submitButtonLocked, setSubmitButtonLocked] = React.useState(false)
   return (
     <div>
       <Card className={classes.card}>
@@ -198,46 +273,21 @@ function CreatePublicationSummary(props) {
             className="new-post-editor"
             description={description}
             setDescription={setDescription}
-            value={text}
-            />
+            value={descriptionText}
+          />
           <Grid container direction="row">
             {/* Action buttons */}
             <Button
               color="secondary"
               variant="contained"
+              disabled={Boolean(submitButtonLocked)}
               style={{
                 marginTop: "20px",
                 borderRadius: 50,
                 marginInline: 2,
               }}
               onClick={() => {
-                // Check submit
-                var msg = "";
-                if (pdfFile === undefined) {
-                  msg += "\n> Pas de pdf";
-                }
-                if (description === "") {
-                  msg += "\n> Pas de description";
-                }
-                if (
-                  tags === undefined ||
-                  tags.length === 0
-                ) {
-                  msg += "\n> Pas de tags";
-                }
-                if (title === undefined || title === "") {
-                  msg += "\n> Pas de titre";
-                }
-                if (msg !== "") {
-                  msg =
-                    "Elements incorrects pour l'envoi de votre publication" +
-                    msg;
-                }
-                if (msg !== "") {
-                  alert(msg);
-                } else {
-                  alert("Success");
-                }
+                savePublication(pdfFile,description,tags,title,pdfStream,setSubmitButtonLocked,false)
               }}
             >
               Publier
@@ -249,6 +299,9 @@ function CreatePublicationSummary(props) {
                 marginTop: "20px",
                 borderRadius: 50,
                 marginInline: 2,
+              }}
+              onClick={() => {
+                savePublication(pdfFile,description,tags,title,pdfStream,setSubmitButtonLocked,true)
               }}
             >
               Enregistrer
@@ -290,7 +343,7 @@ function CreatePublicationForm(props) {
   );
 }
 
-function CreatePublicationStepper() {
+function CreatePublicationStepper({preset}) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
@@ -364,13 +417,13 @@ function CreatePublicationStepper() {
         {allStepsCompleted() ? (
           <Box>
             <Typography className={classes.instructions}>
-              All steps completed - you're finished
+              Toutes les étapes sont terminées
             </Typography>
-            <Button onClick={handleReset}>Reset</Button>
+            <Button onClick={handleReset}>Recommencer</Button>
           </Box>
         ) : (
-          <Box  height="100%">
-            {GetStepContent(activeStep)}
+          <Box height="100%">
+            {GetStepContent(activeStep,preset)}
             <Box>
               <Button
                 disabled={activeStep === 0}
@@ -399,8 +452,8 @@ function CreatePublicationStepper() {
                     onClick={handleComplete}
                   >
                     {completedSteps() === totalSteps() - 1
-                      ? "Finish"
-                      : "Complete Step"}
+                      ? "Terminer"
+                      : "Finir l'étape"}
                   </Button>
                 ))}
             </Box>
@@ -415,13 +468,26 @@ function getStepNames() {
   return ["Informations", "Contenu", "Vérification"];
 }
 
-function GetStepContent(step) {
-  const [description, setDescription] = React.useState(RichTextEditor.createEmptyValue())
-  const [title, setTitle] = React.useState("");
+function GetStepContent(step,preset) {
+  let presetDescription = RichTextEditor.createEmptyValue()
+  if(preset!== undefined && preset.content !== undefined) {
+    presetDescription =  RichTextEditor.createValueFromString(preset.content , 'html')
+    descriptionText = presetDescription.toString('html') // Can't edit the rich text area at the moment if the publication is already created
+  }
+  const [description, setDescription] = React.useState(presetDescription);
+  console.log('text : ', descriptionText)
+  const [title, setTitle] = React.useState((preset && preset.title) || "");
   const [numPages, setNumPages] = React.useState(null);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [pdfFile, setPdfFile] = React.useState();
-  const [tags, setTags] = React.useState([]);
+  const [pdfStream, setPdfStream] = React.useState();
+  const presetTags = []
+  if(preset!== undefined && preset.tags!=null){
+    preset.tags.split(',').forEach(str => {
+      presetTags.push({label:str})
+    });
+  }
+  const [tags, setTags] = React.useState(presetTags);
   switch (step) {
     case 0:
       return (
@@ -429,8 +495,8 @@ function GetStepContent(step) {
           form={{
             title: title,
             setTitle: setTitle,
-            tags:tags,
-            setTags:setTags
+            tags: tags,
+            setTags: setTags,
           }}
         />
       );
@@ -439,12 +505,14 @@ function GetStepContent(step) {
         <CreatePublicationContent
           form={{
             numPages: numPages,
-            text:text,
+            text: descriptionText,
             setNumPages: setNumPages,
             pageNumber: pageNumber,
             description: description,
             setDescription: setDescription,
             setPageNumber: setPageNumber,
+            pdfStream: pdfStream,
+            setPdfStream: setPdfStream,
             pdfFile: pdfFile,
             setPdfFile: setPdfFile,
           }}
@@ -454,25 +522,27 @@ function GetStepContent(step) {
       return (
         <CreatePublicationSummary
           form={{
-            text:text,
+            text: descriptionText,
             title: title,
             numPages: numPages,
             pageNumber: pageNumber,
             pdfFile: pdfFile,
+            pdfStream: pdfStream,
+            setPdfStream: setPdfStream,
             description: description,
             setDescription: setDescription,
-            tags:tags
+            tags: tags,
           }}
         />
       );
     default:
-      return "Unknown step";
+      return "Etape inconnue";
   }
 }
 
 function CreatePublicationContent(props) {
   const classes = useStyles();
-  let {description, setDescription} = props.form
+  let { description, setDescription } = props.form;
   return (
     <div>
       <Card className={classes.card}>
@@ -482,10 +552,10 @@ function CreatePublicationContent(props) {
           editorClassName={classes.rte}
           setDescription={setDescription}
           onChange={(e) => {
-            text = e.toString('html')
+            descriptionText = e.toString("html");
           }}
           description={description}
-          value={text}
+          value={descriptionText}
         />
         <AttachmentArea form={props.form} />
       </Card>
@@ -493,10 +563,11 @@ function CreatePublicationContent(props) {
   );
 }
 
-function CreatePublication() {
+function CreatePublication(props) {
+    console.log(props.location.preset)
   return (
     <div className="App">
-      <CreatePublicationStepper />
+      <CreatePublicationStepper preset={props.location.preset}/>
     </div>
   );
 }

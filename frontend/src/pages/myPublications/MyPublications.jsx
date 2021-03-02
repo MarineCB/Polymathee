@@ -1,9 +1,13 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-
-import { Button, Card, Grid, Box, List } from "@material-ui/core";
+import { useEffect } from "react";
+import { Button, Card, Grid, List, CircularProgress } from "@material-ui/core";
 import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import PublicationTile from "../../components/publication/PublicationTile";
+import axios from "axios";
+var PUBLICATION_URL = "http://localhost:8080/api/publications";
+const USER_ID = 2; // TODO : remove for prod
 const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
@@ -27,84 +31,36 @@ const useStyles = makeStyles(() => ({
 }));
 
 function MyPublications() {
+  const [pubs, setPubs] = React.useState([]);
+  const [loaded, setLoaded] = React.useState(false);
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/publications").then((res) => {
+      setPubs(res.data.filter((pub) => pub.userId.id === USER_ID));
+      setLoaded(true)
+    });
+  }, []);
+
   const classes = useStyles();
   return (
     <div className="App">
-      <div className={classes.root}>
-        <Grid
-          direction="column"
-          container
-        >
+      <div >
+        <Grid  direction="column" container>
           {" "}
-          <Card raised >
+          <Card raised>
             <Typography variant="h5" style={{ marginTop: 20 }}>
               Publications
             </Typography>
             <List>
-              <Card className={classes.publicationCard}>
-                <Grid container alignItems="center" item>
-                  <Grid item xs={3}>
-                    <Typography variant="h6">Efrei Formal Modelling</Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography>Sauvegarder un brouillon</Typography>
-                  </Grid>
-                  <Grid
-                    container
-                    justify="flex-end"
-                    alignItems="center"
-                    item
-                    xs={5}
-                  >
-                    <Box
-                      variant="contained"
-                      className={classes.parallelogram}
-                    />
-                    <Box
-                      variant="contained"
-                      className={classes.parallelogram}
-                    />
-                    <Box
-                      variant="contained"
-                      className={classes.parallelogram}
-                    />
-                  </Grid>
-                </Grid>
-              </Card>
-              <Card className={classes.publicationCard}>
-                <Grid container alignItems="center" item>
-                  <Grid item xs={3}>
-                    <Typography variant="h6">DevOps</Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography>Sauvegarder un brouillon</Typography>
-                  </Grid>
-                  <Grid
-                    container
-                    justify="flex-end"
-                    alignItems="center"
-                    item
-                    xs={5}
-                  >
-                    <Box
-                      variant="contained"
-                      className={classes.parallelogram}
-                    />
-                    <Box
-                      variant="contained"
-                      className={classes.parallelogram}
-                    />
-                    <Box
-                      variant="contained"
-                      className={classes.parallelogram}
-                    />
-                  </Grid>
-                </Grid>
-              </Card>
+            {!loaded? <CircularProgress color="primary" size={100} /> : <div></div>}
+              {pubs.map((publication) => (
+                <PublicationTile data={publication} />
+              ))}
             </List>
           </Card>
           <Card raised style={{ marginTop: "30px" }}>
-            <Typography variant="h5" style={{ marginTop: 20 }}>Favoris</Typography>
+            <Typography variant="h5" style={{ marginTop: 20 }}>
+              Favoris
+            </Typography>
             <List>
               <Card className={classes.publicationCard}>
                 <Grid alignItems="center" container item>
