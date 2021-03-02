@@ -44,11 +44,9 @@ function Homepage() {
   const [users, setUsers] = React.useState([]);
 
   const loadPublications = useCallback(() => {
-    axios
-    .get("api/publications")
-    .then((res) => {
+    axios.get("api/publications").then((res) => {
       setPublications(res.data);
-    })
+    });
   }, []);
 
   useEffect(() => {
@@ -90,29 +88,31 @@ function Homepage() {
         )}
         <Slide direction="right" in={open} mountOnEnter unmountOnExit>
           <Card style={{ height: "70vh", overflow: "auto" }} elevation={2}>
-            <TagsArea
-              tags={tags}
-              setTags={setTags}
-              tagSize="small"
-              label="Filtrer par tag"
-            />
-            <Divider />
-            <TagsArea
-              tags={users}
-              setTags={setUsers}
-              tagSize="small"
-              label="Filtrer par utilisateur"
-            />
-            <Divider />
-            <Box>
-              <Button variant="contained" color="secondary">
-                Rechercher
-              </Button>
-            </Box>
+                <TagsArea
+                  tags={tags}
+                  setTags={setTags}
+                  tagSize="small"
+                  label="Filtrer par tag"
+                />
+                <br/>
+                <Divider />
+                <TagsArea
+                  tags={users}
+                  setTags={setUsers}
+                  tagSize="small"
+                  label="Filtrer par utilisateur"
+                />
+                <br/>
+                <Divider />
+              <Box my={4}>
+                <Button variant="contained" color="secondary">
+                  Chercher
+                </Button>
+              </Box>
           </Card>
         </Slide>
       </Box>
-      <Box flexGrow={1} maxWidth="60%" id="test">
+      <Box flexGrow={1} maxWidth="60%">
         <PublicationList publications={publications} />
       </Box>
     </Grid>
