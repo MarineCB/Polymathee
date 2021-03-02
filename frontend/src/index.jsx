@@ -12,11 +12,12 @@ axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
 
 
 ReactDOM.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Router>
       <App/>
     </Router>
-  </React.StrictMode>,
+ // </React.StrictMode>,
+  ,
   document.getElementById('root')
 );
 
