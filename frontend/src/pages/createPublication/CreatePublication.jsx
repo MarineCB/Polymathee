@@ -426,19 +426,21 @@ function CreatePublicationStepper({preset}) {
             {GetStepContent(activeStep,preset)}
             <Box>
               <Button
+                style={{marginInline:'10px'}}
                 disabled={activeStep === 0}
                 onClick={handleBack}
                 className={classes.button}
               >
-                Back
+                Retour
               </Button>
               <Button
+                style={{marginInline:'10px'}}
                 variant="contained"
                 color="primary"
                 onClick={handleNext}
                 className={classes.button}
               >
-                Next
+                Suivant
               </Button>
               {activeStep !== steps.length &&
                 (completed[activeStep] ? (
@@ -446,15 +448,16 @@ function CreatePublicationStepper({preset}) {
                     Step {activeStep + 1} already completed
                   </Typography>
                 ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleComplete}
-                  >
-                    {completedSteps() === totalSteps() - 1
-                      ? "Terminer"
-                      : "Finir l'étape"}
-                  </Button>
+                  <div/>
+                  // <Button
+                  //   variant="contained"
+                  //   color="primary"
+                  //   onClick={handleComplete}
+                  // >
+                  //   {completedSteps() === totalSteps() - 1
+                  //     ? "Terminer"
+                  //     : "Finir l'étape"}
+                  // </Button>
                 ))}
             </Box>
           </Box>
