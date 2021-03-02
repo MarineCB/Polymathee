@@ -40,7 +40,10 @@ public class AWSServiceImpl implements AWSService {
             final File file = convertMultiPartFileToFile(multipartFile);
             uploadFileToS3Bucket(bucketName, file);
             LOGGER.info("File upload is completed.");
-            file.delete();  // To remove the file locally created in the project folder.
+
+
+            // file.delete();  // To remove the file locally created in the project folder. //Théo
+
         } catch (final AmazonServiceException ex) {
             LOGGER.info("File upload is failed.");
             LOGGER.error("Error= {} while uploading file.", ex.getMessage());

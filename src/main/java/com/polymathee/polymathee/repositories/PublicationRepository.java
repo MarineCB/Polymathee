@@ -2,7 +2,9 @@ package com.polymathee.polymathee.repositories;
 
 import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dao.User;
+
 import com.polymathee.polymathee.enums.StateEnum;
+
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -15,6 +17,7 @@ import java.util.List;
 public interface PublicationRepository extends CrudRepository<Publication, Integer>, JpaSpecificationExecutor<Publication> {
 
     List<Publication> findAll();
+
 
     @Query("SELECT p FROM Publication p ORDER BY p.date DESC")
     List<Publication> GetPublicationDESCDate();
