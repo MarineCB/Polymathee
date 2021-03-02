@@ -10,6 +10,7 @@ import {
   List,
   Grid,
 } from "@material-ui/core";
+import { Favorite, GetApp } from "@material-ui/icons";
 import Tag from "../tag/Tag";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -87,8 +88,35 @@ function PublicationList({ publications }) {
             >
               {publication.userId.name}
               <Box>
+                <Grid
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="center"
+                >
+                  <Favorite />
+                  {publication.likeNumber}
+                </Grid>
+              </Box>
+              <Box>
+                <Grid
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="center"
+                >
+                  <GetApp />
+                  {publication.downloadNumber}
+                </Grid>
+              </Box>
+              <Box>
                 {tags.map((t, index) => (
-                  <Tag key={`${t}${index}`} label={t} tagSize="small" />
+                  <Tag
+                    key={`${t}${index}`}
+                    label={t}
+                    tagSize="small"
+                    variant="default"
+                  />
                 ))}
               </Box>
             </Grid>

@@ -44,7 +44,7 @@ function Homepage() {
   const [users, setUsers] = React.useState([]);
 
   const loadPublications = useCallback(() => {
-    axios.get("api/publications").then((res) => {
+    axios.get("api/publications/%7Bstatus%7D?status=Published").then((res) => {
       setPublications(res.data);
     });
   }, []);
@@ -104,7 +104,7 @@ function Homepage() {
                 />
                 <br/>
                 <Divider />
-              <Box my={4}>
+              <Box my={4} textAlign="center">
                 <Button variant="contained" color="secondary">
                   Chercher
                 </Button>
