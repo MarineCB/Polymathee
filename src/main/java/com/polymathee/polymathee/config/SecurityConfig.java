@@ -33,21 +33,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure( HttpSecurity http ) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/oauth2/**", "/login/**").permitAll()
+    protected void configure( HttpSecurity httpSecurity ) throws Exception {
+        httpSecurity
+                .antMatcher("/**").authorizeRequests()
+                .antMatchers("/").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .oauth2Login()
                 .authorizationEndpoint()
                 .authorizationRequestRepository( new InMemoryRequestRepository() )
             .and()
-                .successHandler( this::successHandler)
-            .and()
-            .exceptionHandling()
-            .authenticationEntryPoint( this::authenticationEntryPoint);
+                .successHandler( this::successHandler);
 
-        http.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
@@ -69,12 +67,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         response.getWriter().write(
                 mapper.writeValueAsString( Collections.singletonMap("accessToken", token))
         );
-    }
-
-    private void authenticationEntryPoint(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException authException) throws IOException {
-
-        response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
-        response.getWriter().write( mapper.writeValueAsString(Collections.singletonMap("error", "Unauthenticated")));
     }
 }
