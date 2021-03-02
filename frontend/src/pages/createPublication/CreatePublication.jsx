@@ -47,12 +47,12 @@ const useStyles = makeStyles((theme) => ({
 
 function TagsCard(props) {
   let { tags, setTags } = props;
-  const [ setText] = React.useState("");
+  const [tagText,setTagText] = React.useState("");
   const handleKeyPress = (data) => {
     if (data.event.key === "Enter") {
       if (data.text !== "") {
         setTags([...tags, { label: data.text }]);
-        setText("");
+        setTagText("");
       }
     }
   };
@@ -82,11 +82,11 @@ function TagsCard(props) {
           variant="outlined"
           label="Ajouter un nouveau tag"
           inputProps={{ maxLength: 20 }} // we don't want the tags to be too long
-          value={text}
+          value={tagText}
           onChange={(event) => {
-            setText(event.target.value);
+            setTagText(event.target.value);
           }}
-          onKeyPress={(e) => handleKeyPress({ event: e, text: text })}
+          onKeyPress={(e) => handleKeyPress({ event: e, text: tagText })}
           InputProps={{
             startAdornment: <InputAdornment position="start">+</InputAdornment>,
           }}
@@ -115,6 +115,7 @@ function AttachmentArea(props) {
   const [, setSize] = React.useState(12);
   return (
     <div>
+      <div>
       {pdfFile !== undefined && (
         <Box display="flex" justifyContent="center">
           <Box mr={2} alignContent="flex-end">
@@ -167,6 +168,7 @@ function AttachmentArea(props) {
           acceptedFiles={["application/pdf"]}
         />
       )}
+      </div>
     </div>
   );
 }
