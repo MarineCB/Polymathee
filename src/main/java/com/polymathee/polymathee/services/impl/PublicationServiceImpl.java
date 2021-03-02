@@ -3,6 +3,7 @@ package com.polymathee.polymathee.services.impl;
 import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dao.User;
 import com.polymathee.polymathee.dto.PublicationDto;
+import com.polymathee.polymathee.enums.StateEnum;
 import com.polymathee.polymathee.repositories.PublicationRepository;
 import com.polymathee.polymathee.repositories.UserRepository;
 import com.polymathee.polymathee.rsql.CustomRsqlVisitor;
@@ -35,6 +36,11 @@ public class PublicationServiceImpl implements PublicationService {
     @Override
     public List<Publication> getPublicationsByUserId(Integer id){
         return publicationRepository.findPublicationByIdUser(id);
+    }
+
+    @Override
+    public Publication getPublicationsById(Integer id){
+        return publicationRepository.findPublicationById(id);
     }
 
     @Override
@@ -75,5 +81,20 @@ public class PublicationServiceImpl implements PublicationService {
 
         publicationRepository.deleteById(id);
 
+    }
+
+    @Override
+    public List<Publication> getPublicationsByStatus(StateEnum status){
+        return publicationRepository.findPublicationByStatus(status);
+    }
+
+    @Override
+    public List<Publication> getDESCLikeNumber(){
+        return publicationRepository.GetPublicationDESCLikeNumber();
+    }
+
+    @Override
+    public List<Publication> getDESCDate(){
+        return publicationRepository.GetPublicationDESCDate();
     }
 }
