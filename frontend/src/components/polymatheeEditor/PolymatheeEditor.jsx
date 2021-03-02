@@ -9,7 +9,6 @@ function PolymatheeEditor(props) {
     let onChange = props.onChange
     
       useEffect(() => {
-          console.log("Changing with", props.value)
         setDescription(RichTextEditor.createValueFromString(props.value , 'html'))
       }, [])
     
