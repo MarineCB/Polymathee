@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import { withRouter } from "react-router-dom";
 import {
   Box,
@@ -10,6 +11,7 @@ import {
   Button,
   Divider,
 } from "@material-ui/core";
+import { useCallback, useEffect } from "react";
 
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
@@ -37,10 +39,19 @@ function Homepage() {
     setOpen(false);
   };
 
-  const publications = [];
-
+  const [publications, setPublications] = React.useState([]);
   const [tags, setTags] = React.useState([]);
   const [users, setUsers] = React.useState([]);
+
+  const loadPublications = useCallback(() => {
+    axios.get("api/publications/%7Bstatus%7D?status=Published").then((res) => {
+      setPublications(res.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    loadPublications();
+  }, [loadPublications]);
 
   return (
     <Grid style={{ maxHeight: "10vh" }} container justify="center">
@@ -77,29 +88,31 @@ function Homepage() {
         )}
         <Slide direction="right" in={open} mountOnEnter unmountOnExit>
           <Card style={{ height: "70vh", overflow: "auto" }} elevation={2}>
-            <TagsArea
-              tags={tags}
-              setTags={setTags}
-              tagSize="small"
-              label="Filtrer par tag"
-            />
-            <Divider />
-            <TagsArea
-              tags={users}
-              setTags={setUsers}
-              tagSize="small"
-              label="Filtrer par utilisateur"
-            />
-            <Divider />
-            <Box>
-              <Button variant="contained" color="secondary">
-                Rechercher
-              </Button>
-            </Box>
+                <TagsArea
+                  tags={tags}
+                  setTags={setTags}
+                  tagSize="small"
+                  label="Filtrer par tag"
+                />
+                <br/>
+                <Divider />
+                <TagsArea
+                  tags={users}
+                  setTags={setUsers}
+                  tagSize="small"
+                  label="Filtrer par utilisateur"
+                />
+                <br/>
+                <Divider />
+              <Box my={4} textAlign="center">
+                <Button variant="contained" color="secondary">
+                  Chercher
+                </Button>
+              </Box>
           </Card>
         </Slide>
       </Box>
-      <Box maxWidth="70%">
+      <Box flexGrow={1} maxWidth="60%">
         <PublicationList publications={publications} />
       </Box>
     </Grid>
