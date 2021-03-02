@@ -21,7 +21,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Tag from "../../components/tag/Tag";
 import PolymatheeEditor from "../../components/polymatheeEditor/PolymatheeEditor";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-let text = "first text"
+let text = ""
 const useStyles = makeStyles((theme) => ({
   center: {
     display: "flex",
@@ -47,12 +47,12 @@ const useStyles = makeStyles((theme) => ({
 
 function TagsCard(props) {
   let { tags, setTags } = props;
-  const [setText] = React.useState("");
+  const [tagText,setTagText] = React.useState("");
   const handleKeyPress = (data) => {
     if (data.event.key === "Enter") {
       if (data.text !== "") {
         setTags([...tags, { label: data.text }]);
-        setText("");
+        setTagText("");
       }
     }
   };
@@ -82,11 +82,11 @@ function TagsCard(props) {
           variant="outlined"
           label="Ajouter un nouveau tag"
           inputProps={{ maxLength: 20 }} // we don't want the tags to be too long
-          value={text}
+          value={tagText}
           onChange={(event) => {
-            setText(event.target.value);
+            setTagText(event.target.value);
           }}
-          onKeyPress={(e) => handleKeyPress({ event: e, text: text })}
+          onKeyPress={(e) => handleKeyPress({ event: e, text: tagText })}
           InputProps={{
             startAdornment: <InputAdornment position="start">+</InputAdornment>,
           }}
@@ -227,7 +227,7 @@ function CreatePublicationSummary(props) {
                 ) {
                   msg += "\n> Pas de tags";
                 }
-                if (title === undefined) {
+                if (title === undefined || title === "") {
                   msg += "\n> Pas de titre";
                 }
                 if (msg !== "") {
