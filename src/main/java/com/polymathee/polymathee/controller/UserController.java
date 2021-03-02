@@ -16,7 +16,7 @@ import java.util.List;
 @SwaggerDefinition(tags = {@Tag(name = "/api",description = "Api Polymathee")})
 public class UserController {
 
-    private static final String GET_USERS = "/api/users";
+    private static final String GET_USERS = "/auth/users";
     private static final String GET_USER_ID = "/api/user/{id}";
     private static final String GET_USER_BY_EMAIL = "/api/user/{email}";
     private static final String DELETE_USER = "/api/users/{userId}";
