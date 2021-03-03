@@ -1,15 +1,14 @@
 package com.polymathee.polymathee.repositories;
 
 import com.polymathee.polymathee.dao.Publication;
-import com.polymathee.polymathee.dao.User;
 
 import com.polymathee.polymathee.enums.StateEnum;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
+import javax.swing.plaf.nimbus.State;
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -33,6 +32,20 @@ public interface PublicationRepository extends CrudRepository<Publication, Integ
     List<Publication> findPublicationByIdUser(Integer id);
 
     List<Publication> findPublicationByStatus(StateEnum Status);
+
+    @Query("SELECT s FROM Publication s WHERE s.tags LIKE :tag AND s.status = 'Published'")
+    List<Publication> findPubliByTagAndStatus(String tag);
+
+    @Query("SELECT s FROM Publication s LEFT JOIN User u ON s.userId.id = u.id WHERE u.name LIKE :name AND s.status = 'Published'")
+    List<Publication> findPubliByUserIdAndStatus(String name);
+
+    List<Publication> findAllByStatus(StateEnum status);
+
+
+
+
+
+
 
 
 

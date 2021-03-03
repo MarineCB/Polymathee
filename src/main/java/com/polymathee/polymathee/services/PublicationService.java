@@ -3,6 +3,7 @@ package com.polymathee.polymathee.services;
 import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dto.PublicationDto;
 
+import com.polymathee.polymathee.dto.PublicationUpdateDto;
 import com.polymathee.polymathee.enums.StateEnum;
 
 
@@ -20,5 +21,9 @@ public interface PublicationService {
     List<Publication> getPublicationsByStatus(StateEnum status);
     List<Publication> getDESCLikeNumber();
     List<Publication> getDESCDate();
+    List<Publication> getPubliTagUser(String tag, String id);
+    Publication updatePublicationById(Integer id, PublicationUpdateDto publication);
+    Publication updatePubicationPublished(Integer id,StateEnum status);
+    List<String> getAllTags();
 
 }
