@@ -6,7 +6,6 @@ import com.polymathee.polymathee.dao.User;
 import com.polymathee.polymathee.dto.CommentInteractionDto;
 import com.polymathee.polymathee.repositories.CommentInteractionRepository;
 import com.polymathee.polymathee.repositories.CommentaryRepository;
-import com.polymathee.polymathee.repositories.LikeTableRepository;
 import com.polymathee.polymathee.repositories.UserRepository;
 import com.polymathee.polymathee.services.CommentaryInteractionService;
 import org.springframework.beans.factory.annotation.Autowired;

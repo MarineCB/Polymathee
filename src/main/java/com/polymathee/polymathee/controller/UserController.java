@@ -1,32 +1,15 @@
 package com.polymathee.polymathee.controller;
 
 import com.polymathee.polymathee.dao.*;
-import com.polymathee.polymathee.dto.CommentInteractionDto;
-import com.polymathee.polymathee.dto.CommentaryDto;
-import com.polymathee.polymathee.dto.LikeTableDto;
-import com.polymathee.polymathee.dto.PublicationDto;
-import com.polymathee.polymathee.enums.StateEnum;
 import com.polymathee.polymathee.services.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Controller
