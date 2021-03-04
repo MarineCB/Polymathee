@@ -31,8 +31,6 @@ public class AWSServiceImpl implements AWSService {
 
 
     @Override
-    // @Async annotation ensures that the method is executed in a different background thread
-    // but not consume the main thread.
     @Async
     public void uploadFile(final MultipartFile multipartFile) {
         LOGGER.info("File upload in progress.");
@@ -40,7 +38,6 @@ public class AWSServiceImpl implements AWSService {
             final File file = convertMultiPartFileToFile(multipartFile);
             uploadFileToS3Bucket(bucketName, file);
             LOGGER.info("File upload is completed.");
-
 
             // file.delete();  // To remove the file locally created in the project folder. //Théo
 
@@ -67,8 +64,6 @@ public class AWSServiceImpl implements AWSService {
         amazonS3.putObject(putObjectRequest);
     }
 
-
-
     public byte[] downloadFile(String fileName) {
         byte[] content = new byte[0];
         S3Object s3Object = amazonS3.getObject(bucketName, fileName);
@@ -79,7 +74,6 @@ public class AWSServiceImpl implements AWSService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return content;
     }
 }

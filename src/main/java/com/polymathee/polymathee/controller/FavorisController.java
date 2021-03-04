@@ -18,20 +18,32 @@ import java.util.List;
 @SwaggerDefinition(tags = {@Tag(name = "/api",description = "Api Favoris")})
 public class FavorisController {
 
+    private static final String GET_LIKES = "/api/favoris";
     private static final String GET_FAVORIS_BY_ID_USER = "/api/favoris/{id}";
     private static final String POST_FAVORIS = "/api/favoris";
     private static final String DELETE_FAVORIS ="/api/favoris/{userId}/{publicationId}";
-    private static final String GET_LIKES = "/api/favoris";
+
 
     @Autowired
     private LikeTableService likeService;
 
+    //GETS
+
     @GetMapping(GET_FAVORIS_BY_ID_USER)
     @ApiOperation(value = "Get favoris by User Id", consumes = "application/json")
-    public ResponseEntity<List<LikeTable>> getAllLikeByUserId(@PathVariable Integer id) {
+    public ResponseEntity<List<LikeTable>> getAllLikeByUserId(@RequestParam("id") Integer id) {
         List<LikeTable> likelist = likeService.getFavorisByUserId(id);
         return new ResponseEntity<>(likelist, HttpStatus.OK);
     }
+
+    @GetMapping(GET_LIKES)
+    @ApiOperation(value = "Get all favoris", consumes = "application/json")
+    public ResponseEntity<List<LikeTable>> AllLike() {
+        List<LikeTable> likelist = likeService.getLikeTable();
+        return new ResponseEntity<>(likelist, HttpStatus.OK);
+    }
+
+    //POSTS
 
     @PostMapping(POST_FAVORIS)
     @ApiOperation(value = "Post favoris", consumes = "application/json")
@@ -40,17 +52,12 @@ public class FavorisController {
         return new ResponseEntity<>(liketable, HttpStatus.OK);
     }
 
+    //DELETES
+
     @DeleteMapping(DELETE_FAVORIS)
     @ApiOperation(value = "Delete favoris", consumes = "application/json")
-    public void deleteFavoris(@PathVariable("userId") int UserId,
-        @PathVariable("publicationId") int PublicationId ) {
+    public void deleteFavoris(@RequestParam("userId") int UserId,
+        @RequestParam("publicationId") int PublicationId ) {
         likeService.deleteLikeTable(PublicationId);
-    }
-
-    @GetMapping(GET_LIKES)
-    @ApiOperation(value = "Get all favoris", consumes = "application/json")
-    public ResponseEntity<List<LikeTable>> AllLike() {
-        List<LikeTable> likelist = likeService.getLikeTable();
-        return new ResponseEntity<>(likelist, HttpStatus.OK);
     }
 }

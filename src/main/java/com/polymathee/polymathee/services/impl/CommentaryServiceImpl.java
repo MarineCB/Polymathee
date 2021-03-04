@@ -8,7 +8,6 @@ import com.polymathee.polymathee.repositories.CommentaryRepository;
 import com.polymathee.polymathee.repositories.PublicationRepository;
 import com.polymathee.polymathee.repositories.UserRepository;
 import com.polymathee.polymathee.services.CommentaryService;
-import com.polymathee.polymathee.services.PublicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,17 +57,11 @@ public class CommentaryServiceImpl implements CommentaryService {
 
     @Override
     public void deleteComment(int comment){
-
         commentaryRepository.deleteComment(comment);
-
     }
 
     @Override
     public void DeleteCommentById(int id){
-
         commentaryRepository.deleteById(id);
-
     }
-
-
 }

@@ -1,7 +1,5 @@
 package com.polymathee.polymathee.dao;
-
 import lombok.Data;
-
 import javax.persistence.*;
 
 @Data
