@@ -69,14 +69,14 @@ public class PublicationController {
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-    @GetMapping(GET_PUBLICATION)
+    /*@GetMapping(GET_PUBLICATION)
     @ApiOperation(value = "Get Publications Filter", consumes = "application/json")
     public ResponseEntity<List<Publication>> getAllPublication(Filter publicationFilter)
             throws UnsupportedEncodingException {
         String filter = URLDecoder.decode(publicationFilter.getFilter(), "utf-8");
         List<Publication> publiList = publicationService.getPublicationsFilter(filter);
         return new ResponseEntity<>(publiList, HttpStatus.OK);
-    }
+    }*/
 
 
     @GetMapping(GET_PUBLICATIONS_BY_ID)
@@ -89,7 +89,7 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_ID_USER)
     @ApiOperation(value = "Get Publication by User ID", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublicationsById(@PathVariable Integer id) {
+    public ResponseEntity<List<Publication>> getAllPublicationsById(@RequestParam Integer id) {
         List<Publication> publiList = publicationService.getPublicationsByUserId(id);
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
@@ -141,7 +141,7 @@ public class PublicationController {
 
     @PutMapping(PUT_PUBLICATION)
     @ApiOperation(value = "Put publication", consumes = "application/json")
-    public ResponseEntity<Publication> updatePubli(@PathVariable("publiId") Integer id,
+    public ResponseEntity<Publication> updatePubli(@RequestParam("publiId") Integer id,
            @RequestBody PublicationUpdateDto publi){
         Publication updatedPublication = publicationService.updatePublicationById(id, publi);
         return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
@@ -157,7 +157,7 @@ public class PublicationController {
 
     @DeleteMapping(DELETE_PUBLICATION)
     @ApiOperation(value = "Delete publication by ID", consumes = "application/json")
-    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") int PubliId) {
+    public ResponseEntity<Boolean> deletePubli(@RequestParam("publiId") int PubliId) {
         commentaryService.deleteComment(PubliId);
         likeService.deleteLikeTable(PubliId);
         publicationService.deletePubli(PubliId);

@@ -40,6 +40,8 @@ public class UserController {
     @Autowired
     private UsersService usersService;
 
+    //GETS
+
     @GetMapping(GET_USERS)
     @ApiOperation(value = "Get all Users", consumes = "application/json")
     public ResponseEntity<List<User>> getUsers() {
@@ -49,14 +51,16 @@ public class UserController {
 
     @GetMapping(GET_USER_ID)
     @ApiOperation(value = "Get User by ID", consumes = "application/json")
-    public ResponseEntity<User> getUserByID(@PathVariable Integer id) {
+    public ResponseEntity<User> getUserByID(@RequestParam("id") Integer id) {
         User user = usersService.getUserByID(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    //DELETES
+
     @DeleteMapping(DELETE_USER)
     @ApiOperation(value = "Delete User by ID", consumes = "application/json")
-    public ResponseEntity<Boolean> deleteUser(@PathVariable("userId") int userId ) {
+    public ResponseEntity<Boolean> deleteUser(@RequestParam("userId") int userId ) {
         usersService.DeleteUserById(userId);
         return new ResponseEntity<>(true, HttpStatus.OK);
     }

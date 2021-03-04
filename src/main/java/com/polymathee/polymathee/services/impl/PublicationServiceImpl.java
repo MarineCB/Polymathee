@@ -79,9 +79,7 @@ public class PublicationServiceImpl implements PublicationService {
 
     @Override
     public void deletePubli(int id ){
-
         publicationRepository.deleteById(id);
-
     }
 
 
@@ -114,9 +112,7 @@ public class PublicationServiceImpl implements PublicationService {
         }
 
         finalTagList = removeDuplicates(resultTagList);
-
         return finalTagList;
-
     }
 
 
@@ -152,7 +148,6 @@ public class PublicationServiceImpl implements PublicationService {
         }
 
         publiTagList2.addAll(publiUserList2);
-
         return new ArrayList<>(removeDuplicates(publiTagList2));
     }
 
@@ -195,14 +190,11 @@ public class PublicationServiceImpl implements PublicationService {
         return strArray;
     }
 
-    public <T> List<T> removeDuplicates(List<T> list)
-    {
+    public <T> List<T> removeDuplicates(List<T> list) {
         List<T> newList = new ArrayList<T>();
 
         for (T publication : list) {
-
             if (!newList.contains(publication)) {
-
                 newList.add(publication);
             }
         }

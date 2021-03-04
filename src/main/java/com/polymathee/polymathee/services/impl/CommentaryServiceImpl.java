@@ -58,17 +58,11 @@ public class CommentaryServiceImpl implements CommentaryService {
 
     @Override
     public void deleteComment(int comment){
-
         commentaryRepository.deleteComment(comment);
-
     }
 
     @Override
     public void DeleteCommentById(int id){
-
         commentaryRepository.deleteById(id);
-
     }
-
-
 }
