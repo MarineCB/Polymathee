@@ -1,8 +1,5 @@
 package com.polymathee.polymathee.dao;
-
-import com.polymathee.polymathee.enums.StateEnum;
 import lombok.Data;
-
 import javax.persistence.*;
 import java.util.Date;
 

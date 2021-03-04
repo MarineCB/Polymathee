@@ -1,15 +1,11 @@
 package com.polymathee.polymathee.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.polymathee.polymathee.dao.User;
 import com.polymathee.polymathee.enums.StateEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.sql.Date;
 

@@ -9,10 +9,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -25,17 +22,11 @@ public class FileController {
     @Autowired
     private AWSService awsService;
 
-    @PostMapping(UPLOAD_FILE)
-    @ApiOperation(value = "Post PDF file", consumes = "application/pdf")
-    public ResponseEntity<String> uploadFile(@RequestPart(value = "file") final MultipartFile multipartFile) {
-        awsService.uploadFile(multipartFile);
-        final String response = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //GETS
 
     @GetMapping(GET_FILE)
     @ApiOperation(value = "Download PDF file", consumes = "application/pdf")
-    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable String fileName) {
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam("fileName") String fileName) {
         byte[] data = awsService.downloadFile(fileName);
         ByteArrayResource resource = new ByteArrayResource(data);
         return ResponseEntity
@@ -44,5 +35,15 @@ public class FileController {
                 .header("Content-type", "application/octet-stream")
                 .header("Content-disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(resource);
+    }
+
+    //POSTS
+
+    @PostMapping(UPLOAD_FILE)
+    @ApiOperation(value = "Post PDF file", consumes = "application/pdf")
+    public ResponseEntity<String> uploadFile(@RequestPart(value = "file") final MultipartFile multipartFile) {
+        awsService.uploadFile(multipartFile);
+        final String response = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
