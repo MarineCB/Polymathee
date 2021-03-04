@@ -1,16 +1,10 @@
 package com.polymathee.polymathee.controller;
 
-import com.polymathee.polymathee.dao.CommentInteraction;
-import com.polymathee.polymathee.dao.Filter;
-import com.polymathee.polymathee.dao.LikeTable;
-import com.polymathee.polymathee.dao.Publication;
-import com.polymathee.polymathee.dto.CommentInteractionDto;
-import com.polymathee.polymathee.dto.PublicationDto;
 
+import com.polymathee.polymathee.dao.Publication;
+import com.polymathee.polymathee.dto.PublicationDto;
 import com.polymathee.polymathee.dto.PublicationUpdateDto;
 import com.polymathee.polymathee.enums.StateEnum;
-
-import com.polymathee.polymathee.services.CommentaryInteractionService;
 import com.polymathee.polymathee.services.CommentaryService;
 import com.polymathee.polymathee.services.LikeTableService;
 import com.polymathee.polymathee.services.PublicationService;
@@ -22,11 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @SwaggerDefinition(tags = {@Tag(name = "/api",description = "Api Publication")})

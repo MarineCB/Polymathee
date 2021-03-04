@@ -1,6 +1,5 @@
 package com.polymathee.polymathee.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.polymathee.polymathee.enums.RoleEnum;
