@@ -23,7 +23,4 @@ public class PublicationUpdateDto {
     private String file;
     @JsonProperty("publication_tags")
     private String tags;
-    @JsonIgnore
-    @JsonProperty("publication_date")
-    private Date date;
 }
