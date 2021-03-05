@@ -42,9 +42,10 @@ public class FavorisController {
 
     @DeleteMapping(DELETE_FAVORIS)
     @ApiOperation(value = "Delete favoris", consumes = "application/json")
-    public void deleteFavoris(@PathVariable("userId") int UserId,
+    public ResponseEntity<Boolean> deleteFavoris(@PathVariable("userId") int UserId,
         @PathVariable("publicationId") int PublicationId ) {
         likeService.deleteLikeTable(PublicationId);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
     @GetMapping(GET_LIKES)

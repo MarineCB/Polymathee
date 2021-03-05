@@ -485,6 +485,7 @@ function CreatePublicationContent(props) {
           setDescription={setDescription}
           onChange={(e) => {
             text = e.toString('html')
+            console.log(text)
           }}
           description={description}
           value={text}

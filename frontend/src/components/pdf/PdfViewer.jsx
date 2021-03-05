@@ -74,7 +74,7 @@ function PdfViewer({pdfFile,height}) {
         </Document>
       </Grid>
       
-      <Box p={2} item>
+      <Box p={2}>
         <Button onClick={previousPage} disabled={isFirstPage()}>Previous</Button>
         <Button onClick={nextPage} disabled={isLastPage()}>Next</Button>
         <Chip label={`Page ${pageNumber} / ${numPages}`}></Chip>

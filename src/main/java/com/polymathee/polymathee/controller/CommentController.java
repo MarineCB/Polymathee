@@ -25,7 +25,7 @@ public class CommentController {
     private static final String GET_COMMENTARIES = "/api/comments";
     private static final String GET_COMMENTS_BY_ID_PUBLICATION = "/api/comments/{id}";
     private static final String POST_COMMENTARY ="/api/commentary";
-    private static final String DELETE_COMMENTARY ="/api/comment/{commentId)";
+    private static final String DELETE_COMMENTARY ="/api/comment/{commentId}";
     private static final String POST_VOTE = "/api/vote";
 
     @Autowired
