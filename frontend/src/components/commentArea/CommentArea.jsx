@@ -167,9 +167,10 @@ function CommentArea({ publicationId, userId }) {
             </Grid>
             <List>
               {comments.sort(upvoteSort).map((curCommentData, index) => (
-                <div>
+                <div
+                key={curCommentData.id+"-"+userId}
+                >
                   <Comment
-                    key={curCommentData.id}
                     comment={curCommentData}
                     loadComments={loadComments}
                     publicationId={publicationId}

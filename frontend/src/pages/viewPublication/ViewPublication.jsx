@@ -21,7 +21,6 @@ import {
   Favorite,
   SaveAlt,
   MoreVert,
-  ArrowUpward,
   FavoriteBorderOutlined,
 } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
@@ -46,7 +45,6 @@ const useStyles = makeStyles(() => ({
 let MOCK_PUBLICATION_ID = 11; // TODO : REPLACE BY REAL VALUE
 let MOCK_USER_ID = 2; // TODO : REPLACE BY REAL VALUE
 function PublicationTags({ publication }) {
-  console.log(publication);
   return (
     <div>
       <Grid item>
@@ -63,22 +61,7 @@ function PublicationTags({ publication }) {
   );
 }
 
-function upvotePublication(publication, userId, setUpvoteButtonDisabled) {
-  const PUT_PUBLICATION_URL = "api/publication/"+publication.id
-  axios.put(PUT_PUBLICATION_URL,{
-    publication_content: publication.content,
-    publication_file: publication.file,
-    publication_tags: publication.tags,
-    publication_title: publication.title,
-    likeNumber: parseInt(publication.likeNumber +1),
-  })
-  .then(res =>{
-    setUpvoteButtonDisabled(true)
-  }).catch(e => {
-    console.error(e)
-    alert('upvote publication fail')
-  })
-}
+
 
 function reportPublication(publication, userId, setReportButtonDisabled) {
   const PUT_PUBLICATION_URL = "api/publication/"+publication.id
@@ -101,7 +84,6 @@ function reportPublication(publication, userId, setReportButtonDisabled) {
 function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
   const classes = useStyles();
   const [downloadEnabled, setDownloadEnabled] = React.useState(true);
-  const [upvoteButtonDisabled, setUpvoteButtonDisabled] = React.useState(false)
   const link = document.createElement("a");
   return (
     <div>
@@ -127,18 +109,7 @@ function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
       >
         Télécharger
       </Button>
-      <Button
-        color="secondary"
-        variant="contained"
-        className={classes.button}
-        startIcon={<ArrowUpward />}
-        disabled={upvoteButtonDisabled}
-        onClick={() =>{
-          upvotePublication(publication,MOCK_USER_ID,setUpvoteButtonDisabled)
-        }}
-      >
-        Upvote
-      </Button>
+
     </div>
   );
 }
