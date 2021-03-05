@@ -1,12 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
-import {
-  Box,
-  Grid,
-  TextField,
-  CircularProgress,
-} from "@material-ui/core";
+import { Box, Grid, TextField, CircularProgress } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import Tag from "./Tag";
 
@@ -14,12 +9,12 @@ function CompletionTagsArea(props) {
   let tags = props.tags;
   let setTags = props.setTags;
   // eslint-disable-next-line
-  const [text,setText] = React.useState("");
+  const [text, setText] = React.useState("");
 
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState([]);
   const loading = open && options.length === 0;
-
+  const url = props.url;
   React.useEffect(() => {
     let active = true;
 
@@ -28,17 +23,20 @@ function CompletionTagsArea(props) {
     }
 
     (async () => {
-      const response = await axios.get("api/publication/tags");
+      const response = await axios.get(url);
       const tags = response.data;
       if (active) {
-        setOptions(Object.keys(tags).map((index) => tags[index]));
+        if (url.includes("publication"))
+          setOptions(Object.keys(tags).map((index) => tags[index]));
+        else if (url.includes("user"))
+          setOptions(Object.keys(tags).map((index) => tags[index].name));
       }
     })();
 
     return () => {
       active = false;
     };
-  }, [loading]);
+  }, [loading, url]);
 
   React.useEffect(() => {
     if (!open) {

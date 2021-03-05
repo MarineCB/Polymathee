@@ -21,7 +21,6 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { makeStyles } from "@material-ui/core/styles";
 import PublicationList from "../../components/publication/PublicationList";
 import CompletionTagArea from "../../components/tag/CompletionTagsArea";
-import UserCompletionTagArea from "../../components/user/CompletionUserTagsArea";
 import { PublicationContext } from "../../store/PublicationContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -45,9 +44,19 @@ function Homepage() {
   };
 
   const [Publications, SetPublications] = useContext(PublicationContext);
-  const [tags, setTags] = React.useState([]);
-  const [users, setUsers] = React.useState([]);
+  const [tags, _setTags] = React.useState([]);
+  const [users, _setUsers] = React.useState([]);
   const [order, setOrder] = React.useState("");
+
+  const setTags = (tag) => {
+    console.log(tags.includes(tag))
+    console.log(tag)
+    if (!tags.includes(tag)) _setTags(tag);
+  };
+
+  const setUsers = (user) => {
+    if (!users.includes(user)) _setUsers(user);
+  };
 
   const handleChange = (event) => {
     setOrder(event.target.value);
@@ -127,14 +136,16 @@ function Homepage() {
               setTags={setTags}
               tagSize="small"
               label="Filtrer par tag"
+              url="api/publication/tags"
             />
             <br />
             <Divider />
-            <UserCompletionTagArea
+            <CompletionTagArea
               tags={users}
               setTags={setUsers}
               tagSize="small"
               label="Filtrer par utilisateur"
+              url="api/users"
             />
             <br />
             <Divider />
