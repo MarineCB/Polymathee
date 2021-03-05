@@ -12,12 +12,12 @@ import {
   Divider,
 } from "@material-ui/core";
 import { useCallback, useEffect } from "react";
-
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { makeStyles } from "@material-ui/core/styles";
 import PublicationList from "../../components/publication/PublicationList";
 import TagsArea from "../../components/tag/TagsArea";
+
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -38,11 +38,9 @@ function Homepage() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
   const [publications, setPublications] = React.useState([]);
   const [tags, setTags] = React.useState([]);
   const [users, setUsers] = React.useState([]);
-
   const loadPublications = useCallback(() => {
     axios.get("api/publications/%7Bstatus%7D?status=Published").then((res) => {
       setPublications(res.data);

@@ -10,6 +10,8 @@ import MyPublication from './pages/myPublications/MyPublications'
 import { ThemeProvider } from '@material-ui/styles';
 import { Box, createMuiTheme, CssBaseline } from '@material-ui/core';
 
+import {UserWrapper} from './context/UserContext';
+
 const theme = createMuiTheme({
   palette: {
     light: {
@@ -52,19 +54,25 @@ const theme = createMuiTheme({
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline/>
-      <Box height="100%">
-        <AppBar/>
-        <Switch>
-          <Route exact path='/'component={Homepage}/>
-          <Route exact path='/login'component={Login}/>
-          <Route exact path='/signup'component={Signup}/>
-          <Route exact path='/createPublication'component={CreatePublication}/>
-          <Route exact path='/viewPublication'component={ViewPublication}/>
-          <Route exact path='/myPublications'component={MyPublication}/>
-        </Switch>
-      </Box>
-    </ThemeProvider>
+    <UserWrapper>
+      <ThemeProvider theme={theme}>
+        <CssBaseline/>
+        <Box height="100%">
+          <AppBar/>
+          <Switch>
+            <Route exact path='/'component={Homepage}/>
+            <Route exact path='/login'component={Login}/>
+            <Route exact path='/signup'component={Signup}/>
+            <Route exact path='/createPublication'component={CreatePublication}/>
+            <Route exact path='/viewPublication'component={ViewPublication}/>
+            <Route exact path='/myPublications'component={MyPublication}/>
+            <Route path='/test' component={() => { 
+                    window.location.href = 'https://localhost:8080/login/oauth2/code/google'; 
+                    return null;
+            }}/>
+          </Switch>
+        </Box>
+      </ThemeProvider>
+    </UserWrapper>
   );
 }
