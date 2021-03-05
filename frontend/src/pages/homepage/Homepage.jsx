@@ -56,6 +56,14 @@ function Homepage() {
     if (users.filter(e => e.label === user.label).length === 0) _setUsers([...users,user]);
   };
 
+  const deleteTag = (tag) => {
+    _setTags(tags.filter((ct) => ct.label !== tag))
+  };
+
+  const deleteUser = (user) => {
+    _setUsers(users.filter((ct) => ct.label !== user))
+  };
+
   const handleChange = (event) => {
     setOrder(event.target.value);
     if (event.target.value === "like") {
@@ -135,6 +143,7 @@ function Homepage() {
               tagSize="small"
               label="Filtrer par tag"
               url="api/publication/tags"
+              deleteTags = {deleteTag}
             />
             <br />
             <Divider />
@@ -144,6 +153,7 @@ function Homepage() {
               tagSize="small"
               label="Filtrer par utilisateur"
               url="api/users"
+              deleteTags = {deleteUser}
             />
             <br />
             <Divider />

@@ -8,6 +8,7 @@ import Tag from "./Tag";
 function CompletionTagsArea(props) {
   let tags = props.tags;
   let setTags = props.setTags;
+  let deleteTag = props.deleteTags;
   // eslint-disable-next-line
   const [text, setText] = React.useState("");
 
@@ -53,7 +54,7 @@ function CompletionTagsArea(props) {
             label={t.label}
             tagSize={props.tagSize}
             onDelete={() => {
-              setTags(tags.filter((ct) => ct.label !== t.label));
+              deleteTag(t.label);
             }}
           />
         ))}
