@@ -74,7 +74,7 @@ function CompletionTagsArea(props) {
               event.target.textContent !== undefined
             ) {
               setText(event.target.textContent);
-              setTags([...tags, { label: event.target.textContent }]);
+              setTags({ label: event.target.textContent });
               setText("");
             }
           }}

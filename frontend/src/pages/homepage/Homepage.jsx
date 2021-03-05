@@ -49,13 +49,11 @@ function Homepage() {
   const [order, setOrder] = React.useState("");
 
   const setTags = (tag) => {
-    console.log(tags.includes(tag))
-    console.log(tag)
-    if (!tags.includes(tag)) _setTags(tag);
+    if (tags.filter(e => e.label === tag.label).length === 0) _setTags([...tags,tag]);
   };
 
   const setUsers = (user) => {
-    if (!users.includes(user)) _setUsers(user);
+    if (users.filter(e => e.label === user.label).length === 0) _setUsers([...users,user]);
   };
 
   const handleChange = (event) => {
