@@ -1,11 +1,7 @@
 package com.polymathee.polymathee.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.polymathee.polymathee.dao.Publication;
-import com.polymathee.polymathee.dao.User;
-import com.polymathee.polymathee.enums.StateEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,7 +27,7 @@ public class CommentaryDto implements Serializable {
     private Integer userId;
     @JsonProperty("publication_id")
     private Integer publiID;
-    @JsonProperty("commentary-date")
+    @JsonProperty("commentary_date")
     private Date date;
 
 

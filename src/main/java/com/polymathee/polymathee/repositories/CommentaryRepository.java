@@ -1,7 +1,6 @@
 package com.polymathee.polymathee.repositories;
 
 import com.polymathee.polymathee.dao.Commentary;
-import com.polymathee.polymathee.dao.Publication;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

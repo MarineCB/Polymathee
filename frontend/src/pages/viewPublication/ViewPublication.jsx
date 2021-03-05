@@ -9,9 +9,14 @@ import {
   Chip,
   Typography,
   CardContent,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
-import { Favorite, SaveAlt } from "@material-ui/icons";
+import { Favorite, MoreVert, SaveAlt, ArrowUpward } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
+import PdfViewer from "../../components/pdf/PdfViewer";
+import { DropzoneArea } from "material-ui-dropzone";
 const useStyles = makeStyles(() => ({
   comments: {
     display: "flex",
@@ -45,8 +50,10 @@ function PublicationTags() {
   );
 }
 
-function PublicationActions() {
+function PublicationActions({pdfFile, objectURL, setObjectURL} ) {
   const classes = useStyles();
+  const [downloadEnabled, setDownloadEnabled] = React.useState(true);
+  const link = document.createElement("a");
   return (
     <div>
       <Button
@@ -54,6 +61,20 @@ function PublicationActions() {
         variant="contained"
         className={classes.button}
         startIcon={<SaveAlt />}
+        disabled={!downloadEnabled}
+        onClick={() => {
+          // Download the file
+          const url = window.URL.createObjectURL(pdfFile)
+          setObjectURL(url);
+              link.href = url;
+              link.download = pdfFile.path;
+              link.dispatchEvent(new MouseEvent("click"));
+    
+              setDownloadEnabled(false);
+              setTimeout(() => {
+                setDownloadEnabled(true);
+          },1000)
+        }}
       >
         Télécharger
       </Button>
@@ -61,10 +82,11 @@ function PublicationActions() {
         color="secondary"
         variant="contained"
         className={classes.button}
-        startIcon={<Favorite />}
+        startIcon={<ArrowUpward />}
       >
-        Liker
+        Upvote
       </Button>
+    
     </div>
   );
 }
@@ -80,10 +102,40 @@ function InfoPhrase() {
   );
 }
 
-function RightSide() {
+function RightSide({pdfFile, objectURL, setObjectURL}) {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
-    <div>
+    <div id="top">
       <Grid>
+        <Grid container justify="flex-end">
+          <IconButton
+            aria-label="delete"
+            aria-controls="simple-menu"
+            aria-haspopup="true"
+            color="primary"
+            onClick={handleClick}
+          >
+            <MoreVert />
+          </IconButton>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClose}>
+              Signaler en tant que contenu inapproprié
+            </MenuItem>
+          </Menu>
+        </Grid>
         <CardContent>
           <Typography component="h5" variant="h5">
             The Twist of Fate
@@ -99,7 +151,7 @@ function RightSide() {
         </CardContent>
         <Grid>
           <Grid item>
-            <PublicationActions />
+            <PublicationActions pdfFile={pdfFile} objectURL={objectURL} setObjectURL={setObjectURL} />
           </Grid>
         </Grid>
       </Grid>
@@ -110,29 +162,59 @@ function RightSide() {
   );
 }
 
+function LeftSide(pdfFile,objectURL,setObjectURL) {
+  const classes = useStyles();
+  
+  return (
+    <Grid sm={6} xs={6} item>
+      <Grid>
+        <PdfViewer pdfFile={pdfFile} objectURL={objectURL} setObjectURL={setObjectURL}/>
+        {/* <img
+            className={classes.pdfViewer}
+            alt="Nom du pdf"
+            src="https://rightword.com.au/ptero/wp-content/uploads/2011/07/iBooks_PDF_read.png"
+          /> */}
+          <IconButton
+            color="secondary"
+            variant="contained"
+            className={classes.button}
+          >
+            <Favorite/>
+          </IconButton>
+       
+      </Grid>
+    </Grid>
+  );
+}
+
 function ViewPublication() {
   const classes = useStyles();
+  const [pdfFile, setPdfFile] = React.useState();
+  const [objectURL, setObjectURL] = React.useState(null);
   return (
     <div>
-      <Grid>
-        <InfoPhrase />
-        <Card raised style={{ margin: "30px" }}>
-          <Grid style={{ padding: "20px" }}>
-            <Grid container justify="center" direction="row">
-              <Grid sm={6} xs={6} item>
-                <img
-                  className={classes.pdfViewer}
-                  alt="Nom du pdf"
-                  src="https://rightword.com.au/ptero/wp-content/uploads/2011/07/iBooks_PDF_read.png"
-                />
+      <div className="App">
+        <Grid>
+          <InfoPhrase />
+          <Card raised style={{ margin: "30px" }}>
+            <Grid style={{ padding: "20px" }}>
+              <Grid container justify="center" direction="row">
+                <LeftSide sm={6} xs={6} pdfFile={pdfFile} objectURL={objectURL} setObjectURL={setObjectURL} item />
+                <RightSide sm={6} xs={6} pdfFile={pdfFile} objectURL={objectURL} setObjectURL={setObjectURL} item />
               </Grid>
-              <RightSide sm={6} xs={6} item />
             </Grid>
-          </Grid>
-        </Card>
-      </Grid>
-      <div className={classes.comments}>
-        <CommentArea />
+          </Card>
+          <DropzoneArea
+            filesLimit={1}
+            maxFileSize={60000000}
+            onChange={(files) => {
+              setPdfFile(files[0]);
+            }}
+          />
+          <div className={classes.comments}>
+            <CommentArea />
+          </div>
+        </Grid>
       </div>
     </div>
   );
