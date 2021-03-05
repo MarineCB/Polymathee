@@ -2,6 +2,7 @@ package com.polymathee.polymathee.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +21,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@ComponentScan(basePackages = { "com.polymathee.polymathee" })
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final ObjectMapper mapper;
@@ -34,15 +36,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure( HttpSecurity httpSecurity ) throws Exception {
+
         httpSecurity
-                .antMatcher("/**").authorizeRequests()
-                .antMatchers("/api/**").permitAll()
+                .antMatcher("/auth/**").authorizeRequests()
+                .antMatchers("/api/**", "swagger-ui.html","/webjars/**").permitAll()
                 .anyRequest().authenticated()
-            .and()
+                .and()
                 .oauth2Login()
                 .authorizationEndpoint()
                 .authorizationRequestRepository( new InMemoryRequestRepository() )
-            .and()
+                .and()
                 .successHandler( this::successHandler);
 
         httpSecurity.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);

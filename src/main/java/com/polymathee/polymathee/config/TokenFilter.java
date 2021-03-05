@@ -25,7 +25,7 @@ public class TokenFilter extends OncePerRequestFilter {
               FilterChain filterChain) throws ServletException, IOException {
         String authToken = request.getHeader("Authorization");
         if(authToken != null) {
-            String token = authToken.split(" ")[1];
+            String token = authToken.split(" ")[0];
             Authentication authentication = tokenStore.getAuth( token );
             if(authentication != null) {
                 SecurityContextHolder.getContext().setAuthentication( authentication );
