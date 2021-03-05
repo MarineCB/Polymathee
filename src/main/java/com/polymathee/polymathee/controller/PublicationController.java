@@ -26,7 +26,6 @@ public class PublicationController {
 
     private static final String GET_PUBLICATIONS_ID_USER = "/api/publications/user/{id}";
     private static final String GET_PUBLICATIONS_BY_ID = "/api/publications/{id}";
-    private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/{status}";
     private static final String GET_PUBLICATIONS_BY_LIKE_NUMBER_DESC = "/api/publications/like";
     private static final String GET_PUBLICATIONS_BY_DATE = "/api/publications/date";
     private static final String GET_PUBLICATIONS_BY_USER_AND_TAG = "/api/publications/filter/{user_name}/{tags}";
@@ -53,19 +52,18 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS)
     @ApiOperation(value = "Get all Publications", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublications() {
-        List<Publication> publiList = publicationService.getPublicationList();
+    public ResponseEntity<List<Publication>> getAllPublications(@RequestParam(value="status",required = false) StateEnum status) {
+
+        List<Publication> publiList = null;
+        if(status !=  null) {
+            publiList = publicationService.getPublicationsByStatus(status);
+        } else {
+            publiList = publicationService.getPublicationList();
+        }
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-    /*@GetMapping(GET_PUBLICATION)
-    @ApiOperation(value = "Get Publications Filter", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublication(Filter publicationFilter)
-            throws UnsupportedEncodingException {
-        String filter = URLDecoder.decode(publicationFilter.getFilter(), "utf-8");
-        List<Publication> publiList = publicationService.getPublicationsFilter(filter);
-        return new ResponseEntity<>(publiList, HttpStatus.OK);
-    }*/
+
 
 
     @GetMapping(GET_PUBLICATIONS_BY_ID)
@@ -83,13 +81,15 @@ public class PublicationController {
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-
+/*
     @GetMapping(GET_PUBLICATIONS_BY_STATUS)
     @ApiOperation(value = "Get Publication by status", consumes = "application/json")
     public ResponseEntity<List<Publication>> getPublicationsByStatus(@PathVariable(value="status") StateEnum status) {
         List<Publication> listPubli = publicationService.getPublicationsByStatus(status);
         return new ResponseEntity<>(listPubli, HttpStatus.OK);
     }
+
+ */
 
     @GetMapping(GET_PUBLICATIONS_BY_LIKE_NUMBER_DESC)
     @ApiOperation(value = "Get Publication by like number desc", consumes = "application/json")

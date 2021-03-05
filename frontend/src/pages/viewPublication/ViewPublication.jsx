@@ -358,7 +358,6 @@ function ViewPublication(props) {
               })
               .then((resPdf) => {
                 let blob = new Blob([resPdf.data], { type: "application/pdf" }); // Convert to blob, required to display the PDF
-                console.log("Load success of pdf into this page", resPdf);
                 blob.path = selectedPublication.file;
                 if (selectedPublication.file === undefined) {
                   throw new ReferenceError(

@@ -91,11 +91,13 @@ function Homepage() {
     });
     const tagsString = tagslabel.join(",");
     const usersString = userslabel.join(",");
-    let url = "api/publications/filter/%7Buser_name%7D/%7Btags%7D?";
+    let url = `api/publications/filter/${usersString}/${tagsString}`;
+    /*
     if (userslabel !== undefined && usersString !== "")
       url += "user_name=" + usersString;
     if (tagsString !== undefined && tagsString !== "")
       url += "&tags=" + tagsString;
+      */
     const response = await axios.get(url);
     SetPublications(response.data);
     //ApplyChange()
