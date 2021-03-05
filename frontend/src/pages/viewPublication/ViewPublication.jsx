@@ -63,9 +63,45 @@ function PublicationTags({ publication }) {
   );
 }
 
-function PublicationActions({ pdfFile, objectURL, setObjectURL }) {
+function upvotePublication(publication, userId, setUpvoteButtonDisabled) {
+  const PUT_PUBLICATION_URL = "api/publication/"+publication.id
+  axios.put(PUT_PUBLICATION_URL,{
+    publication_content: publication.content,
+    publication_file: publication.file,
+    publication_tags: publication.tags,
+    publication_title: publication.title,
+    likeNumber: parseInt(publication.likeNumber +1),
+  })
+  .then(res =>{
+    setUpvoteButtonDisabled(true)
+  }).catch(e => {
+    console.error(e)
+    alert('upvote publication fail')
+  })
+}
+
+function reportPublication(publication, userId, setReportButtonDisabled) {
+  const PUT_PUBLICATION_URL = "api/publication/"+publication.id
+  axios.put(PUT_PUBLICATION_URL,{
+    publication_content: publication.content,
+    publication_file: publication.file,
+    publication_tags: publication.tags,
+    publication_title: publication.title,
+    report:  parseInt(publication.report +1),
+  })
+  .then(res =>{
+    setReportButtonDisabled(true)
+  }).catch(e => {
+    console.error(e)
+    alert('report publication fail')
+  })
+}
+
+
+function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
   const classes = useStyles();
   const [downloadEnabled, setDownloadEnabled] = React.useState(true);
+  const [upvoteButtonDisabled, setUpvoteButtonDisabled] = React.useState(false)
   const link = document.createElement("a");
   return (
     <div>
@@ -96,6 +132,10 @@ function PublicationActions({ pdfFile, objectURL, setObjectURL }) {
         variant="contained"
         className={classes.button}
         startIcon={<ArrowUpward />}
+        disabled={upvoteButtonDisabled}
+        onClick={() =>{
+          upvotePublication(publication,MOCK_USER_ID,setUpvoteButtonDisabled)
+        }}
       >
         Upvote
       </Button>
@@ -124,6 +164,7 @@ function RightSide({
   setAlreadyFavorited,
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [reportButtonDisabled, setReportButtonDisabled] = React.useState(false)
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -150,7 +191,12 @@ function RightSide({
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>
+            <MenuItem
+            disabled={reportButtonDisabled}
+            onClick={() => {
+              reportPublication(pubInfos,MOCK_USER_ID,setReportButtonDisabled)
+              handleClose()}
+              }>
               Signaler en tant que contenu inapproprié
             </MenuItem>
           </Menu>
@@ -220,6 +266,7 @@ function RightSide({
               pdfFile={pdfFile}
               objectURL={objectURL}
               setObjectURL={setObjectURL}
+              publication={pubInfos}
             />
           </Grid>
         </Grid>

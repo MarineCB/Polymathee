@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -34,25 +33,13 @@ public class CommentController {
     @Autowired
     private CommentaryInteractionService commentaryInteractionService;
 
+    //GETS
+
     @GetMapping(GET_COMMENTS_BY_ID_PUBLICATION)
     @ApiOperation(value = "get commentary by ID Publication", consumes = "application/json")
-    public ResponseEntity<List<Commentary>> AllCommentaryByIDPublication(@PathVariable Integer id) {
+    public ResponseEntity<List<Commentary>> AllCommentaryByIDPublication(@PathVariable("id") Integer id) {
         List<Commentary> commentlist = commentaryService.getCommentaryByIdPublication(id);
         return new ResponseEntity<>(commentlist, HttpStatus.OK);
-    }
-
-    @PostMapping(POST_COMMENTARY)
-    @ApiOperation(value = "Post commentary", consumes = "application/json")
-    public ResponseEntity<Commentary> addComment(@RequestBody CommentaryDto commentaryDto){
-        Commentary commentary = commentaryService.saveComment(commentaryDto);
-        return new ResponseEntity<>(commentary, HttpStatus.OK);
-    }
-
-    @DeleteMapping(DELETE_COMMENTARY)
-    @ApiOperation(value = "Delete commentary", consumes = "application/json")
-    public ResponseEntity<Boolean> deleteComment(@PathVariable("commentId") int commentId ) {
-        commentaryService.DeleteCommentById(commentId);
-        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
     @GetMapping(GET_COMMENTARIES)
@@ -62,10 +49,28 @@ public class CommentController {
         return new ResponseEntity<>(commentlist, HttpStatus.OK);
     }
 
+    //POSTS
+
+    @PostMapping(POST_COMMENTARY)
+    @ApiOperation(value = "Post commentary", consumes = "application/json")
+    public ResponseEntity<Commentary> addComment(@RequestBody CommentaryDto commentaryDto){
+        Commentary commentary = commentaryService.saveComment(commentaryDto);
+        return new ResponseEntity<>(commentary, HttpStatus.OK);
+    }
+
     @PostMapping(POST_VOTE)
     @ApiOperation(value = "Post vote", consumes = "application/json")
     public ResponseEntity<CommentInteraction> addFavoris(@RequestBody CommentInteractionDto comment){
         CommentInteraction commentInteraction = commentaryInteractionService.saveVote(comment);
         return new ResponseEntity<>(commentInteraction, HttpStatus.OK);
+    }
+
+    //DELETES
+
+    @DeleteMapping(DELETE_COMMENTARY)
+    @ApiOperation(value = "Delete commentary", consumes = "application/json")
+    public ResponseEntity<Boolean> deleteComment(@PathVariable("commentId") int commentId ) {
+        commentaryService.DeleteCommentById(commentId);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 }

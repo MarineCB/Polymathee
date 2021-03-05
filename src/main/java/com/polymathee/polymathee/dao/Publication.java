@@ -1,6 +1,5 @@
 package com.polymathee.polymathee.dao;
 
-
 import com.polymathee.polymathee.enums.StateEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

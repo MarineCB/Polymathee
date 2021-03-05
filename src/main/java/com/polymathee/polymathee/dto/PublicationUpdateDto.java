@@ -10,11 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LikeTableDto {
-
-    @JsonProperty("user_id")
-    private Integer userId;
-    @JsonProperty("publication_id")
-    private Integer publiId;
-
+public class PublicationUpdateDto {
+    @JsonProperty("publication_title")
+    private String title;
+    @JsonProperty("publication_content")
+    private String content;
+    @JsonProperty("publication_file")
+    private String file;
+    @JsonProperty("publication_tags")
+    private String tags;
 }
