@@ -17,19 +17,19 @@ const ProfileMenu = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const {authToken, setAuthToken, logout} = useContext(UserContext);
+    const {setAuthToken, logout, isConnected} = useContext(UserContext);
 
     const responseGoogle = (response) => {
-      //send bearer token to backend
       window.localStorage.setItem('myToken', response.tokenId);
       setAuthToken(response.tokenId);
       console.log(response)
     }
+
     const ProfileMenuLogout = () => {
         handleClose();
         logout();    
     }
-    
+
     return(
         <div>
             <button className="profile-button" onClick={handleClick}>
@@ -41,23 +41,31 @@ const ProfileMenu = () => {
             keepMounted
             open={Boolean(anchorEl)}
             onClose={handleClose}
-        >
-            <MenuItem onClick={handleClose}>
-                <GoogleLogin 
-                clientId="830825430370-i6c50kj5nsr5amgqlr1qapjq9k9f0tqa.apps.googleusercontent.com"
-                onSuccess={responseGoogle}
-                onFailure={responseGoogle}
-                redirectUri="http://localhost:8080/login/oauth2/code/google"
-                />
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-                Profile
-            </MenuItem>
-            <MenuItem onClick={ProfileMenuLogout}>
-                Logout
-            </MenuItem>
-        </Menu>
-      </div>
+            >
+                {
+                    !isConnected ? (
+                    <MenuItem onClick={handleClose}>
+                        <GoogleLogin 
+                        clientId="830825430370-i6c50kj5nsr5amgqlr1qapjq9k9f0tqa.apps.googleusercontent.com"
+                        onSuccess={responseGoogle}
+                        onFailure={responseGoogle}
+                        redirectUri="http://localhost:8080/login/oauth2/code/google"
+                        />
+                    </MenuItem>
+                    ) : (
+                        <div>
+                        <MenuItem onClick={handleClose}>
+                            Profile
+                        </MenuItem>
+                        <MenuItem onClick={ProfileMenuLogout}>
+                            Logout
+                        </MenuItem>
+                        </div>
+                    )
+                }
+                
+            </Menu>
+        </div>
     );
 }
 

@@ -1,28 +1,48 @@
 import React, { useState, useEffect, createContext } from 'react';
+import jwt_decode from 'jwt-decode';
+import axios from 'axios';
 
 export const UserContext = createContext();
 
 export const UserWrapper = (props) => {
-    const [username, setUsername] = useState('');
+    const [firstname, setFirstname] = useState('');
+    const [lastname, setLastname] = useState('');
     const [authToken, setAuthToken] = useState('');
-
+    const [isConnected, setIsConnected] = useState(false);
+    
     useEffect(() => {
         const storageToken = window.localStorage.getItem('myToken');
         console.log("in storage we have :",storageToken)
-        //trigger this only if user just arrived on Homepage + token stored in localStorage still usable
         if(storageToken) {
             setAuthToken(storageToken);
-        }
+            setIsConnected(true);
+        } 
     },[]);
-    
+
+    useEffect(() => {
+        async function getUsers () {
+            const result = await axios('/api/users');
+            console.log('gggzger', result);
+        }
+        if(authToken) {
+            setIsConnected(true);           
+            const decoded = jwt_decode(authToken);
+            setFirstname(decoded.given_name);
+            setLastname(decoded.family_name);
+            getUsers();
+        } else {
+            setIsConnected(false);
+        }
+    },[authToken]);
 
     const logout = () => {
         window.localStorage.setItem('myToken', '');
         setAuthToken('');
-        setUsername('');
+        setFirstname('');
+        setLastname('');
     }
 
-    const value = { authToken, setAuthToken, username, setUsername, logout}
+    const value = { authToken, setAuthToken, firstname, lastname, setFirstname, setLastname, logout, isConnected}
     return (
         <UserContext.Provider value={value}>
             {props.children}
