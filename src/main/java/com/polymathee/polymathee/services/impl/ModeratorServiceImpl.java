@@ -35,7 +35,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     @Override
-    public Moderator saveModerator(ModeratorDto moderatorDto) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public Moderator saveModerator(ModeratorDto moderatorDto) {
 
         Moderator moderator = new Moderator();
         moderator.setUsername(moderatorDto.getUsername());
@@ -45,20 +45,7 @@ public class ModeratorServiceImpl implements ModeratorService {
         return moderator;
     }
 
-
-    public byte[] ModeratorHash(String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
-
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        byte[] hash = factory.generateSecret(spec).getEncoded();
-        return hash;
-    }
-
-
-    public Boolean ComparePassword(String password, String UserName) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public Boolean ComparePassword(String password, String UserName) {
 
         Boolean bool = null;
         List<Moderator> mod;
