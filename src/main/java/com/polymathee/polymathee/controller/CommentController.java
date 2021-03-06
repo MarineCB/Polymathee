@@ -28,9 +28,9 @@ public class CommentController {
     private static final String GET_COMMENTS_BY_ID_PUBLICATION = "/api/comments/{id}";
     private static final String GET_COMMENTS_BY_UPVOTE = "/api/comments/upvote";
     private static final String POST_COMMENT ="/api/comment";
-    private static final String DELETE_COMMENT ="/api/comment/{commentId)";
+    private static final String DELETE_COMMENT ="/api/comment/{commentId}";
     private static final String POST_VOTE = "/api/vote";
-    private static final String PUT_COMMENT_REPORT = "/api/report/comment/{commentId]";
+    private static final String PUT_COMMENT_REPORT = "/api/report/comment/{commentId}";
 
     @Autowired
     private CommentaryService commentaryService;
