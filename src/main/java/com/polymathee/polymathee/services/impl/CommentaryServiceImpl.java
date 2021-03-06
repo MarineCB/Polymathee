@@ -84,7 +84,6 @@ public class CommentaryServiceImpl implements CommentaryService {
     public List<Commentary> SortByCommentUpvote(Integer id) {
         List<Commentary> comments ;
         comments = commentaryRepository.SortByUpvote();
-
             return comments;
 
     }
