@@ -27,7 +27,7 @@ public class CommentaryDto implements Serializable {
     private Integer userId;
     @JsonProperty("publication_id")
     private Integer publiID;
-    @JsonProperty("commentary-date")
+    @JsonProperty("commentary_date")
     private Date date;
 
 
