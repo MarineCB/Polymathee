@@ -25,5 +25,6 @@ public interface CommentaryRepository extends CrudRepository<Commentary, Integer
 
     Commentary findCommentaryById(Integer id);
 
-
+    @Query("SELECT c FROM Commentary c ORDER BY c.upvote DESC")
+    List<Commentary> SortByUpvote();
 }

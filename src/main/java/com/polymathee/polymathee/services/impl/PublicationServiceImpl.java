@@ -55,8 +55,11 @@ public class PublicationServiceImpl implements PublicationService {
     @Override
     public Publication savePubli(PublicationDto publicationDto) {
 
+        String file = "";
         Publication publication = new Publication();
         User user = userRepository.findUserById(publicationDto.getUserId());
+
+
 
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
@@ -179,6 +182,32 @@ public class PublicationServiceImpl implements PublicationService {
         if(publicationUpdate.isPresent()){
             Publication newPublication = publicationUpdate.get();
             newPublication.setStatus(status);
+            return publicationRepository.save(newPublication);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Publication updatePubicationDownloadNumber(Integer id) {
+        Optional<Publication> publicationUpdate = publicationRepository.findById(id);
+
+        if(publicationUpdate.isPresent()){
+            Publication newPublication = publicationUpdate.get();
+            newPublication.setDownloadNumber(newPublication.getDownloadNumber()+1);
+            return publicationRepository.save(newPublication);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Publication updateReport(Integer id) {
+        Optional<Publication> publicationUpdate = publicationRepository.findById(id);
+
+        if(publicationUpdate.isPresent()){
+            Publication newPublication = publicationUpdate.get();
+            newPublication.setReport(newPublication.getReport()+1);
             return publicationRepository.save(newPublication);
         } else {
             return null;
