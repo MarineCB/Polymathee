@@ -11,5 +11,6 @@ import java.util.List;
 public interface UserRepository extends CrudRepository<User, Integer>, JpaSpecificationExecutor<User> {
     List<User> findAll();
     User findUserById(Integer id);
-     void deleteById(int id);
+    void deleteById(int id);
+    User findUserByEmail(String email);
 }

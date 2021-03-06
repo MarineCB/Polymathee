@@ -18,6 +18,7 @@ public class UserController {
 
     private static final String GET_USERS = "/api/users";
     private static final String GET_USER_ID = "/api/user/{id}";
+    private static final String GET_USER_BY_EMAIL = "/api/user/{email}";
     private static final String DELETE_USER = "/api/users/{userId}";
 
     @Autowired
@@ -36,6 +37,13 @@ public class UserController {
     @ApiOperation(value = "Get User by ID", consumes = "application/json")
     public ResponseEntity<User> getUserByID(@RequestParam("id") Integer id) {
         User user = usersService.getUserByID(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping(GET_USER_BY_EMAIL)
+    @ApiOperation(value = "Get User by email", consumes = "application/json")
+    public ResponseEntity<User> getUserByEmail(@RequestParam("email") String email) {
+        User user = usersService.FindUserByEmail(email);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
