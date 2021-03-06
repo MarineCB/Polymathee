@@ -1,7 +1,5 @@
 package com.polymathee.polymathee.repositories;
 
-import com.polymathee.polymathee.dao.Commentary;
-import com.polymathee.polymathee.dao.LikeTable;
 import com.polymathee.polymathee.dao.Moderator;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
