@@ -1,8 +1,17 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import { Box, Card, Typography, Grid, Button } from "@material-ui/core";
+import {
+  Box,
+  Card,
+  Typography,
+  Grid,
+  Button,
+  IconButton,
+  Tooltip,
+} from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { ZoomIn, Edit } from "@material-ui/icons";
+import { ZoomIn, Edit, Delete } from "@material-ui/icons";
+import axios from "axios";
 const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
@@ -49,6 +58,69 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+
+function deletePublication(
+  publicationId,
+  setSnackbarMsg,
+  showSnackbar,
+  hideSnackbar,
+  reloadPublications,
+  setDelPubDialogVisible
+) {
+  const DELETE_PUB_URL = "api/publication/" + publicationId;
+  setSnackbarMsg("Suppression...");
+  showSnackbar();
+  axios
+    .delete(DELETE_PUB_URL)
+    .then((res) => {
+      if (showSnackbar) {
+        setSnackbarMsg("Publication supprimée");
+      }
+      setDelPubDialogVisible(false)
+      reloadPublications(); // Reload all publications, removing the publication
+    })
+    .catch((err) => {
+      console.error(err);
+      if (showSnackbar) {
+        setSnackbarMsg("Echec de suppression de cette publication");
+        showSnackbar();
+        setTimeout(()=>{
+          hideSnackbar()
+        },3000)
+      }
+      setDelPubDialogVisible(false)
+    });
+}
+
+function askDeletePublication(
+  publication,
+  setDelPubDialogVisible,
+  setDelPubDialogMsg,
+  setSnackbarMsg,
+  showSnackbar,
+  hideSnackbar,
+  setConfirmDeleteHandler,
+  reloadPublications
+) {
+  // Configure the handler for deletion
+  setConfirmDeleteHandler(() => () => {
+    console.log("Click confirm delete for " + publication.id);
+    deletePublication(
+      publication.id,
+      setSnackbarMsg,
+      showSnackbar,
+      hideSnackbar,
+      reloadPublications,
+      setDelPubDialogVisible
+    );
+  });
+
+  setDelPubDialogMsg(
+    "Êtes-vous sûr de supprimer votre publication : " + publication.title
+  );
+  setDelPubDialogVisible(true);
+}
+
 /**
  * Returns the publication status
  * @param {String} status
@@ -92,19 +164,28 @@ function GetInfoForPublicationStatus(status) {
 function ProgressRects({ publicationInfo }) {
   const rects = [];
   const classes = useStyles();
-  console.log("publicationInfo", publicationInfo);
   for (let i = 0; i < 3; i++) {
     if (i < publicationInfo.step) {
       rects.push(
-        <Box variant="contained" className={classes.parallelogramDone} />
+        <Box
+          key={i}
+          variant="contained"
+          className={classes.parallelogramDone}
+        />
       );
     } else if (i > publicationInfo.step) {
       rects.push(
-        <Box variant="contained" className={classes.parallelogramEmpty} />
+        <Box
+          key={i}
+          variant="contained"
+          className={classes.parallelogramEmpty}
+        />
       );
     } else {
       // Show current status color
-      rects.push(<Box variant="contained" className={publicationInfo.class} />);
+      rects.push(
+        <Box key={i} variant="contained" className={publicationInfo.class} />
+      );
     }
   }
   return (
@@ -114,27 +195,43 @@ function ProgressRects({ publicationInfo }) {
   );
 }
 
-function PublicationTile({ data }) {
+function PublicationTile({
+  publication,
+  onClick,
+  setSnackbarMsg,
+  showSnackbar,
+  hideSnackbar,
+  setDelPubDialogVisible,
+  delPubDialogMsg,
+  setDelPubDialogMsg,
+  setConfirmDeleteHandler,
+  reloadPublications,
+}) {
   const classes = useStyles();
   const history = useHistory();
-  const infos = GetInfoForPublicationStatus(data.status);
+  const infos = GetInfoForPublicationStatus(publication.status);
+
   return (
-    <Card className={classes.publicationCard}>
+    <Card
+      key={publication.id}
+      onClick={onClick}
+      className={classes.publicationCard}
+    >
       <Grid container alignItems="center" item>
         <Grid item xs={3}>
-          <Typography variant="h6">{data.title}</Typography>
+          <Typography variant="h6">{publication.title}</Typography>
         </Grid>
         <Grid item xs={3}>
           <Typography>{infos.msg}</Typography>
         </Grid>
-        <Grid item>
-          {data.status === "Saved" ? (
+        <Grid item xs={6}>
+          {publication.status === "Saved" ? (
             <Button
               startIcon={<Edit />}
               onClick={() => {
                 history.push({
                   pathname: "/createPublication",
-                  preset: data,
+                  preset: publication,
                 });
               }}
             >
@@ -146,13 +243,35 @@ function PublicationTile({ data }) {
               onClick={() => {
                 history.push({
                   pathname: "/viewPublication",
-                  publicationId: data.id,
+                  publicationId: publication.id,
                 });
               }}
             >
               Visionner
             </Button>
           )}
+          <Tooltip
+            title="Supprimer"
+            placement="right"
+            style={{ padding: "20px" }}
+          >
+            <IconButton
+              onClick={() =>
+                askDeletePublication(
+                  publication,
+                  setDelPubDialogVisible,
+                  setDelPubDialogMsg,
+                  setSnackbarMsg,
+                  showSnackbar,
+                  hideSnackbar,
+                  setConfirmDeleteHandler,
+                  reloadPublications
+                )
+              }
+            >
+              <Delete />
+            </IconButton>
+          </Tooltip>
         </Grid>
         <Grid container justify="flex-end" alignItems="center" item xs={5}>
           <ProgressRects publicationInfo={infos} />

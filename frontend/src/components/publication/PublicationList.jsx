@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import { withRouter } from "react-router-dom";
 import {
   Box,
@@ -13,9 +13,6 @@ import { Favorite, GetApp } from "@material-ui/icons";
 import Tag from "../tag/Tag";
 import { makeStyles } from "@material-ui/core/styles";
 import { PublicationContext } from "../../store/PublicationContext";
-
-
-
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,7 +43,6 @@ function extractContent(s) {
 
 function PublicationList() {
   const classes = useStyles();
-
   const [Publications] = useContext(PublicationContext);
   const listItems = Publications.map((publication, index) => {
     const tags = publication.tags.split(",");
@@ -59,7 +55,9 @@ function PublicationList() {
               primary={publication.title}
               secondary={
                 <React.Fragment>
-                  {new Date(publication.date).toLocaleDateString() +" "+ new Date(publication.date).toLocaleTimeString()}
+                  {new Date(publication.date).toLocaleDateString() +
+                    " " +
+                    new Date(publication.date).toLocaleTimeString()}
                 </React.Fragment>
               }
             />
@@ -114,9 +112,9 @@ function PublicationList() {
                 </Grid>
               </Box>
               <Box>
-                {tags.map((t, index) => (
+                {tags.map((t, index2) => (
                   <Tag
-                    key={`${t}${index}`}
+                    key={`${t}${index2}`}
                     label={t}
                     tagSize="small"
                     variant="default"

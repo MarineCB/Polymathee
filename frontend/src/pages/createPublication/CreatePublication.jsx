@@ -15,22 +15,30 @@ import {
   Stepper,
   Step,
   StepButton,
+  Dialog,
+  DialogActions,
   Box,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
 } from "@material-ui/core";
 import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Tag from "../../components/tag/Tag";
 import PolymatheeEditor from "../../components/polymatheeEditor/PolymatheeEditor";
-import {useEffect} from "react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 let descriptionText = "";
+let editMode = false;
 const useStyles = makeStyles((theme) => ({
   center: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     height: "80%",
+  },
+  dropzoneParagraph: {
+    padding: "20px",
   },
   card: {
     margin: "30px",
@@ -48,9 +56,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+let MOCK_USER_ID = 2;
+
 function TagsCard(props) {
   let { tags, setTags } = props;
-  const [tagText,setTagText] = React.useState("");
+  const [tagText, setTagText] = React.useState("");
   const handleKeyPress = (data) => {
     if (data.event.key === "Enter") {
       if (data.text !== "") {
@@ -100,7 +110,14 @@ function TagsCard(props) {
 }
 
 function AttachmentArea(props) {
-  let { pdfFile, setPdfFile, pageNumber, setNumPages, numPages, pdfStream, setPdfStream } = props.form;
+  let {
+    pdfFile,
+    setPdfFile,
+    pageNumber,
+    setNumPages,
+    numPages,
+    setPdfStream,
+  } = props.form;
   const classes = useStyles();
 
   function loadPdf(file) {
@@ -109,7 +126,7 @@ function AttachmentArea(props) {
       const result = reader.result;
       setPdfFile(result);
     });
-    setPdfStream(file)
+    setPdfStream(file);
     reader.readAsDataURL(file);
   }
 
@@ -120,137 +137,196 @@ function AttachmentArea(props) {
   return (
     <div>
       <Box m={2}>
-      {pdfFile !== undefined && (
-        <Box display="flex" justifyContent="center">
-          <Box mr={2} alignContent="flex-end">
-            <Document file={pdfFile} onLoadSuccess={onDocumentLoadSuccess}>
-              <Page height={250} pageNumber={pageNumber} />
-            </Document>
-            <Typography>Nombre de pages : {numPages}</Typography>
+        {pdfFile !== undefined && (
+          <Box display="flex" justifyContent="center">
+            <Box mr={2} alignContent="flex-end">
+              <Document file={pdfFile} onLoadSuccess={onDocumentLoadSuccess}>
+                <Page height={250} pageNumber={pageNumber} />
+              </Document>
+              <Typography>Nombre de pages : {numPages}</Typography>
+            </Box>
+            <Box ml={2} alignContent="flex-start">
+              <DropzoneAreaBase
+                showPreviews={true}
+                showPreviewsInDropzone={false}
+                filesLimit={1}
+                maxFileSize={60000000}
+                useChipsForPreview
+                onDrop={(files) => {
+                  if (files.length > 0) {
+                    loadPdf(files[0]);
+                    setSize(6);
+                  }
+                }}
+                dropzoneParagraphClass={classes.dropzoneParagraph}
+                previewGridProps={{
+                  container: { spacing: 1, direction: "row" },
+                }}
+                previewChipProps={{ classes: { root: classes.previewChip } }}
+                dropzoneText="Choisir à nouveau"
+                initialFiles={pdfFile !== undefined ? [pdfFile] : undefined}
+                previewText="Contenu choisi"
+                acceptedFiles={["application/pdf"]}
+              />
+            </Box>
           </Box>
-          <Box ml={2} alignContent="flex-start">
-            <DropzoneAreaBase
-          showPreviews={true}
-              showPreviewsInDropzone={false}
-              filesLimit={1}
-              maxFileSize={60000000}
-              useChipsForPreview
-              onDrop={(files) => {
-                if (files.length > 0) {
-                  loadPdf(files[0]);
-                  setSize(6);
-                }
-              }}
-              previewGridProps={{ container: { spacing: 1, direction: "row" } }}
-              previewChipProps={{ classes: { root: classes.previewChip } }}
-              dropzoneText="Choisir à nouveau"
-              initialFiles={pdfFile !== undefined ? [pdfFile] : undefined}
-              previewText="Contenu choisi"
-              acceptedFiles={["application/pdf"]}
-            />
-          </Box>
-        </Box>
-      )}
-      {pdfFile === undefined && (
-        <DropzoneAreaBase
-          showPreviews={true}
-          showPreviewsInDropzone={false}
-          filesLimit={1}
-          maxFileSize={60000000}
-          useChipsForPreview
-          onDrop={(files) => {
-            if (files.length > 0) {
-              loadPdf(files[0]);
-              setSize(6);
-            }
-          }}
-          previewGridProps={{ container: { spacing: 1, direction: "row" } }}
-          previewChipProps={{ classes: { root: classes.previewChip } }}
-          dropzoneText="Déposez votre document "
-          initialFiles={pdfFile !== undefined ? [pdfFile] : undefined}
-          previewText="Contenu choisi"
-          acceptedFiles={["application/pdf"]}
-        />
-      )}
+        )}
+        {pdfFile === undefined && (
+          <DropzoneAreaBase
+            showPreviews={true}
+            showPreviewsInDropzone={false}
+            filesLimit={1}
+            maxFileSize={60000000}
+            useChipsForPreview
+            onDrop={(files) => {
+              if (files.length > 0) {
+                loadPdf(files[0]);
+                setSize(6);
+              }
+            }}
+            previewGridProps={{ container: { spacing: 1, direction: "row" } }}
+            previewChipProps={{ classes: { root: classes.previewChip } }}
+            dropzoneText="Déposez votre document "
+            initialFiles={pdfFile !== undefined ? [pdfFile] : undefined}
+            previewText="Contenu choisi"
+            acceptedFiles={["application/pdf"]}
+          />
+        )}
       </Box>
     </div>
   );
 }
 
-function savePublication(pdfFile,description,tags,title,pdfStream,setSubmitButtonLocked,isDraft)
-{
-    // Check submit
-    var msg = "";
-    if (pdfFile === undefined) {
-      msg += "\n> Pas de pdf";
-    }
-    if (description === "") {
-      msg += "\n> Pas de description";
-    }
-    if (tags === undefined || tags.length === 0) {
-      msg += "\n> Pas de tags";
-    }
-    if (title === undefined || title === "") {
-      msg += "\n> Pas de titre";
-    }
-    if (msg !== "") {
-      msg =
-        "Elements incorrects pour l'envoi de votre publication" +
-        msg;
-    }
-    if (msg !== "") {
-      alert(msg);
+function savePublication(
+  pdfFile,
+  description,
+  tags,
+  title,
+  pdfStream,
+  setSubmitButtonLocked,
+  isDraft,
+  setAlertDialogMsg,
+  setDialogOpen,
+  editMode // Indicate if the publication must be created or edited
+) {
+  // Check submit
+  var msg = "";
+  if (pdfFile === undefined) {
+    msg += "\n- Pas de pdf";
+  }
+  if (description === "") {
+    msg += "\n- Pas de description";
+  }
+  if (tags === undefined || tags.length === 0) {
+    msg += "\n- Pas de tags";
+  }
+  if (title === undefined || title === "") {
+    msg += "\n- Pas de titre";
+  }
+  if (msg !== "") {
+    setAlertDialogMsg(msg);
+    setDialogOpen(true);
+  } else {
+    const UPLOAD_URL = "api/upload";
+    const PUBLICATION_URL = "api/publication";
+    let createdPublication = null; // Publication created with first post
+    // First POST : All informations but not the PDF
+    if(editMode === true){
+      // TODO COMPLETE
     } else {
-      alert("Success");
+    axios
+      .post(PUBLICATION_URL, {
+        publication_content: descriptionText,
+        publication_date: Date.now(),
+        publication_download_number: 0,
+        publication_file: title,
+        publication_like_number: 0,
+        publication_report: 0,
+        publication_status: isDraft ? "Saved" : "To_Treat", // Precise enum values
+        publication_tags: tags.map((t) => t.label).join(","), // separate with "," each tag
+        publication_title: title + "_user_" + MOCK_USER_ID,
+        user_id: MOCK_USER_ID,
+      })
+      .then((res) => {
+        console.log(res.status, res.statusText);
+        createdPublication = res.data;
+        console.log("Pub infos sent to database!", createdPublication);
+        // We create a format for sending a pdf
+        const formData = new FormData();
+        formData.append("file", pdfStream);
+        const config = {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        };
+        // Second POST : the PDF only
+        axios
+          .post(UPLOAD_URL, formData, config)
+          .then((resUpload) => {
+            if (isDraft) {
+              setAlertDialogMsg(
+                "Publication sauvegardée en tant que brouillon"
+              );
+              setDialogOpen(true);
+              setSubmitButtonLocked(true);
+            } else {
+              setAlertDialogMsg("Publication envoyée pour validation!");
+              setDialogOpen(true);
+            }
+          })
+          .catch((errUpload) => {
+            setAlertDialogMsg(
+              "Une erreur est survenue lors de la publication de votre fichier"
+            );
+            setDialogOpen(true);
+            console.error(
+              "Failed to upload pdf,deleting publication",
+              errUpload
+            );
+            axios
+              .delete(PUBLICATION_URL + "/" + createdPublication.id)
+              .then((resDelete) => {
+                setAlertDialogMsg(
+                  "Une erreur est survenue lors de la publication de votre fichier"
+                );
+                setDialogOpen(true);
+              })
+              .catch((e) => {
+                console.error(
+                  "Failed to delete uploaded pub infos after we found that we couldn't delete the uploaded document",
+                  e
+                );
+              });
+          });
+      })
+      .catch((err) => {
+        setAlertDialogMsg(
+          "Une erreur est survenue lors de l'envoie des informations de votre publication"
+        );
+        console.error(err);
+        setDialogOpen(true);
+      });
+  }    }
 
-      const formData = new FormData();
-      formData.append("file", pdfStream);
-      const config = {
-        headers: {
-          "content-type": "multipart/form-data",
-        },
-      };
-      console.log(formData)
-      console.log("Description text :", descriptionText)
-      const UPLOAD_URL = "http://localhost:8080/api/upload"
-      const PUBLICATION_URL = "http://localhost:8080/api/publication"
-      axios
-        .post(UPLOAD_URL, formData, config)
-        .then((resUpload) => {
-          console.log("PDF uploaded ", resUpload);
-          axios
-            .post(PUBLICATION_URL, {
-              publication_content: descriptionText,
-              publication_date: Date.now,
-              publication_download_number: 0,
-              publication_file: title,
-              publication_like_number: 0,
-              publication_report: 0,
-              publication_status:  (isDraft) ? "Saved" : "To_Treat", // Precise enum values
-              publication_tags: tags.map(t => t.label).join(","), // separate with "," each tag
-              publication_title: "string",
-              user_id: 2,
-            })
-            .then((res) => {
-              console.log(res.status, res.statusText);
-              if (!isDraft) {
-                setSubmitButtonLocked(true)
-              }
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        })
-        .catch((errUpload) => {
-          console.error("Failed to upload pdf", errUpload);
-        });
-    }
 }
 
 function CreatePublicationSummary(props) {
   const classes = useStyles();
-  let { title, pdfFile, description, setDescription, tags, pdfStream } = props.form;
-  const [submitButtonLocked, setSubmitButtonLocked] = React.useState(false)
+  let {
+    title,
+    pdfFile,
+    description,
+    setDescription,
+    tags,
+    pdfStream,
+  } = props.form;
+  const [submitButtonLocked, setSubmitButtonLocked] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [alertDialogMsg, setAlertDialogMsg] = React.useState("");
+
+  const handleClose = () => {
+    setDialogOpen(false);
+  };
   return (
     <div>
       <Card className={classes.card}>
@@ -277,37 +353,82 @@ function CreatePublicationSummary(props) {
             setDescription={setDescription}
             value={descriptionText}
           />
+          <div>
+            {/** Error area if one the required elements is missing from the controls for sending a new publication */}
+            <Dialog
+              open={dialogOpen}
+              onClose={handleClose}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle>{"Information"}</DialogTitle>
+              <DialogContent>
+                {/*We use whiteSpace: 'pre-line' to enable line breaks*/}
+                <DialogContentText style={{ whiteSpace: "pre-line" }}>
+                  {alertDialogMsg}
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleClose} color="primary">
+                  OK
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </div>
           <Grid container direction="row">
             {/* Action buttons */}
-            <Button
-              color="secondary"
-              variant="contained"
-              disabled={Boolean(submitButtonLocked)}
-              style={{
-                marginTop: "20px",
-                borderRadius: 50,
-                marginInline: 2,
-              }}
-              onClick={() => {
-                savePublication(pdfFile,description,tags,title,pdfStream,setSubmitButtonLocked,false)
-              }}
-            >
-              Publier
-            </Button>
-            <Button
-              color="secondary"
-              variant="contained"
-              style={{
-                marginTop: "20px",
-                borderRadius: 50,
-                marginInline: 2,
-              }}
-              onClick={() => {
-                savePublication(pdfFile,description,tags,title,pdfStream,setSubmitButtonLocked,true)
-              }}
-            >
-              Enregistrer
-            </Button>
+              <Box>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  disabled={Boolean(submitButtonLocked)}
+                  style={{
+                    marginTop: "20px",
+                    borderRadius: 50,
+                    marginInline: 2,
+                  }}
+                  onClick={() => {
+                    savePublication(
+                      pdfFile,
+                      description,
+                      tags,
+                      title,
+                      pdfStream,
+                      setSubmitButtonLocked,
+                      false,
+                      setAlertDialogMsg,
+                      setDialogOpen
+                    );
+                  }}
+                >
+                  {editMode ? "Publier ce brouillon" : "Publier"} 
+                </Button>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  style={{
+                    marginTop: "20px",
+                    borderRadius: 50,
+                    marginInline: 2,
+                  }}
+                  onClick={() => {
+                    savePublication(
+                      pdfFile,
+                      description,
+                      tags,
+                      title,
+                      pdfStream,
+                      setSubmitButtonLocked,
+                      true,
+                      setAlertDialogMsg,
+                      setDialogOpen,
+                      editMode
+                    );
+                  }}
+                >
+                  {editMode ? "Mettre à jour ce brouillon" : "Enregistrer en tant que brouillon"}
+                </Button>
+              </Box>
           </Grid>
         </Grid>
       </Card>
@@ -345,7 +466,7 @@ function CreatePublicationForm(props) {
   );
 }
 
-function CreatePublicationStepper({preset}) {
+function CreatePublicationStepper({ preset }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
@@ -385,13 +506,6 @@ function CreatePublicationStepper({preset}) {
     setActiveStep(step);
   };
 
-  const handleComplete = () => {
-    const newCompleted = completed;
-    newCompleted[activeStep] = true;
-    setCompleted(newCompleted);
-    handleNext();
-  };
-
   const handleReset = () => {
     setActiveStep(0);
     setCompleted({});
@@ -425,10 +539,10 @@ function CreatePublicationStepper({preset}) {
           </Box>
         ) : (
           <Box height="100%">
-            {GetStepContent(activeStep,preset)}
+            {GetStepContent(activeStep, preset)}
             <Box>
               <Button
-                style={{marginInline:'10px'}}
+                style={{ marginInline: "10px" }}
                 disabled={activeStep === 0}
                 onClick={handleBack}
                 className={classes.button}
@@ -436,7 +550,7 @@ function CreatePublicationStepper({preset}) {
                 Retour
               </Button>
               <Button
-                style={{marginInline:'10px'}}
+                style={{ marginInline: "10px" }}
                 variant="contained"
                 color="primary"
                 onClick={handleNext}
@@ -450,16 +564,7 @@ function CreatePublicationStepper({preset}) {
                     Step {activeStep + 1} already completed
                   </Typography>
                 ) : (
-                  <div/>
-                  // <Button
-                  //   variant="contained"
-                  //   color="primary"
-                  //   onClick={handleComplete}
-                  // >
-                  //   {completedSteps() === totalSteps() - 1
-                  //     ? "Terminer"
-                  //     : "Finir l'étape"}
-                  // </Button>
+                  <div />
                 ))}
             </Box>
           </Box>
@@ -473,23 +578,25 @@ function getStepNames() {
   return ["Informations", "Contenu", "Vérification"];
 }
 
-function GetStepContent(step,preset) {
-  let presetDescription = RichTextEditor.createEmptyValue()
-  if(preset!== undefined && preset.content !== undefined) {
-    presetDescription =  RichTextEditor.createValueFromString(preset.content , 'html')
-    descriptionText = presetDescription.toString('html') // Can't edit the rich text area at the moment if the publication is already created
+function GetStepContent(step, preset) {
+  let presetDescription = RichTextEditor.createEmptyValue();
+  if (preset !== undefined && preset.content !== undefined) {
+    presetDescription = RichTextEditor.createValueFromString(
+      preset.content,
+      "html"
+    );
+    descriptionText = presetDescription.toString("html"); // Can't edit the rich text area at the moment if the publication is already created
   }
   const [description, setDescription] = React.useState(presetDescription);
-  console.log('text : ', descriptionText)
   const [title, setTitle] = React.useState((preset && preset.title) || "");
   const [numPages, setNumPages] = React.useState(null);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [pdfFile, setPdfFile] = React.useState();
   const [pdfStream, setPdfStream] = React.useState();
-  const presetTags = []
-  if(preset!== undefined && preset.tags!=null){
-    preset.tags.split(',').forEach(str => {
-      presetTags.push({label:str})
+  const presetTags = [];
+  if (preset !== undefined && preset.tags != null) {
+    preset.tags.split(",").forEach((str) => {
+      presetTags.push({ label: str });
     });
   }
   const [tags, setTags] = React.useState(presetTags);
@@ -569,10 +676,11 @@ function CreatePublicationContent(props) {
 }
 
 function CreatePublication(props) {
-    console.log(props.location.preset)
+  console.log(props.location.preset);
+  editMode = props.location.editMode !== undefined && props.location.editMode === true;
   return (
     <div className="App">
-      <CreatePublicationStepper preset={props.location.preset}/>
+      <CreatePublicationStepper preset={props.location.preset} />
     </div>
   );
 }
