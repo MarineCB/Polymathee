@@ -208,6 +208,7 @@ function ViewPublication() {
             filesLimit={1}
             maxFileSize={60000000}
             onChange={(files) => {
+              console.log("Files:", files);
               setPdfFile(files[0]);
             }}
           />
