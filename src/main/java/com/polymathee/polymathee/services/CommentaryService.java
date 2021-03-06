@@ -16,4 +16,8 @@ public interface CommentaryService {
     void deleteComment(int comment);
 
     void DeleteCommentById(int id);
+
+    Commentary updateReport(Integer id);
+
+    List<Commentary> SortByCommentUpvote(Integer id);
 }

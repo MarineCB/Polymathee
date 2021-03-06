@@ -5,6 +5,7 @@ import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.enums.StateEnum;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -39,6 +40,10 @@ public interface PublicationRepository extends CrudRepository<Publication, Integ
     List<Publication> findPubliByUserIdAndStatus(String name);
 
     List<Publication> findAllByStatus(StateEnum status);
+
+    @Modifying
+    @Query("UPDATE Publication p SET  p.file = :file  WHERE p.id = :id")
+    void updateFileById(int id, String file);
 
 
 

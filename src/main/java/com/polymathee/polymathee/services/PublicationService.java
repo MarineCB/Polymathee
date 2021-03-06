@@ -25,5 +25,7 @@ public interface PublicationService {
     Publication updatePublicationById(Integer id, PublicationUpdateDto publication);
     Publication updatePubicationPublished(Integer id,StateEnum status);
     List<String> getAllTags();
+    Publication updatePubicationDownloadNumber(Integer id);
+    Publication updateReport(Integer id);
 
 }
