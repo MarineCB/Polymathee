@@ -7,6 +7,7 @@ export const UserContext = createContext();
 export const UserWrapper = (props) => {
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
+    const [email, setEmail] = useState('');
     const [authToken, setAuthToken] = useState('');
     const [isConnected, setIsConnected] = useState(false);
     
@@ -20,16 +21,11 @@ export const UserWrapper = (props) => {
     },[]);
 
     useEffect(() => {
-        async function getUsers () {
-            const result = await axios('/api/users');
-            console.log('gggzger', result);
-        }
         if(authToken) {
             setIsConnected(true);           
             const decoded = jwt_decode(authToken);
-            setFirstname(decoded.given_name);
-            setLastname(decoded.family_name);
-            getUsers();
+            console.log(decoded);
+            setEmail(decoded.email);
         } else {
             setIsConnected(false);
         }
