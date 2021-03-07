@@ -10,7 +10,7 @@ import MyPublication from './pages/myPublications/MyPublications'
 import { ThemeProvider } from '@material-ui/styles';
 import { Box, createMuiTheme, CssBaseline } from '@material-ui/core';
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     light: {
       main: '#FFFAFA'
