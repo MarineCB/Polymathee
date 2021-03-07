@@ -9,14 +9,18 @@ function PolymatheeEditor(props) {
     let onChange = props.onChange
     
       useEffect(() => {
-        setDescription(RichTextEditor.createValueFromString(props.value , 'html'))
+        if(props.value._editorState) { // If already in html object
+          setDescription(props.value)
+        } else { // If plain string
+          setDescription(RichTextEditor.createValueFromString(props.value , 'html'))
+        }
       }, [])
     
 
       function handleValueChange(editorValue) {
         setDescription(editorValue)
         if (onChange) onChange(editorValue)
-
+        console.log(description)
       }
   
       return (

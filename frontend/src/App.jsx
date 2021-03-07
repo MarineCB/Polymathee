@@ -11,7 +11,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import { Box, createMuiTheme, CssBaseline } from '@material-ui/core';
 import { PublicationProvider } from './store/PublicationContext';
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     light: {
       main: '#FFFAFA'

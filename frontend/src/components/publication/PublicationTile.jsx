@@ -58,7 +58,6 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-
 function deletePublication(
   publicationId,
   setSnackbarMsg,
@@ -75,20 +74,22 @@ function deletePublication(
     .then((res) => {
       if (showSnackbar) {
         setSnackbarMsg("Publication supprimée");
+        setTimeout(() => {
+          hideSnackbar();
+        }, 5000);
       }
-      setDelPubDialogVisible(false)
+      setDelPubDialogVisible(false);
       reloadPublications(); // Reload all publications, removing the publication
     })
     .catch((err) => {
       console.error(err);
       if (showSnackbar) {
         setSnackbarMsg("Echec de suppression de cette publication");
-        showSnackbar();
-        setTimeout(()=>{
-          hideSnackbar()
-        },3000)
+        setTimeout(() => {
+          hideSnackbar();
+        }, 3000);
       }
-      setDelPubDialogVisible(false)
+      setDelPubDialogVisible(false);
     });
 }
 
@@ -143,7 +144,7 @@ function GetInfoForPublicationStatus(status) {
     case "Published":
       return {
         step: 3,
-        msg: "Publication en ligne",
+        msg: "Publié",
         class: classes.parallelogramDone,
       };
     case "Rejected":
@@ -232,6 +233,7 @@ function PublicationTile({
                 history.push({
                   pathname: "/createPublication",
                   preset: publication,
+                  editMode: true,
                 });
               }}
             >

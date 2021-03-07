@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import RichTextEditor from "react-rte";
-import { withRouter } from "react-router-dom";
+import { useHistory, withRouter } from "react-router-dom";
 import { DropzoneAreaBase } from "material-ui-dropzone";
 import { Document, Page, pdfjs } from "react-pdf";
 import axios from "axios";
 import "./CreatePublication.css";
+import badWords from "./badWords.json";
 import {
   Button,
   Card,
@@ -21,6 +22,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
+  CircularProgress,
 } from "@material-ui/core";
 import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -28,8 +30,10 @@ import Tag from "../../components/tag/Tag";
 import PolymatheeEditor from "../../components/polymatheeEditor/PolymatheeEditor";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-let descriptionText = "";
+let MOCK_USER_ID = 2; // TODO : replace in prod
+
 let editMode = false;
+let editedPdfFileToo = false; // Optimization, the pdf file will only be uploaded when edited
 const useStyles = makeStyles((theme) => ({
   center: {
     display: "flex",
@@ -55,8 +59,6 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "200px",
   },
 }));
-
-let MOCK_USER_ID = 2;
 
 function TagsCard(props) {
   let { tags, setTags } = props;
@@ -90,14 +92,15 @@ function TagsCard(props) {
       <div>
         <TextField
           style={{ marginTop: 30 }}
-          error={tags.length !== 0 ? false : true}
           id="outlined-adornment-amount"
           variant="outlined"
           label="Ajouter un nouveau tag"
           inputProps={{ maxLength: 20 }} // we don't want the tags to be too long
           value={tagText}
           onChange={(event) => {
-            setTagText(event.target.value);
+            if (!event.target.value.endsWith(",")) {
+              setTagText(event.target.value);
+            }
           }}
           onKeyPress={(e) => handleKeyPress({ event: e, text: tagText })}
           InputProps={{
@@ -112,24 +115,58 @@ function TagsCard(props) {
 function AttachmentArea(props) {
   let {
     pdfFile,
-    setPdfFile,
+    setPdfFile, // Used to set the pdf visually
     pageNumber,
     setNumPages,
     numPages,
     setPdfStream,
+    preset,
   } = props.form;
   const classes = useStyles();
 
-  function loadPdf(file) {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      const result = reader.result;
-      setPdfFile(result);
-    });
-    setPdfStream(file);
-    reader.readAsDataURL(file);
-  }
+  const loadPdfCallback = useCallback(
+    (blob) => {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        const result = reader.result;
+        setPdfFile(result);
+      });
+      setPdfStream(blob);
+      reader.readAsDataURL(blob);
+    },
+    [setPdfFile, setPdfStream]
+  );
 
+  useEffect(() => {
+    // Load PDF file from publication id
+    if (editMode) {
+      // If we already downloaded the file 1 time, no need to redownload it
+      // if(!pdfFile) {
+      console.log("Chargement du PDF");
+      const publicationCurrentlyEdited = preset;
+      const URL_DOWNLOAD = "/api/download";
+      axios
+        .get(URL_DOWNLOAD + "/" + publicationCurrentlyEdited.file, {
+          responseType: "arraybuffer", // We don't download as a blob directly, as it will be downloaded as application/octed-stream which is invalid for iframes
+        })
+        .then((resPdf) => {
+          let blob = new Blob([resPdf.data], { type: "application/pdf" }); // Convert to blob, required to display the PDF
+          blob.path = publicationCurrentlyEdited.file;
+          if (publicationCurrentlyEdited.file === undefined) {
+            throw new ReferenceError(
+              "File path must be provided with blob ( path attribute)"
+            );
+          }
+          loadPdfCallback(blob);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+    // }
+  }, [preset, loadPdfCallback]);
+
+  // Automatically display the number of loaded pages for the new PDF
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
   }
@@ -154,8 +191,9 @@ function AttachmentArea(props) {
                 useChipsForPreview
                 onDrop={(files) => {
                   if (files.length > 0) {
-                    loadPdf(files[0]);
+                    loadPdfCallback(files[0]);
                     setSize(6);
+                    editedPdfFileToo = true;
                   }
                 }}
                 dropzoneParagraphClass={classes.dropzoneParagraph}
@@ -180,8 +218,9 @@ function AttachmentArea(props) {
             useChipsForPreview
             onDrop={(files) => {
               if (files.length > 0) {
-                loadPdf(files[0]);
+                loadPdfCallback(files[0]);
                 setSize(6);
+                editedPdfFileToo = true;
               }
             }}
             previewGridProps={{ container: { spacing: 1, direction: "row" } }}
@@ -196,7 +235,7 @@ function AttachmentArea(props) {
     </div>
   );
 }
-
+// Save of modify a publication, with UI handling
 function savePublication(
   pdfFile,
   description,
@@ -207,9 +246,14 @@ function savePublication(
   isDraft,
   setAlertDialogMsg,
   setDialogOpen,
-  editMode // Indicate if the publication must be created or edited
+  setSaveDraftButtonDisabled,
+  publicationId, // Edit only, publication id for upload for S3
+  setLoadingPost,
+  publicationSentAction,
+  publicatinSavedAction
 ) {
   // Check submit
+
   var msg = "";
   if (pdfFile === undefined) {
     msg += "\n- Pas de pdf";
@@ -223,110 +267,234 @@ function savePublication(
   if (title === undefined || title === "") {
     msg += "\n- Pas de titre";
   }
+  tags = tags.map((t) => {
+    return { label: t.label.replace(",", "") };
+  }); // Remove special characters
+  tags = tags.filter((t) => t.label.length !== 0 || t.label !== ""); // Remove invalid tags
+  console.log(description);
+  if (description !== undefined) {
+    for (let i = 0; i < badWords.length; i++) {
+      if (description.toLowerCase().includes(badWords[i].toLowerCase())) {
+        msg += "\n- Mot interdit : " + badWords[i];
+      }
+    }
+  }
   if (msg !== "") {
     setAlertDialogMsg(msg);
     setDialogOpen(true);
   } else {
-    const UPLOAD_URL = "api/upload";
-    const PUBLICATION_URL = "api/publication";
+    const PUT_PUBLICATION_URL_EDIT = "api/publication/" + publicationId;
+    const POST_PUBLICATION_URL = "api/publication/";
     let createdPublication = null; // Publication created with first post
+    const pubFile = title + ".pdf";
     // First POST : All informations but not the PDF
-    if(editMode === true){
-      // TODO COMPLETE
+    if (editMode === true) {
+      axios
+        .put(PUT_PUBLICATION_URL_EDIT, {
+          publication_content: description,
+          publication_file: pubFile,
+          publication_tags: tags.map((t) => t.label).join(","),
+          publication_title: title,
+        })
+        .then((res) => {
+          const editedPublication = res.data;
+          const UPLOAD_FILE_URL_EDIT = "api/upload/" + editedPublication.id;
+          const DELETE_FILE_URL_EDIT = "api/delete/" + editedPublication.id;
+          if (editedPdfFileToo) {
+            axios
+              .delete(DELETE_FILE_URL_EDIT)
+              .then((resDelete) => {
+                console.log("deleted old PDF file");
+                uploadPDF(
+                  UPLOAD_FILE_URL_EDIT,
+                  pdfStream,
+                  setAlertDialogMsg,
+                  setDialogOpen,
+                  setLoadingPost
+                );
+              })
+              .catch((eFile) => {
+                console.warn(
+                  "Une erreur est survenue lors de la modification de votre fichier. Impossible de supprimer l'ancien fichier avant d'envoyer le nouveau. Peut être que le fichier n'existe plus",
+                  eFile
+                );
+                uploadPDF(
+                  UPLOAD_FILE_URL_EDIT,
+                  pdfStream,
+                  setAlertDialogMsg,
+                  setDialogOpen,
+                  setLoadingPost
+                );
+              });
+          } else {
+            setAlertDialogMsg("Brouillon mis à jour (informations seulement)");
+            setDialogOpen(true);
+          }
+        })
+        .catch((e) => {
+          setAlertDialogMsg(
+            "Une erreur est survenue lors de la modification des informations de votre brouillon"
+          );
+          console.error(e);
+        });
     } else {
-    axios
-      .post(PUBLICATION_URL, {
-        publication_content: descriptionText,
+      // When creating a new publication, not editing it (Submit button)
+      const data = {
+        publication_content: description,
         publication_date: Date.now(),
         publication_download_number: 0,
-        publication_file: title,
+        publication_file: pubFile,
         publication_like_number: 0,
         publication_report: 0,
         publication_status: isDraft ? "Saved" : "To_Treat", // Precise enum values
         publication_tags: tags.map((t) => t.label).join(","), // separate with "," each tag
-        publication_title: title + "_user_" + MOCK_USER_ID,
+        publication_title: title,
         user_id: MOCK_USER_ID,
-      })
-      .then((res) => {
-        console.log(res.status, res.statusText);
-        createdPublication = res.data;
-        console.log("Pub infos sent to database!", createdPublication);
-        // We create a format for sending a pdf
-        const formData = new FormData();
-        formData.append("file", pdfStream);
-        const config = {
-          headers: {
-            "content-type": "multipart/form-data",
-          },
-        };
-        // Second POST : the PDF only
-        axios
-          .post(UPLOAD_URL, formData, config)
-          .then((resUpload) => {
-            if (isDraft) {
+      };
+      setLoadingPost(true);
+      // First POST : All informations but not the PDF
+      axios
+        .post(POST_PUBLICATION_URL, data)
+        .then((res) => {
+          console.log(res.status, res.statusText);
+          createdPublication = res.data;
+          console.log("Pub infos sent to database!", createdPublication);
+          // We create a format for sending a pdf
+          const formData = new FormData();
+          console.log(pdfStream);
+          formData.append("file", pdfStream);
+          const config = {
+            headers: {
+              "content-type": "multipart/form-data",
+            },
+          };
+          const UPLOAD_FILE_URL = "api/upload/" + createdPublication.id;
+          // Second POST : the PDF only
+          axios
+            .post(UPLOAD_FILE_URL, formData, config)
+            .then((resUpload) => {
+              if (isDraft) {
+                publicatinSavedAction();
+              } else {
+                publicationSentAction();
+              }
+            })
+            .catch((errUpload) => {
               setAlertDialogMsg(
-                "Publication sauvegardée en tant que brouillon"
+                "Une erreur est survenue lors de la publication de votre fichier"
               );
               setDialogOpen(true);
-              setSubmitButtonLocked(true);
-            } else {
-              setAlertDialogMsg("Publication envoyée pour validation!");
-              setDialogOpen(true);
-            }
-          })
-          .catch((errUpload) => {
-            setAlertDialogMsg(
-              "Une erreur est survenue lors de la publication de votre fichier"
-            );
-            setDialogOpen(true);
-            console.error(
-              "Failed to upload pdf,deleting publication",
-              errUpload
-            );
-            axios
-              .delete(PUBLICATION_URL + "/" + createdPublication.id)
-              .then((resDelete) => {
-                setAlertDialogMsg(
-                  "Une erreur est survenue lors de la publication de votre fichier"
-                );
-                setDialogOpen(true);
-              })
-              .catch((e) => {
-                console.error(
-                  "Failed to delete uploaded pub infos after we found that we couldn't delete the uploaded document",
-                  e
-                );
-              });
-          });
-      })
-      .catch((err) => {
-        setAlertDialogMsg(
-          "Une erreur est survenue lors de l'envoie des informations de votre publication"
-        );
-        console.error(err);
-        setDialogOpen(true);
-      });
-  }    }
+              setLoadingPost(false);
+              console.error(
+                "step 2 failed : Failed to upload pdf,deleting publication",
+                errUpload
+              );
+              axios
+                .delete("api/publication/" + createdPublication.id)
+                .then((resDelete) => {
+                  console.log(
+                    "uploaded infos were deleted because file {" +
+                      createdPublication.file +
+                      "} could not be uploaded"
+                  );
+                  setAlertDialogMsg(
+                    "Une erreur est survenue lors de la publication de votre fichier"
+                  );
+                  setDialogOpen(true);
+                })
+                .catch((e) => {
+                  console.error(
+                    "Failed to delete uploaded pub infos after we found that we couldn't delete the uploaded document",
+                    e
+                  );
+                });
+            });
+        })
+        .catch((err) => {
+          setAlertDialogMsg(
+            "Une erreur est survenue lors de l'envoi des informations de votre publication"
+          );
+          console.error("Step 1 failed", err);
+          setDialogOpen(true);
+        });
+    }
+  }
+}
 
+// Upload a PDF file to the S3 vault
+function uploadPDF(
+  UPLOAD_FILE_URL,
+  pdfStream,
+  setAlertDialogMsg,
+  setDialogOpen,
+  setLoadingPost
+) {
+  setLoadingPost(true);
+  const formData = new FormData();
+  formData.append("file", pdfStream);
+  console.log("Sending stream from edit", pdfStream);
+  const config = {
+    headers: {
+      "content-type": "multipart/form-data",
+    },
+  };
+  axios
+    .post(UPLOAD_FILE_URL, formData, config)
+    .then((resUploadNewFile) => {
+      console.log("uploaded PDF file");
+      setAlertDialogMsg("Brouillon mis à jour (informations et fichier)");
+      setDialogOpen(true);
+      editedPdfFileToo = false;
+      setLoadingPost(false);
+    })
+    .catch((eUploadNewFile) => {
+      console.error(eUploadNewFile);
+      setAlertDialogMsg(
+        "Une erreur est survenue lors de la modification de votre fichier. Impossible d'envoyer le fichier modifié"
+      );
+      setDialogOpen(true);
+      setLoadingPost(false);
+    });
 }
 
 function CreatePublicationSummary(props) {
   const classes = useStyles();
   let {
+    submitButtonLocked,
+    setSubmitButtonLocked,
+    saveDraftButtonDisabled,
+    setSaveDraftButtonDisabled,
     title,
     pdfFile,
     description,
     setDescription,
     tags,
     pdfStream,
+    publicationId,
   } = props.form;
-  const [submitButtonLocked, setSubmitButtonLocked] = React.useState(false);
+  const history = useHistory();
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [alertDialogMsg, setAlertDialogMsg] = React.useState("");
-
+  const [loadingPost, setLoadingPost] = React.useState(false);
   const handleClose = () => {
     setDialogOpen(false);
   };
+
+  function publicationSentAction() {
+    setAlertDialogMsg("Publication envoyée pour validation!");
+    setDialogOpen(true);
+    setSaveDraftButtonDisabled(true);
+    setSubmitButtonLocked(true);
+    setLoadingPost(false);
+  }
+
+  function publicationSavedAction() {
+    setAlertDialogMsg("Publication sauvegardée en tant que brouillon");
+    setDialogOpen(true);
+    setSubmitButtonLocked(true);
+    setLoadingPost(false);
+  }
+
   return (
     <div>
       <Card className={classes.card}>
@@ -351,7 +519,7 @@ function CreatePublicationSummary(props) {
             className="new-post-editor"
             description={description}
             setDescription={setDescription}
-            value={descriptionText}
+            value={description}
           />
           <div>
             {/** Error area if one the required elements is missing from the controls for sending a new publication */}
@@ -375,60 +543,99 @@ function CreatePublicationSummary(props) {
               </DialogActions>
             </Dialog>
           </div>
-          <Grid container direction="row">
+          <Grid direction="row">
             {/* Action buttons */}
-              <Box>
-                <Button
-                  color="secondary"
-                  variant="contained"
-                  disabled={Boolean(submitButtonLocked)}
-                  style={{
-                    marginTop: "20px",
-                    borderRadius: 50,
-                    marginInline: 2,
-                  }}
-                  onClick={() => {
-                    savePublication(
-                      pdfFile,
-                      description,
-                      tags,
-                      title,
-                      pdfStream,
-                      setSubmitButtonLocked,
-                      false,
-                      setAlertDialogMsg,
-                      setDialogOpen
-                    );
-                  }}
-                >
-                  {editMode ? "Publier ce brouillon" : "Publier"} 
-                </Button>
-                <Button
-                  color="secondary"
-                  variant="contained"
-                  style={{
-                    marginTop: "20px",
-                    borderRadius: 50,
-                    marginInline: 2,
-                  }}
-                  onClick={() => {
-                    savePublication(
-                      pdfFile,
-                      description,
-                      tags,
-                      title,
-                      pdfStream,
-                      setSubmitButtonLocked,
-                      true,
-                      setAlertDialogMsg,
-                      setDialogOpen,
-                      editMode
-                    );
-                  }}
-                >
-                  {editMode ? "Mettre à jour ce brouillon" : "Enregistrer en tant que brouillon"}
-                </Button>
-              </Box>
+            <Box>
+              <Grid justify="space-between" alignItems="stretch" container>
+                <Grid item>
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    disabled={submitButtonLocked}
+                    style={{
+                      marginTop: "20px",
+                      borderRadius: 50,
+                      marginInline: 2,
+                    }}
+                    onClick={() => {
+                      savePublication(
+                        pdfFile,
+                        description.toString("html"),
+                        tags,
+                        title,
+                        pdfStream,
+                        setSubmitButtonLocked,
+                        false,
+                        setAlertDialogMsg,
+                        setDialogOpen,
+                        setSaveDraftButtonDisabled,
+                        publicationId,
+                        setLoadingPost,
+                        publicationSentAction, // POST
+                        publicationSavedAction // PUT
+                      );
+                    }}
+                  >
+                    {editMode ? "Publier ce brouillon" : "Publier"}
+                    {loadingPost ? (
+                      <CircularProgress
+                        style={{ marginLeft: "10px" }}
+                        size={25}
+                      />
+                    ) : (
+                      <div />
+                    )}
+                  </Button>
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    disabled={saveDraftButtonDisabled}
+                    style={{
+                      marginTop: "20px",
+                      borderRadius: 50,
+                      marginInline: 2,
+                    }}
+                    onClick={() => {
+                      savePublication(
+                        pdfFile,
+                        description.toString("html"),
+                        tags,
+                        title,
+                        pdfStream,
+                        setSubmitButtonLocked,
+                        true,
+                        setAlertDialogMsg,
+                        setDialogOpen,
+                        setSaveDraftButtonDisabled,
+                        publicationId,
+                        setLoadingPost,
+                        publicationSentAction, // POST
+                        publicationSavedAction // PUT
+                      );
+                    }}
+                  >
+                    {editMode
+                      ? "Mettre à jour ce brouillon"
+                      : "Enregistrer en tant que brouillon"}
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    style={{
+                      marginLeft: "30px",
+                      marginTop: "20px",
+                      borderRadius: 50,
+                      marginInline: 2,
+                    }}
+                    onClick={() => history.push("/myPublications")}
+                    color="secondary"
+                    variant="contained"
+                  >
+                    Mes publications
+                  </Button>
+                </Grid>
+              </Grid>
+            </Box>
           </Grid>
         </Grid>
       </Card>
@@ -445,10 +652,11 @@ function CreatePublicationForm(props) {
       <Card className={classes.card}>
         <FormControl fullWidth={true} style={{ margin: 20 }}>
           <Typography variant="h5" style={{ marginInline: 10 }}>
-            Créer une publication
+            {editMode
+              ? "Modification de votre publication"
+              : "Créer une publication"}
           </Typography>
           <TextField
-            error={title.length !== 0 ? false : true}
             style={{ padding: 10 }}
             value={title}
             onChange={(e) => {
@@ -585,14 +793,24 @@ function GetStepContent(step, preset) {
       preset.content,
       "html"
     );
-    descriptionText = presetDescription.toString("html"); // Can't edit the rich text area at the moment if the publication is already created
+    // descriptionText =  description!==undefined ? description : ; // Can't edit the rich text area at the moment if the publication is already created
   }
-  const [description, setDescription] = React.useState(presetDescription);
+  console.log("presetDescription : ", presetDescription);
+  const [descriptionHtml, setDescriptionHtml] = React.useState(
+    presetDescription === undefined
+      ? RichTextEditor.createEmptyValue()
+      : presetDescription
+  );
+  console.log("description : ", descriptionHtml);
   const [title, setTitle] = React.useState((preset && preset.title) || "");
   const [numPages, setNumPages] = React.useState(null);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [pdfFile, setPdfFile] = React.useState();
   const [pdfStream, setPdfStream] = React.useState();
+  const [submitButtonLocked, setSubmitButtonLocked] = React.useState(false);
+  const [saveDraftButtonDisabled, setSaveDraftButtonDisabled] = React.useState(
+    false
+  );
   const presetTags = [];
   if (preset !== undefined && preset.tags != null) {
     preset.tags.split(",").forEach((str) => {
@@ -617,16 +835,16 @@ function GetStepContent(step, preset) {
         <CreatePublicationContent
           form={{
             numPages: numPages,
-            text: descriptionText,
             setNumPages: setNumPages,
             pageNumber: pageNumber,
-            description: description,
-            setDescription: setDescription,
+            description: descriptionHtml,
+            setDescription: setDescriptionHtml,
             setPageNumber: setPageNumber,
             pdfStream: pdfStream,
             setPdfStream: setPdfStream,
             pdfFile: pdfFile,
             setPdfFile: setPdfFile,
+            preset: preset, // Used for editing the publication file in draft mode
           }}
         />
       );
@@ -634,16 +852,20 @@ function GetStepContent(step, preset) {
       return (
         <CreatePublicationSummary
           form={{
-            text: descriptionText,
+            submitButtonLocked: submitButtonLocked,
+            setSubmitButtonLocked: setSubmitButtonLocked,
+            saveDraftButtonDisabled: saveDraftButtonDisabled,
+            setSaveDraftButtonDisabled: setSaveDraftButtonDisabled,
             title: title,
             numPages: numPages,
             pageNumber: pageNumber,
             pdfFile: pdfFile,
             pdfStream: pdfStream,
             setPdfStream: setPdfStream,
-            description: description,
-            setDescription: setDescription,
+            description: descriptionHtml,
+            setDescription: setDescriptionHtml,
             tags: tags,
+            publicationId: preset ? preset.id : undefined, // For draft modifications only
           }}
         />
       );
@@ -664,10 +886,10 @@ function CreatePublicationContent(props) {
           editorClassName={classes.rte}
           setDescription={setDescription}
           onChange={(e) => {
-            descriptionText = e.toString("html");
+            //descriptionText = e.toString("html");
           }}
           description={description}
-          value={descriptionText}
+          value={description}
         />
         <AttachmentArea form={props.form} />
       </Card>
@@ -677,7 +899,8 @@ function CreatePublicationContent(props) {
 
 function CreatePublication(props) {
   console.log(props.location.preset);
-  editMode = props.location.editMode !== undefined && props.location.editMode === true;
+  editMode =
+    props.location.editMode !== undefined && props.location.editMode === true;
   return (
     <div className="App">
       <CreatePublicationStepper preset={props.location.preset} />

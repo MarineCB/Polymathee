@@ -7,6 +7,9 @@ import {
   List,
   CircularProgress,
   Box,
+  Paper,
+  Tabs,
+  Tab,
   Button,
   Slide,
   Dialog,
@@ -15,13 +18,25 @@ import {
   DialogContentText,
   DialogActions,
   Snackbar,
+  IconButton,
 } from "@material-ui/core";
 import { Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import PublicationTile from "../../components/publication/PublicationTile";
 import axios from "axios";
 import PublicationTileFav from "../../components/publication/PublicationTileFav";
+import { Info, Publish, Search } from "@material-ui/icons";
 const MOCK_USER_ID = 2; // TODO : remove for prod
-
+const useStyles = makeStyles((theme) => ({
+  icon: {
+    marginTop: "10px",
+    padding: 50,
+    fontSize: "200%",
+    "&:hover": {
+      color: theme.palette.primary.main,
+    },
+  },
+}));
 // Load created publications
 function loadSubmittedPublications(setPubs, setLoaded, userId) {
   axios.get("api/publications/user/" + userId).then((res) => {
@@ -43,7 +58,76 @@ function TransitionUp(props) {
   return <Slide {...props} direction="up" />;
 }
 
+function CreatePublicationBox({ pubs }) {
+  const classes = useStyles();
+  const history = useHistory();
+  const empty = pubs === undefined || pubs.length === 0;
+  return (
+    <Box p={2} style={{ paddingBottom: "40px" }}>
+      <Typography variant="h6">
+        {empty
+          ? "Publiez votre première publication"
+          : "Publiez une nouvelle publication"}
+      </Typography>
+      <IconButton
+        onClick={() => history.push("/createPublication")}
+        className={classes.icon}
+        variant="outlined"
+        color="secondary"
+      >
+        <Publish fontSize="large" />
+      </IconButton>
+      <Typography>
+        {" "}
+        {empty
+          ? "En seulement quelques clics"
+          : `Déjà ${pubs.length} publications créees`}
+      </Typography>
+    </Box>
+  );
+}
+
+function AddFavoriteBox({ pubsFav }) {
+  const history = useHistory();
+  const classes = useStyles();
+  const empty = pubsFav === undefined || pubsFav.length === 0;
+  return (
+    <Box p={2} style={{ paddingBottom: "40px" }}>
+      <Typography variant="h6">
+        {empty ? "Aucun favori pour le moment" : "Ajouter des favoris"}
+      </Typography>
+      <IconButton
+        onClick={() => history.push("/")}
+        className={classes.icon}
+        variant="outlined"
+        color="secondary"
+      >
+        <Search fontSize="large" />
+      </IconButton>
+      <Typography> Parcourir les publications</Typography>
+    </Box>
+  );
+}
+
+function NoPublicationsMsg() {
+  return (
+    <Box p={6}>
+      <Grid container justify="center" direction="row">
+        <Grid>
+          <Info />
+        </Grid>
+        <Grid>
+          <Typography style={{ paddingLeft: "20px" }}>
+            Aucune publication n'a ce statut
+          </Typography>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+}
+
 function MyPublications() {
+  const classes = useStyles();
   const [pubs, setPubs] = React.useState([]);
   const [pubsFav, setPubsFav] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false); // Loading animation for the user's publications
@@ -53,6 +137,7 @@ function MyPublications() {
   const [transition, setTransition] = React.useState();
   const [delPubDialogVisible, setDelPubDialogVisible] = React.useState(false);
   const [delPubDialogMsg, setDelPubDialogMsg] = React.useState("");
+  const [curFilter, setCurFilter] = React.useState(); // Nothing means no filter
   const [confirmDeleteHandler, setConfirmDeleteHandler] = React.useState(
     () => () => {
       console.error(
@@ -60,6 +145,17 @@ function MyPublications() {
       );
     }
   );
+  let displayPubs = getFilteredPubs();
+  const [tabValue, setTabValue] = React.useState(0);
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  function setTab(tabIndex, status) {
+    setTabValue(tabIndex);
+    setCurFilter(status);
+  }
+
   const showSnackbar = (Transition) => () => {
     setTransition(() => Transition);
     setSnackbarVisible(true);
@@ -75,68 +171,89 @@ function MyPublications() {
     setDelPubDialogVisible(false);
   };
 
-  const history = useHistory();
   useEffect(() => {
     // Load all publications
     loadSubmittedPublications(setPubs, setLoaded, MOCK_USER_ID);
     loadFavoritedPublications(setPubsFav, setLoadedFav, MOCK_USER_ID);
   }, []);
 
+  function getFilteredPubs() {
+    return curFilter !== undefined
+      ? pubs.filter((p) => p.status.toLowerCase() === curFilter)
+      : pubs;
+  }
   return (
     <div className="App">
       <div>
         <Grid direction="column" container>
           {" "}
           <Card raised>
-            <Typography variant="h5" style={{ marginTop: 20 }}>
+            <Typography variant="h4" style={{ marginTop: 20 }}>
               Publications
             </Typography>
+            {(() => {
+              if (!loaded) {
+                return <CircularProgress style={{margin:"30px"}} color="primary" size={70} />;
+              } else {
+                return <CreatePublicationBox pubs={pubs} />;
+              }
+            })()}
+
+            <Paper className={classes.root}>
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                indicatorColor="secondary"
+                textColor="secondary"
+                centered
+              >
+                <Tab label="Tout" onClick={() => setTab(0)} />
+                <Tab label="Publié" onClick={() => setTab(1, "published")} />
+                <Tab label="Brouillon" onClick={() => setTab(2, "saved")} />
+                <Tab label="En attente" onClick={() => setTab(3, "to_treat")} />
+                <Tab label="Rejeté" onClick={() => setTab(4, "rejected")} />
+              </Tabs>
+            </Paper>
             <List>
-              {!loaded ? (
-                <CircularProgress color="primary" size={100} />
+              {displayPubs.length > 0 ? (
+                displayPubs.map((publication) => (
+                  <PublicationTile
+                    key={publication.id}
+                    publication={publication}
+                    setSnackbarMsg={setSnackbarMsg}
+                    showSnackbar={showSnackbar(TransitionUp)}
+                    hideSnackbar={hideSnackbar(TransitionUp)}
+                    delPubDialogMsg={delPubDialogMsg}
+                    setDelPubDialogMsg={setDelPubDialogMsg}
+                    setDelPubDialogVisible={setDelPubDialogVisible}
+                    setConfirmDeleteHandler={setConfirmDeleteHandler} // We need to be able to override the handler for deleting a publication with the correct id, so that each publication uses its own delete function
+                    reloadPublications={() => {
+                      loadSubmittedPublications(
+                        setPubs,
+                        setLoaded,
+                        MOCK_USER_ID
+                      );
+                    }}
+                  />
+                ))
               ) : (
-                <div></div>
+                <NoPublicationsMsg />
               )}
-              {pubs.map((publication) => (
-                <PublicationTile
-                  key={publication.id}
-                  publication={publication}
-                  setSnackbarMsg={setSnackbarMsg}
-                  showSnackbar={showSnackbar(TransitionUp)}
-                  hideSnackbar={hideSnackbar(TransitionUp)}
-                  delPubDialogMsg={delPubDialogMsg}
-                  setDelPubDialogMsg={setDelPubDialogMsg}
-                  setDelPubDialogVisible={setDelPubDialogVisible}
-                  setConfirmDeleteHandler={setConfirmDeleteHandler} // We need to be able to override the handler for deleting a publication with the correct id, so that each publication uses its own delete function
-                  reloadPublications={() => {
-                    loadSubmittedPublications(setPubs, setLoaded, MOCK_USER_ID);
-                  }}
-                />
-              ))}
             </List>
           </Card>
-          <Card raised style={{ marginTop: "30px" }}>
-            <Typography variant="h5" style={{ marginTop: 20 }}>
+          <Card raised style={{ marginTop: "5 0px" }}>
+            <Typography variant="h4" style={{ marginTop: 20 }}>
               Favoris
             </Typography>
             <List>
-              {!loadedFav ? (
-                <CircularProgress color="primary" size={100} />
-              ) : (
-                <Box p={2} style={{ paddingBottom: "40px" }}>
-                  <Typography variant="h6">
-                    Aucun publication ajoutée pour le moment
-                  </Typography>
-                  <Button
-                    onClick={() => history.push("/")}
-                    style={{ marginTop: "10px" }}
-                    variant="outlined"
-                    color="secondary"
-                  >
-                    Parcourir les publications
-                  </Button>
-                </Box>
-              )}
+              {(() => {
+                if (!loadedFav) {
+                  return <CircularProgress style={{margin:"30px"}} color="primary" size={70} />;
+                } else {
+                  return <AddFavoriteBox pubsFav={pubsFav} />;
+                }
+              })()}
+
               {pubsFav.map((publication) => (
                 <PublicationTileFav
                   key={publication.id}
