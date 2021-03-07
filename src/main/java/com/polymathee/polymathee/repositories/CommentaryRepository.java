@@ -30,4 +30,7 @@ public interface CommentaryRepository extends CrudRepository<Commentary, Integer
 
     @Query("SELECT c FROM Commentary c ORDER BY c.upvote DESC")
     List<Commentary> SortByUpvote();
+
+    @Query("Select c from Commentary c where c.report > :report ORDER BY c.report DESC")
+    List<Commentary> findCommentByReportDesc(int report);
 }

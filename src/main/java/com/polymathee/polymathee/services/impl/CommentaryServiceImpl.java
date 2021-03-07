@@ -89,4 +89,13 @@ public class CommentaryServiceImpl implements CommentaryService {
             return comments;
 
     }
+
+    @Override
+    public List<Commentary> GetCommentReport(Integer number) {
+
+        List<Commentary> comments ;
+        comments = commentaryRepository.findCommentByReportDesc(number);
+        return comments;
+
+    }
 }

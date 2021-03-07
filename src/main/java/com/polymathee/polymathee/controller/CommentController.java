@@ -28,6 +28,7 @@ public class CommentController {
     private static final String GET_COMMENTS_BY_ID_PUBLICATION = "/api/comments/{id}";
     private static final String GET_COMMENTS_BY_ID_USER = "/api/comments/user/{id}";
     private static final String GET_COMMENTS_BY_UPVOTE = "/api/comments/upvote";
+    private static final String GET_COMMENTS_BY_REPORT_DESC = "/api/comments/reports/{report}";
     private static final String POST_COMMENT ="/api/comment";
     private static final String DELETE_COMMENT ="/api/comment/{commentId}";
     private static final String POST_VOTE = "/api/vote";
@@ -45,6 +46,7 @@ public class CommentController {
     @ApiOperation(value = "get commentary by ID Publication", consumes = "application/json")
     public ResponseEntity<List<Commentary>> AllCommentaryByIDPublication(@PathVariable("id") Integer id) {
         List<Commentary> commentlist = commentaryService.getCommentaryByIdPublication(id);
+
         return new ResponseEntity<>(commentlist, HttpStatus.OK);
     }
 
@@ -55,11 +57,20 @@ public class CommentController {
         return new ResponseEntity<>(commentlist, HttpStatus.OK);
     }
 
+
     @GetMapping(GET_COMMENTS_BY_ID_USER)
     @ApiOperation(value = "Get all commentaries by ID User", consumes = "application/json")
     public ResponseEntity<List<Commentary>> allCommentaryByIDUser(@PathVariable("id") Integer id) {
         List<Commentary> commentList = commentaryService.getCommentaryByIdUser(id);
         return new ResponseEntity<>(commentList, HttpStatus.OK);
+    }
+
+    @GetMapping(GET_COMMENTS_BY_REPORT_DESC)
+    @ApiOperation(value = "Get comments report desc", consumes = "application/json")
+    public ResponseEntity<List<Commentary>> AllCommentaryByReportDesc(@PathVariable("report") Integer report) {
+        List<Commentary> commentlist = commentaryService.GetCommentReport(report);
+        return new ResponseEntity<>(commentlist, HttpStatus.OK);
+
     }
 
 

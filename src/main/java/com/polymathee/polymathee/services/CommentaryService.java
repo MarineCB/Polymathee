@@ -22,4 +22,6 @@ public interface CommentaryService {
     Commentary updateReport(Integer id);
 
     List<Commentary> SortByCommentUpvote(Integer id);
+
+    List<Commentary> GetCommentReport(Integer number);
 }
