@@ -105,7 +105,6 @@ function askDeletePublication(
 ) {
   // Configure the handler for deletion
   setConfirmDeleteHandler(() => () => {
-    console.log("Click confirm delete for " + publication.id);
     deletePublication(
       publication.id,
       setSnackbarMsg,
@@ -220,7 +219,9 @@ function PublicationTile({
     >
       <Grid container alignItems="center" item>
         <Grid item xs={3}>
-          <Typography variant="h6">{publication.title}</Typography>
+          <Tooltip  title={"Créee le " + new Date(publication.date).toLocaleDateString()}>
+            <Typography variant="h6">{publication.title}</Typography>
+          </Tooltip>
         </Grid>
         <Grid item xs={3}>
           <Typography>{infos.msg}</Typography>

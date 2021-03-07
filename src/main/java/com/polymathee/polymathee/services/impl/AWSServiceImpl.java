@@ -40,15 +40,16 @@ public class AWSServiceImpl implements AWSService {
     @Async
     public void uploadFile(final MultipartFile multipartFile, int id) {
         LOGGER.info("File upload in progress.");
+        final File file = convertMultiPartFileToFile(multipartFile);
         try {
-            final File file = convertMultiPartFileToFile(multipartFile);
             uploadFileToS3Bucket(bucketName, file, id);
             LOGGER.info("File upload is completed.");
-            // file.delete();  // To remove the file locally created in the project folder. //Théo
-
         } catch (final AmazonServiceException ex) {
             LOGGER.info("File upload is failed.");
             LOGGER.error("Error= {} while uploading file.", ex.getMessage());
+        } finally {
+            if(!file.delete())
+                LOGGER.info("Failed to delete temp file");// To remove the file locally created in the project folder.
         }
     }
 
@@ -64,14 +65,14 @@ public class AWSServiceImpl implements AWSService {
 
     private void uploadFileToS3Bucket(final String bucketName, final File file, int id) {
 
-        String File= "";
+        String fileStr= "";
         Publication publication;
         publication = publicationRepository.findPublicationById(id);
         final String uniqueFileName =  file.getName();
-        File = publication.getUserId().getId() +"-"+ uniqueFileName;
-        publicationRepository.updateFileById(id,File);
+        fileStr = publication.getUserId().getId() +"-"+ uniqueFileName;
+        publicationRepository.updateFileById(id,fileStr);
         LOGGER.info("Uploading file with name= " + uniqueFileName);
-        final PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, File, file);
+        final PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileStr, file);
         amazonS3.putObject(putObjectRequest);
     }
 
@@ -100,11 +101,6 @@ public class AWSServiceImpl implements AWSService {
 
             System.out.println(e.getErrorMessage());
 
-        } finally {
-
-            if(amazonS3 != null) {
-                amazonS3.shutdown();
-            }
         }
     }
 

@@ -29,11 +29,14 @@ import { Info, Publish, Search } from "@material-ui/icons";
 const MOCK_USER_ID = 2; // TODO : remove for prod
 const useStyles = makeStyles((theme) => ({
   icon: {
-    marginTop: "10px",
+    marginTop: "30px",
+    marginBottom: "30px",
     padding: 50,
     fontSize: "200%",
     "&:hover": {
+      transition: "transform .2s", /* Animation */
       color: theme.palette.primary.main,
+      transform: "scale(1.5)"
     },
   },
 }));

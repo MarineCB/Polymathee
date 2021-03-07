@@ -20,7 +20,6 @@ function PolymatheeEditor(props) {
       function handleValueChange(editorValue) {
         setDescription(editorValue)
         if (onChange) onChange(editorValue)
-        console.log(description)
       }
   
       return (

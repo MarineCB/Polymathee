@@ -138,11 +138,11 @@ function AttachmentArea(props) {
   );
 
   useEffect(() => {
+    // If we edit a draft publication
     // Load PDF file from publication id
     if (editMode) {
       // If we already downloaded the file 1 time, no need to redownload it
       // if(!pdfFile) {
-      console.log("Chargement du PDF");
       const publicationCurrentlyEdited = preset;
       const URL_DOWNLOAD = "/api/download";
       axios
@@ -154,7 +154,7 @@ function AttachmentArea(props) {
           blob.path = publicationCurrentlyEdited.file;
           if (publicationCurrentlyEdited.file === undefined) {
             throw new ReferenceError(
-              "File path must be provided with blob ( path attribute)"
+              "File path must be provided with blob ( <blob>.path attribute)"
             );
           }
           loadPdfCallback(blob);
@@ -271,7 +271,6 @@ function savePublication(
     return { label: t.label.replace(",", "") };
   }); // Remove special characters
   tags = tags.filter((t) => t.label.length !== 0 || t.label !== ""); // Remove invalid tags
-  console.log(description);
   if (description !== undefined) {
     for (let i = 0; i < badWords.length; i++) {
       if (description.toLowerCase().includes(badWords[i].toLowerCase())) {
@@ -287,6 +286,24 @@ function savePublication(
     const POST_PUBLICATION_URL = "api/publication/";
     let createdPublication = null; // Publication created with first post
     const pubFile = title + ".pdf";
+
+    const successHandler = ()=>{
+      setDialogOpen(true);
+      editedPdfFileToo = false;
+      setLoadingPost(false);
+      setAlertDialogMsg(
+        "Publication publiée"
+      );
+      setSubmitButtonLocked(true)
+      setSaveDraftButtonDisabled(true)
+    }
+    const errorHandler = () => {
+      setAlertDialogMsg(
+        "Une erreur est survenue lors de la modification du statut de votre publication"
+      );
+      setDialogOpen(true);
+      setLoadingPost(false);
+    }
     // First POST : All informations but not the PDF
     if (editMode === true) {
       axios
@@ -302,32 +319,43 @@ function savePublication(
           const DELETE_FILE_URL_EDIT = "api/delete/" + editedPublication.id;
           if (editedPdfFileToo) {
             axios
-              .delete(DELETE_FILE_URL_EDIT)
+              .delete(DELETE_FILE_URL_EDIT) // Delete old PDF
               .then((resDelete) => {
-                console.log("deleted old PDF file");
-                uploadPDF(
+                uploadPDF( // Then upload the new one
                   UPLOAD_FILE_URL_EDIT,
                   pdfStream,
                   setAlertDialogMsg,
                   setDialogOpen,
-                  setLoadingPost
+                  setLoadingPost,
+                  !isDraft, // also update the status of the publication from Saved to To_treat, if this is a draft
+                  editedPublication.id,
+                  successHandler,
+                  errorHandler
                 );
               })
-              .catch((eFile) => {
+              .catch((eFile) => { 
                 console.warn(
                   "Une erreur est survenue lors de la modification de votre fichier. Impossible de supprimer l'ancien fichier avant d'envoyer le nouveau. Peut être que le fichier n'existe plus",
                   eFile
-                );
-                uploadPDF(
-                  UPLOAD_FILE_URL_EDIT,
-                  pdfStream,
-                  setAlertDialogMsg,
-                  setDialogOpen,
-                  setLoadingPost
-                );
-              });
-          } else {
-            setAlertDialogMsg("Brouillon mis à jour (informations seulement)");
+                  );
+                  uploadPDF(
+                    UPLOAD_FILE_URL_EDIT,
+                    pdfStream,
+                    setAlertDialogMsg,
+                    setDialogOpen,
+                    setLoadingPost,
+                    !isDraft, // also update the status of the publication from Saved to To_treat, if this is a draft
+                    editedPublication.id,
+                    successHandler,
+                    errorHandler
+                    );
+                  });
+                } else {
+            if(!isDraft) {
+              updateStatusFromDraftToToTreat(publicationId,successHandler,errorHandler)
+            } else {
+              setAlertDialogMsg("Brouillon mis à jour (informations seulement)");
+            }
             setDialogOpen(true);
           }
         })
@@ -356,12 +384,9 @@ function savePublication(
       axios
         .post(POST_PUBLICATION_URL, data)
         .then((res) => {
-          console.log(res.status, res.statusText);
           createdPublication = res.data;
-          console.log("Pub infos sent to database!", createdPublication);
           // We create a format for sending a pdf
           const formData = new FormData();
-          console.log(pdfStream);
           formData.append("file", pdfStream);
           const config = {
             headers: {
@@ -392,11 +417,6 @@ function savePublication(
               axios
                 .delete("api/publication/" + createdPublication.id)
                 .then((resDelete) => {
-                  console.log(
-                    "uploaded infos were deleted because file {" +
-                      createdPublication.file +
-                      "} could not be uploaded"
-                  );
                   setAlertDialogMsg(
                     "Une erreur est survenue lors de la publication de votre fichier"
                   );
@@ -421,18 +441,31 @@ function savePublication(
   }
 }
 
+function updateStatusFromDraftToToTreat(publicationId,successHandler,errorHandler) {
+  const status = "To_Treat"
+  axios.put(`api/status/publication/${publicationId}/${status}`).then(resUpdatePubStatus =>{
+    successHandler()
+  }).catch(errUpdateStatus =>{
+    console.error(errUpdateStatus)
+    errorHandler()
+  }) 
+}
+
 // Upload a PDF file to the S3 vault
 function uploadPDF(
   UPLOAD_FILE_URL,
   pdfStream,
   setAlertDialogMsg,
   setDialogOpen,
-  setLoadingPost
+  setLoadingPost,
+  updateStatusToToTreat, // Change from Saved to To_Treat the publication status
+  publicationId, // Only required if the status needs to be updated
+  successHandlerStatus,
+  errorHandlerStatus
 ) {
   setLoadingPost(true);
   const formData = new FormData();
   formData.append("file", pdfStream);
-  console.log("Sending stream from edit", pdfStream);
   const config = {
     headers: {
       "content-type": "multipart/form-data",
@@ -441,11 +474,14 @@ function uploadPDF(
   axios
     .post(UPLOAD_FILE_URL, formData, config)
     .then((resUploadNewFile) => {
-      console.log("uploaded PDF file");
       setAlertDialogMsg("Brouillon mis à jour (informations et fichier)");
-      setDialogOpen(true);
-      editedPdfFileToo = false;
-      setLoadingPost(false);
+      if(updateStatusToToTreat) {
+        updateStatusFromDraftToToTreat(publicationId, successHandlerStatus,errorHandlerStatus)
+      } else {
+        setDialogOpen(true);
+        setLoadingPost(false);
+      }
+
     })
     .catch((eUploadNewFile) => {
       console.error(eUploadNewFile);
@@ -795,13 +831,11 @@ function GetStepContent(step, preset) {
     );
     // descriptionText =  description!==undefined ? description : ; // Can't edit the rich text area at the moment if the publication is already created
   }
-  console.log("presetDescription : ", presetDescription);
   const [descriptionHtml, setDescriptionHtml] = React.useState(
     presetDescription === undefined
       ? RichTextEditor.createEmptyValue()
       : presetDescription
   );
-  console.log("description : ", descriptionHtml);
   const [title, setTitle] = React.useState((preset && preset.title) || "");
   const [numPages, setNumPages] = React.useState(null);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -898,7 +932,6 @@ function CreatePublicationContent(props) {
 }
 
 function CreatePublication(props) {
-  console.log(props.location.preset);
   editMode =
     props.location.editMode !== undefined && props.location.editMode === true;
   return (
