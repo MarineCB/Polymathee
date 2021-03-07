@@ -15,7 +15,7 @@ function NavBar() {
             container
             justify="center"
           >
-            <Typography variant="h6" onClick={() => history.push("/")}>
+            <Typography variant="h6" onClick={() => history.push("/homepage")}>
               Polymathée
             </Typography>
           </Grid>

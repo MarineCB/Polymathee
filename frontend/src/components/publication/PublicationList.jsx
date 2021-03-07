@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import { withRouter } from "react-router-dom";
 import {
   Box,
@@ -13,6 +13,8 @@ import { Favorite, GetApp } from "@material-ui/icons";
 import Tag from "../tag/Tag";
 import { makeStyles } from "@material-ui/core/styles";
 import { PublicationContext } from "../../store/PublicationContext";
+import { useHistory } from "react-router-dom";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,6 +44,7 @@ function extractContent(s) {
 }
 
 function PublicationList() {
+  const history = useHistory();
   const classes = useStyles();
 
   const [Publications] = useContext(PublicationContext);
@@ -49,14 +52,24 @@ function PublicationList() {
     const tags = publication.tags.split(",");
 
     return (
-      <Box flexGrow={1} key={index} m={2}>
-        <Card style={{ cursor: "pointer" }}>
+      <Box flexGrow={1} key={index} m={3}>
+        <Card
+          onClick={() => {
+            history.push({
+              pathname: "/viewPublication",
+              publicationId: publication.id,
+            });
+          }}
+          style={{ cursor: "pointer" }}
+        >
           <ListItem>
             <ListItemText
               primary={publication.title}
               secondary={
                 <React.Fragment>
-                  {new Date(publication.date).toLocaleDateString() +" "+ new Date(publication.date).toLocaleTimeString()}
+                  {new Date(publication.date).toLocaleDateString() +
+                    " " +
+                    new Date(publication.date).toLocaleTimeString()}
                 </React.Fragment>
               }
             />
