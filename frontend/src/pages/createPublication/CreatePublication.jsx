@@ -579,7 +579,7 @@ function CreatePublicationSummary(props) {
               </DialogActions>
             </Dialog>
           </div>
-          <Grid direction="row">
+          <Grid>
             {/* Action buttons */}
             <Box>
               <Grid justify="space-between" alignItems="stretch" container>
@@ -625,7 +625,7 @@ function CreatePublicationSummary(props) {
                   <Button
                     color="secondary"
                     variant="contained"
-                    disabled={saveDraftButtonDisabled}
+                    disabled={submitButtonLocked || saveDraftButtonDisabled}
                     style={{
                       marginTop: "20px",
                       borderRadius: 50,
@@ -799,6 +799,7 @@ function CreatePublicationStepper({ preset }) {
                 color="primary"
                 onClick={handleNext}
                 className={classes.button}
+                disabled={activeStep === totalSteps() - 1}
               >
                 Suivant
               </Button>
