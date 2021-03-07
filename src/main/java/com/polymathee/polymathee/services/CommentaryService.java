@@ -11,6 +11,8 @@ public interface CommentaryService {
 
     List<Commentary> getCommentaryByIdPublication(Integer id);
 
+    List<Commentary> getCommentaryByIdUser(Integer id);
+
     Commentary saveComment(CommentaryDto commentaryDto);
 
     void deleteComment(int comment);

@@ -17,6 +17,9 @@ public interface CommentaryRepository extends CrudRepository<Commentary, Integer
     @Query("SELECT sdto FROM Commentary sdto WHERE sdto.publicationId.id=:id")
     List<Commentary> findAllByPublicationId(Integer id);
 
+    @Query("SELECT sdto FROM Commentary sdto WHERE sdto.userId.id=:id")
+    List<Commentary> findAllByUserId(Integer id);
+
     void deleteById(int id);
 
     @Modifying

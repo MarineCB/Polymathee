@@ -22,9 +22,7 @@ import java.util.List;
 @SwaggerDefinition(tags = {@Tag(name = "/api",description = "Api Publication")})
 public class PublicationController {
 
-    private static final String GET_PUBLICATION = "/api/publication";
     private static final String GET_PUBLICATIONS = "/api/publications";
-
     private static final String GET_PUBLICATIONS_ID_USER = "/api/publications/user/{id}";
     private static final String GET_PUBLICATIONS_BY_ID = "/api/publications/{id}";
     private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/{status}";
@@ -61,19 +59,9 @@ public class PublicationController {
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-    /*@GetMapping(GET_PUBLICATION)
-    @ApiOperation(value = "Get Publications Filter", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublication(Filter publicationFilter)
-            throws UnsupportedEncodingException {
-        String filter = URLDecoder.decode(publicationFilter.getFilter(), "utf-8");
-        List<Publication> publiList = publicationService.getPublicationsFilter(filter);
-        return new ResponseEntity<>(publiList, HttpStatus.OK);
-    }*/
-
-
     @GetMapping(GET_PUBLICATIONS_BY_ID)
     @ApiOperation(value = "Get Publication by  ID", consumes = "application/json")
-    public ResponseEntity<Publication> getPublicationsById(@RequestParam(value="id") int id) {
+    public ResponseEntity<Publication> getPublicationsById(@PathVariable("id") Integer id) {
         Publication publi = publicationService.getPublicationsById(id);
         return new ResponseEntity<>(publi, HttpStatus.OK);
     }
@@ -81,7 +69,7 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_ID_USER)
     @ApiOperation(value = "Get Publication by User ID", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublicationsById(@RequestParam Integer id) {
+    public ResponseEntity<List<Publication>> getAllPublicationsById(@PathVariable("id") Integer id) {
         List<Publication> publiList = publicationService.getPublicationsByUserId(id);
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
@@ -89,7 +77,7 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_BY_STATUS)
     @ApiOperation(value = "Get Publication by status", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByStatus(@RequestParam(value="status") StateEnum status) {
+    public ResponseEntity<List<Publication>> getPublicationsByStatus(@PathVariable("status") StateEnum status) {
         List<Publication> listPubli = publicationService.getPublicationsByStatus(status);
         return new ResponseEntity<>(listPubli, HttpStatus.OK);
     }
