@@ -186,7 +186,7 @@ function Landing() {
 
             <Typography align="justify" variant="subtitle1">
               Polymathée est un site de partage de connaissances en ligne où les
-              étudiants, du primaire au supérieur, peuvent discuter et
+              étudiants, du secondaire au supérieur, peuvent discuter et
               s'entraider. Les étudiants peuvent y partager des documents ainsi
               que les compléter avec une description ou des explications. Il est
               également possible d'échanger avec les autres étudiants sur un fil
