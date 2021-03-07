@@ -5,6 +5,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { UserContext } from "../../context/UserContext";
 import {GoogleLogin} from 'react-google-login';
+import axios from 'axios';
 
 const ProfileMenu = () => {
 
@@ -17,18 +18,19 @@ const ProfileMenu = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const {setAuthToken, logout, isConnected} = useContext(UserContext);
+    const {setAuthToken, logout, isConnected, name, userId, email, role, strikeNumber} = useContext(UserContext);
 
     const responseGoogle = (response) => {
       window.localStorage.setItem('myToken', response.tokenId);
       setAuthToken(response.tokenId);
-      console.log(response)
     }
 
     const ProfileMenuLogout = () => {
         handleClose();
         logout();    
     }
+
+    console.log("data : ", name, userId, role, strikeNumber, email);
 
     return(
         <div>
