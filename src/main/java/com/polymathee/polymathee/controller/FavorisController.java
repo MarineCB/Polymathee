@@ -31,7 +31,7 @@ public class FavorisController {
 
     @GetMapping(GET_FAVORIS_BY_ID_USER)
     @ApiOperation(value = "Get favoris by User Id", consumes = "application/json")
-    public ResponseEntity<List<LikeTable>> getAllLikeByUserId(@RequestParam("id") Integer id) {
+    public ResponseEntity<List<LikeTable>> getAllLikeByUserId(@PathVariable("id") Integer id) {
         List<LikeTable> likelist = likeService.getFavorisByUserId(id);
         return new ResponseEntity<>(likelist, HttpStatus.OK);
     }
@@ -56,8 +56,9 @@ public class FavorisController {
 
     @DeleteMapping(DELETE_FAVORIS)
     @ApiOperation(value = "Delete favoris", consumes = "application/json")
-    public void deleteFavoris(@RequestParam("userId") int UserId,
-        @RequestParam("publicationId") int PublicationId ) {
-        likeService.deleteLikeTable(PublicationId);
+    public ResponseEntity<Boolean> deleteFavoris(@PathVariable("userId") int userId,
+        @PathVariable("publicationId") int publicationId ) {
+        likeService.deleteLikeTable(publicationId);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 }

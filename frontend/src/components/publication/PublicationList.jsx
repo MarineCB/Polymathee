@@ -110,9 +110,9 @@ function PublicationList({ publications }) {
                 </Grid>
               </Box>
               <Box>
-                {tags.map((t, index) => (
+                {tags.map((t, index2) => (
                   <Tag
-                    key={`${t}${index}`}
+                    key={`${t}${index2}`}
                     label={t}
                     tagSize="small"
                     variant="default"
