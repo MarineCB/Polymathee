@@ -11,7 +11,7 @@ import { useHistory } from "react-router-dom";
 import axios from 'axios';
 import {useStyles} from '../publication/PublicationTile';
 
-const GenericPublicationTile = ({publication}) => {
+const GenericPublicationTile = ({publication, task}) => {
     const classes = useStyles();
     const history = useHistory();
     const [infos, setInfos] = useState();
@@ -64,7 +64,7 @@ const GenericPublicationTile = ({publication}) => {
         console.log(res);
         window.location.reload();
     }
-
+    
     return(
         <Card
             key={publication.id}
@@ -83,10 +83,15 @@ const GenericPublicationTile = ({publication}) => {
                     <Button
                         startIcon={<ZoomIn />}
                         onClick={() => {
-                        history.push({
-                        pathname: "/viewPublication",
-                        publicationId: publication.id,
-                        });
+                          history.push({
+                            pathname: "/viewPublication",
+                            publicationId: publication.id,
+                            search:
+                              "?" +
+                              new URLSearchParams({
+                                publicationId: publication.id,
+                              }).toString(),
+                          });
                         }}
                     >
                         Visionner
@@ -94,12 +99,15 @@ const GenericPublicationTile = ({publication}) => {
                 </Grid>
                 
                 <Grid container justify="flex-end" alignItems="center" item xs={3}>
-                <Button
+                  {
+                    task === 'pending' && (
+                      <div>
+                        <Button
                         startIcon={<Check />}
                         onClick={() => {
                             updatePublication(publication.id, 'Published')
                         }}
-                    >
+                        >
                         Valider
                     </Button>
                     <Button
@@ -110,7 +118,22 @@ const GenericPublicationTile = ({publication}) => {
                     >
                         Refuser
                     </Button>
-                    
+                      </div>
+                  
+                    )
+                  }  
+                  {
+                    task === 'reported' && (
+                      <Button
+                        startIcon={<HighlightOff />}
+                        onClick={() => {
+                            updatePublication(publication.id, 'Rejected')
+                        }}
+                      >
+                        Refuser
+                      </Button>
+                    )
+                  }  
                 </Grid>
             </Grid>
         </Card>
