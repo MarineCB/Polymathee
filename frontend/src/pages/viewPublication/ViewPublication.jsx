@@ -45,8 +45,9 @@ const useStyles = makeStyles(() => ({
     marginInline: "2px",
   },
 }));
-let PUBLICATION_ID = undefined;
+let PUBLICATION_ID = undefined
 let MOCK_USER_ID = 2; // TODO : REPLACE BY REAL VALUE
+let initiallyFavorited
 function PublicationTags({ publication }) {
   return (
     <div>
@@ -166,10 +167,18 @@ function RightSide({
     setAnchorEl(event.currentTarget);
   };
   const incrementFavNumber = () => {
-    setLikeNumber(pubInfos.likeNumber + 1);
+    if(initiallyFavorited) {
+      setLikeNumber(pubInfos.likeNumber)
+    } else {
+      setLikeNumber(likeNumber + 1);
+    }
   };
   const decrementFavNumber = () => {
-    setLikeNumber(pubInfos.likeNumber);
+    if(initiallyFavorited) {
+      setLikeNumber(likeNumber-1)
+    } else {
+      setLikeNumber(pubInfos.likeNumber)
+    }
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -317,6 +326,10 @@ function  syncFavButttonStatus(userId, publicationId, setAlreadyFavorited) {
           alreadyFav = true;
         }
       });
+      // We save if the button was loaded as favorited or not
+      if(initiallyFavorited === undefined) {
+        initiallyFavorited = alreadyFav
+      }
       if (setAlreadyFavorited) {
         setAlreadyFavorited(alreadyFav);
       }
@@ -357,7 +370,6 @@ function removeFromFavorites(
 ) {
   const URL_RMV_FROM_FAVORITES =
     "/api/favoris/" + userId + "/" + publication.id;
-  console.log(URL_RMV_FROM_FAVORITES);
   axios
     .delete(URL_RMV_FROM_FAVORITES)
     .then((res) => {
