@@ -24,7 +24,7 @@ function removeFavAndSync(userId, publicationId, loadFavoritedPublications) {
   axios
     .delete("api/favoris/" + userId + "/" + publicationId)
     .then((res) => {
-      loadFavoritedPublications(userId);
+      loadFavoritedPublications()
     })
     .catch((e) => {
       console.error(e);
@@ -37,6 +37,7 @@ function PublicationTileFav({
   loadFavoritedPublications,
 }) {
   publication = publication.publicationId;
+  console.log(publication)
   const classes = useStyles();
   const history = useHistory();
   return (

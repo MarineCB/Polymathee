@@ -44,6 +44,10 @@ const useStyles = makeStyles(() => ({
   button: {
     marginInline: "2px",
   },
+  rte: {
+    maxWidth:"700px",
+    minWidth:"400px"
+  }
 }));
 let PUBLICATION_ID = undefined
 let MOCK_USER_ID = 2; // TODO : REPLACE BY REAL VALUE
@@ -154,6 +158,7 @@ function RightSide({
   downloadCount,
   setDownloadCount,
 }) {
+  const classes = useStyles()
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [reportButtonDisabled, setReportButtonDisabled] = React.useState(false);
   const [likeNumber, setLikeNumber] = React.useState(pubInfos.likeNumber);
@@ -267,12 +272,8 @@ function RightSide({
           <Typography variant="h5">Description</Typography>
           <RichTextEditor
             readOnly
-            value={RichTextEditor.createValueFromString(
-              "<p><strong>Ceci est un texte en gras</strong></p>" +
-                "<h1><strong>Texte gros</strong></h1>" +
-                "<p><u>Coucou c'est un nouveau test, souligné</u></p>",
-              "html"
-            )}
+            className={classes.rte}
+            value={RichTextEditor.createValueFromString(  "<div>"+pubInfos.content+"</div>","html"   )}
           />{" "}
           {/* <PolymatheeEditor readOnly={Boolean(true)} value={RichTextEditor.createValueFromString(pubInfos.content , 'html')} /> */}
         </CardContent>

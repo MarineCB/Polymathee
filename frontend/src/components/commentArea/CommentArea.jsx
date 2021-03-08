@@ -34,7 +34,6 @@ const upvoteSort = (a,b)=>parseFloat(b.upvote) - parseFloat(a.upvote)
 
 
 function sendComment(publicationId, personalCom, comments, setComments) {
-  console.log("Sending comment ....");
 
   const data = {
     "commentary-date": Date.now(),
@@ -64,7 +63,6 @@ function loadComments(publicationId, setComments) {
   axios
     .get(COMMENTS_FOR_PUB_URL)
     .then((c) => {
-      console.log(c.data);
       setComments(c.data);
     })
     .catch((e) => {

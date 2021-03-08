@@ -73,12 +73,8 @@ function PdfViewer({pdfFile,height}) {
           <Page className={"PDFPage"} height={height} pageNumber={pageNumber} />
         </Document>
       </Grid>
-      
       <Box p={2}>
-        <Button onClick={previousPage} disabled={isFirstPage()}>Previous</Button>
-        <Button onClick={nextPage} disabled={isLastPage()}>Next</Button>
-        <Chip label={`Page ${pageNumber} / ${numPages}`}></Chip>
-        <Tooltip title="Mode plein écran" aria-label="fullscreen">
+      <Tooltip title="Mode plein écran" aria-label="fullscreen">
         <IconButton
         color="secondary"
         variant="contained"
@@ -116,7 +112,13 @@ function PdfViewer({pdfFile,height}) {
         <Fullscreen />
       </IconButton>
       </Tooltip>
-      </Box>
+  
+        <Button onClick={previousPage} disabled={isFirstPage()}>Previous</Button>
+        <Button onClick={nextPage} disabled={isLastPage()}>Next</Button>
+        <Chip label={`Page ${pageNumber} / ${numPages}`}></Chip>
+              {/* Fullscreen button */}
+
+     </Box>
     </Grid>
   );
 }
