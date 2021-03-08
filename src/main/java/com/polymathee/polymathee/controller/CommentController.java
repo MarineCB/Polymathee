@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -100,7 +99,7 @@ public class CommentController {
 
     @DeleteMapping(DELETE_COMMENT)
     @ApiOperation(value = "Delete commentary", consumes = "application/json")
-    public ResponseEntity<Boolean> deleteComment(@RequestParam("commentId") int commentId ) {
+    public ResponseEntity<Boolean> deleteComment(@PathVariable("commentId") int commentId ) {
         commentaryService.DeleteCommentById(commentId);
         return new ResponseEntity<>(true, HttpStatus.OK);
     }

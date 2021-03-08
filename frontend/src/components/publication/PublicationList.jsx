@@ -58,6 +58,11 @@ function PublicationList() {
             history.push({
               pathname: "/viewPublication",
               publicationId: publication.id,
+              search:
+                "?" +
+                new URLSearchParams({
+                  publicationId: publication.id,
+                }).toString(),
             });
           }}
           style={{ cursor: "pointer" }}
