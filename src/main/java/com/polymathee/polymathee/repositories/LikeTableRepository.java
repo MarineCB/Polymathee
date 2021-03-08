@@ -19,8 +19,6 @@ public interface LikeTableRepository extends CrudRepository<LikeTable, Integer>,
 
 
     @Modifying
-    @Query("DELETE FROM LikeTable stfo  WHERE stfo.publicationId.id =:publicationId")
-    void deleteFavoris(Integer publicationId);
-
-
+    @Query("DELETE FROM LikeTable stfo  WHERE stfo.publicationId.id =:publicationId AND stfo.userId.id=:userId")
+    void deleteFavoris(Integer publicationId, Integer userId);
 }

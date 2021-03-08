@@ -1,6 +1,7 @@
 package com.polymathee.polymathee.controller;
 
 
+import com.polymathee.polymathee.dao.Commentary;
 import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dto.PublicationDto;
 import com.polymathee.polymathee.dto.PublicationUpdateDto;
@@ -36,9 +37,10 @@ public class PublicationController {
     private static final String POST_PUBLICATION ="/api/publication";
 
     private static final String PUT_PUBLICATION ="/api/publication/{publiId}";
+    private static final String PUT_PUBLICATION_REPORT = "/api/report/publication/{publiId}";
     private static final String PUT_PUBLICATION_STATUS ="/api/status/publication/{publiId}/{status}";
     private static final String PUT_PUBLICATION_DOWNLOADNUMBER="/api/download/publication/{publiId}";
-    private static final String DELETE_PUBLICATION ="/api/publication/{publiId}";
+    private static final String DELETE_PUBLICATION ="/api/publication/{publiId}/{userId}";
 
 
     @Autowired
@@ -147,9 +149,10 @@ public class PublicationController {
 
     @DeleteMapping(DELETE_PUBLICATION)
     @ApiOperation(value = "Delete publication by ID", consumes = "application/json")
-    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") int publiId) {
+    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") Integer publiId,
+           @PathVariable("userId") Integer userId) {
         commentaryService.deleteComment(publiId);
-        likeService.deleteLikeTable(publiId);
+        likeService.deleteLikeTable(publiId, userId);
         publicationService.deletePubli(publiId);    
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
@@ -160,6 +163,13 @@ public class PublicationController {
     public ResponseEntity<Publication> updateDownloadNumber(@PathVariable(value="publiId")
                                                                     int publiId){
         Publication updatedPublication = publicationService.updatePubicationDownloadNumber(publiId);
+        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
+    }
+
+    @PutMapping(PUT_PUBLICATION_REPORT)
+    @ApiOperation(value = "Put publication report", consumes = "application/json")
+    public ResponseEntity<Publication> updatePublicationReport(@PathVariable("publiId") Integer id){
+        Publication updatedPublication = publicationService.updateReport(id);
         return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
     }
 
