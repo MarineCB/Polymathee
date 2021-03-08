@@ -76,6 +76,7 @@ function Homepage() {
       publications.sort(function (a, b) {
         return new Date(b.date) - new Date(a.date);
       });
+      setOrder("");
     }
   };
 
@@ -98,7 +99,6 @@ function Homepage() {
       url += "&tags=" + tagsString;
     const response = await axios.get(url);
     setPublications(response.data);
-    //ApplyChange()
   };
 
   useEffect(() => {}, [publications]);
@@ -158,7 +158,7 @@ function Homepage() {
             <br />
             <Divider />
             <Box p={3} minWidth="70%">
-              <FormLabel component="legend">Order by</FormLabel>
+              <FormLabel component="legend">Trier par</FormLabel>
               <RadioGroup
                 aria-label="gender"
                 name="gender1"
@@ -173,7 +173,7 @@ function Homepage() {
                 <FormControlLabel
                   value="like"
                   control={<Radio size="small" />}
-                  label="Like"
+                  label="J'aime"
                 />
               </RadioGroup>
             </Box>
