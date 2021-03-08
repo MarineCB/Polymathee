@@ -9,6 +9,7 @@ import ViewPublication from './pages/viewPublication/ViewPublication';
 import MyPublication from './pages/myPublications/MyPublications'
 import { ThemeProvider } from '@material-ui/styles';
 import { Box, createMuiTheme, CssBaseline } from '@material-ui/core';
+import ModeratorPAge from './pages/moderatorPage/ModeratorPage';
 
 export const theme = createMuiTheme({
   palette: {
@@ -63,6 +64,7 @@ export default function App() {
           <Route exact path='/createPublication'component={CreatePublication}/>
           <Route exact path='/viewPublication'component={ViewPublication}/>
           <Route exact path='/myPublications'component={MyPublication}/>
+          <Route exact path='/moderatorPage' component={ModeratorPAge}/>
         </Switch>
       </Box>
     </ThemeProvider>
