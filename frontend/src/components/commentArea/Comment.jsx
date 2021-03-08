@@ -69,6 +69,7 @@ function Comment({
   publicationId,
   setComments,
   userId,
+  reportAction
 }) {
   const isAuthor = Boolean(userId === comment.userId.id);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -164,8 +165,9 @@ function Comment({
         >
           <MenuItem
             disabled={reportDisabled}
-            onClick={() => {
+            onClick={async () => {
               CloseMenu();
+              reportAction()
               setReportDisabled(true);
             }}
           >

@@ -72,6 +72,15 @@ function loadComments(publicationId, setComments) {
     });
 }
 
+// Report a comment that is inappropriate
+async function reportAction(commentId) {
+  try{
+    await axios.put('api/report/comment/')
+  }catch(e) {
+    console.error(e)
+  }
+}
+
 function CommentArea({ publicationId, userId }) {
   const [comments, setComments] = React.useState([]);
   const [personalCom, setPersonalCom] = React.useState("");
@@ -176,6 +185,7 @@ function CommentArea({ publicationId, userId }) {
                     publicationId={publicationId}
                     setComments={setComments}
                     userId={TEST_USER_ID}
+                    reportAction={reportAction}
                   />
                   {index < comments.length - 1 ? (
                     <Divider variant="inset" component="li" />

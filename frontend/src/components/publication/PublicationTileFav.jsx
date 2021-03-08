@@ -24,14 +24,18 @@ function removeFavAndSync(userId, publicationId, loadFavoritedPublications) {
   axios
     .delete("api/favoris/" + userId + "/" + publicationId)
     .then((res) => {
-      loadFavoritedPublications(userId)
+      loadFavoritedPublications(userId);
     })
     .catch((e) => {
-      console.error(e)
+      console.error(e);
     });
 }
 
-function PublicationTileFav({ publication, onClick, loadFavoritedPublications }) {
+function PublicationTileFav({
+  publication,
+  onClick,
+  loadFavoritedPublications,
+}) {
   publication = publication.publicationId;
   const classes = useStyles();
   const history = useHistory();
@@ -48,9 +52,17 @@ function PublicationTileFav({ publication, onClick, loadFavoritedPublications })
         </Grid>
         <Grid item xs={4} container alignItems="flex-end" justify="flex-end">
           <Grid item>
-            <Button onClick={()=>{
-              removeFavAndSync(MOCK_USER_ID,publication.id,loadFavoritedPublications)
-            }} variant="contained" color="secondary">
+            <Button
+              onClick={() => {
+                removeFavAndSync(
+                  MOCK_USER_ID,
+                  publication.id,
+                  loadFavoritedPublications
+                );
+              }}
+              variant="contained"
+              color="secondary"
+            >
               Retirer
             </Button>
           </Grid>
@@ -60,7 +72,11 @@ function PublicationTileFav({ publication, onClick, loadFavoritedPublications })
               onClick={() => {
                 history.push({
                   pathname: "/viewPublication",
-                  publicationId: publication.id,
+                  search:
+                    "?" +
+                    new URLSearchParams({
+                      publicationId: publication.id,
+                    }).toString(),
                 });
               }}
             >

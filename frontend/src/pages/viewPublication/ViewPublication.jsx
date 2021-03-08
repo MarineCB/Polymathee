@@ -16,6 +16,7 @@ import {
   MenuItem,
   Box,
   Tooltip,
+  Badge,
 } from "@material-ui/core";
 import {
   Favorite,
@@ -42,7 +43,7 @@ const useStyles = makeStyles(() => ({
     marginInline: "2px",
   },
 }));
-let MOCK_PUBLICATION_ID = 11; // TODO : REPLACE BY REAL VALUE
+let PUBLICATION_ID = undefined;
 let MOCK_USER_ID = 2; // TODO : REPLACE BY REAL VALUE
 function PublicationTags({ publication }) {
   return (
@@ -61,39 +62,48 @@ function PublicationTags({ publication }) {
   );
 }
 
-
-
 function reportPublication(publication, userId, setReportButtonDisabled) {
-  const PUT_PUBLICATION_URL = "api/publication/"+publication.id
-  axios.put(PUT_PUBLICATION_URL,{
-    publication_content: publication.content,
-    publication_file: publication.file,
-    publication_tags: publication.tags,
-    publication_title: publication.title,
-    report:  parseInt(publication.report +1),
-  })
-  .then(res =>{
-    setReportButtonDisabled(true)
-  }).catch(e => {
-    console.error(e)
-    alert('report publication fail')
-  })
+  const PUT_PUBLICATION_URL = "api/publication/" + publication.id;
+  axios
+    .put(PUT_PUBLICATION_URL, {
+      publication_content: publication.content,
+      publication_file: publication.file,
+      publication_tags: publication.tags,
+      publication_title: publication.title,
+      report: parseInt(publication.report + 1),
+    })
+    .then((res) => {
+      setReportButtonDisabled(true);
+    })
+    .catch((e) => {
+      console.error(e);
+      alert("report publication fail");
+    });
 }
 
-async function incrementDownloadCount() {
-  try{
-    const result = await axios.put("api/publication/CHANGEME QUICK")
-    if(result) {
-      return true
+async function incrementDownloadCount(
+  publicationId,
+  downloadCount,
+  setDownloadCount
+) {
+  try {
+    const result = await axios.put("api/publication/download/" + publicationId);
+    if (result.status === 200) {
+      setDownloadCount(downloadCount + 1);
     }
-    return false
-  }catch(e) {
-    console.error(e)
-    return false
+  } catch (e) {
+    console.error(e);
   }
 }
 
-function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
+function PublicationActions({
+  pdfFile,
+  objectURL,
+  setObjectURL,
+  publication,
+  downloadCount,
+  setDownloadCount,
+}) {
   const classes = useStyles();
   const [downloadEnabled, setDownloadEnabled] = React.useState(true);
   const link = document.createElement("a");
@@ -105,14 +115,14 @@ function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
         className={classes.button}
         startIcon={<SaveAlt />}
         disabled={!downloadEnabled}
-        onClick={() => {
+        onClick={async () => {
           // Download the file
           const url = window.URL.createObjectURL(pdfFile);
           setObjectURL(url);
           link.href = url;
           link.download = pdfFile.path;
           link.dispatchEvent(new MouseEvent("click"));
-          incrementDownloadCount()
+          incrementDownloadCount(downloadCount, setDownloadCount);
           setDownloadEnabled(false);
           setTimeout(() => {
             setDownloadEnabled(true);
@@ -121,7 +131,6 @@ function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
       >
         Télécharger
       </Button>
-
     </div>
   );
 }
@@ -145,11 +154,20 @@ function RightSide({
   pubInfos,
   alreadyFavorited,
   setAlreadyFavorited,
+  downloadCount,
+  setDownloadCount,
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [reportButtonDisabled, setReportButtonDisabled] = React.useState(false)
+  const [reportButtonDisabled, setReportButtonDisabled] = React.useState(false);
+  const [likeNumber, setLikeNumber] = React.useState(pubInfos.likeNumber);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
+  };
+  const incrementFavNumber = () => {
+    setLikeNumber(pubInfos.likeNumber + 1);
+  };
+  const decrementFavNumber = () => {
+    setLikeNumber(pubInfos.likeNumber + 1);
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -157,7 +175,7 @@ function RightSide({
   return (
     <div id="top">
       <Grid>
-      <Grid container justify="flex-end">
+        <Grid container justify="flex-end">
           <IconButton
             aria-label="delete"
             aria-controls="simple-menu"
@@ -175,17 +193,21 @@ function RightSide({
             onClose={handleClose}
           >
             <MenuItem
-            disabled={reportButtonDisabled}
-            onClick={() => {
-              reportPublication(pubInfos,MOCK_USER_ID,setReportButtonDisabled)
-              handleClose()}
-              }>
+              disabled={reportButtonDisabled}
+              onClick={() => {
+                reportPublication(
+                  pubInfos,
+                  MOCK_USER_ID,
+                  setReportButtonDisabled
+                );
+                handleClose();
+              }}
+            >
               Signaler en tant que contenu inapproprié
             </MenuItem>
           </Menu>
         </Grid>
         <CardContent>
-        
           <Grid justify="center" alignItems="center" container>
             <Grid item>
               <Typography component="h5" variant="h5">
@@ -198,15 +220,18 @@ function RightSide({
                   onClick={() => {
                     removeFromFavorites(
                       MOCK_USER_ID,
-                      MOCK_PUBLICATION_ID,
-                      setAlreadyFavorited
+                      pubInfos,
+                      setAlreadyFavorited,
+                      decrementFavNumber
                     );
                   }}
                   color="secondary"
                   variant="contained"
                 >
                   <Tooltip title="Retirer de vos favoris">
-                    <Favorite color="error" />
+                    <Badge badgeContent={likeNumber}>
+                      <Favorite color="error" />
+                    </Badge>
                   </Tooltip>
                 </IconButton>
               ) : (
@@ -214,8 +239,9 @@ function RightSide({
                   onClick={() => {
                     addToFavorites(
                       MOCK_USER_ID,
-                      MOCK_PUBLICATION_ID,
-                      setAlreadyFavorited
+                      pubInfos,
+                      setAlreadyFavorited,
+                      incrementFavNumber
                     );
                   }}
                   color="secondary"
@@ -250,6 +276,8 @@ function RightSide({
               objectURL={objectURL}
               setObjectURL={setObjectURL}
               publication={pubInfos}
+              downloadCount={downloadCount}
+              setDownloadCount={setDownloadCount}
             />
           </Grid>
         </Grid>
@@ -262,7 +290,6 @@ function RightSide({
 }
 
 function LeftSide(pdfFile, objectURL, setObjectURL) {
-
   return (
     <Grid sm={6} xs={6} item>
       <Grid>
@@ -275,14 +302,14 @@ function LeftSide(pdfFile, objectURL, setObjectURL) {
 /**
  * Set if the favorite button is in add or remove from favorites mode
  */
-function syncFavButttonStatus(userId, publicationId, setAlreadyFavorited) {
+function syncFavButttonStatus(userId, publication, setAlreadyFavorited) {
   const URL_FAVORIS_FOR_USER = "/api/favoris/" + userId;
   axios
     .get(URL_FAVORIS_FOR_USER)
     .then((res) => {
       let alreadyFav = false;
       res.data.forEach((f) => {
-        if (f.publicationId.id === publicationId) {
+        if (f.publicationId.id === publication.id) {
           alreadyFav = true;
         }
       });
@@ -296,15 +323,21 @@ function syncFavButttonStatus(userId, publicationId, setAlreadyFavorited) {
     });
 }
 
-function addToFavorites(userId, publicationId, setAlreadyFavorited) {
+function addToFavorites(
+  userId,
+  publication,
+  setAlreadyFavorited,
+  incrementFavNumber
+) {
   const URL_ADD_TO_FAVORITES = "/api/favoris/";
   axios
     .post(URL_ADD_TO_FAVORITES, {
-      publication_id: publicationId,
+      publication_id: publication.id,
       user_id: userId,
     })
     .then((res) => {
-      syncFavButttonStatus(userId, publicationId, setAlreadyFavorited);
+      syncFavButttonStatus(userId, publication.id, setAlreadyFavorited);
+      incrementFavNumber();
     })
     .catch((e) => {
       console.error(e);
@@ -312,13 +345,20 @@ function addToFavorites(userId, publicationId, setAlreadyFavorited) {
     });
 }
 
-function removeFromFavorites(userId, publicationId, setAlreadyFavorited) {
-  const URL_RMV_FROM_FAVORITES = "/api/favoris/" + userId + "/" + publicationId;
+function removeFromFavorites(
+  userId,
+  publication,
+  setAlreadyFavorited,
+  decrementFavNumber
+) {
+  const URL_RMV_FROM_FAVORITES =
+    "/api/favoris/" + userId + "/" + publication.id;
   console.log(URL_RMV_FROM_FAVORITES);
   axios
     .delete(URL_RMV_FROM_FAVORITES)
     .then((res) => {
-      syncFavButttonStatus(userId, publicationId, setAlreadyFavorited);
+      syncFavButttonStatus(userId, publication.id, setAlreadyFavorited);
+      decrementFavNumber();
     })
     .catch((e) => {
       console.error(e);
@@ -329,41 +369,41 @@ function removeFromFavorites(userId, publicationId, setAlreadyFavorited) {
 function ViewPublication(props) {
   const [pubInfos, setPubsInfos] = React.useState();
   const [pdfFile, setPdfFile] = React.useState();
-  const URL_PUBLICATIONS = "/api/publications";
   const URL_DOWNLOAD = "/api/download";
   const histo = useHistory();
   const [objectURL, setObjectURL] = React.useState(null);
   const [alreadyFavorited, setAlreadyFavorited] = React.useState(false);
 
+  const [downloadCount, setDownloadCount] = React.useState();
+  const [timeoutReached, setTimeoutReached] = React.useState(false);
+  setTimeout(() => {
+    setTimeoutReached(true);
+  }, 6000);
   //let publicationId = props.location.publicationId
 
   if (
-    props.location.publicationId !== null &&
-    props.location.publicationId !== undefined
+    props.match.params.publicationId !== null &&
+    props.match.params.publicationId !== undefined
   ) {
-    MOCK_PUBLICATION_ID = props.location.publicationId;
-  } else {
-    console.warn("using mock user: " + MOCK_PUBLICATION_ID);
+    PUBLICATION_ID = props.match.params.publicationId;
   }
+  const URL_PUBLICATION_BY_ID = "/api/publications/" + PUBLICATION_ID;
   useEffect(() => {
-    if (MOCK_PUBLICATION_ID !== undefined) {
-      syncFavButttonStatus(
-        MOCK_USER_ID,
-        MOCK_PUBLICATION_ID,
-        setAlreadyFavorited
-      );
+    if (PUBLICATION_ID !== undefined) {
+      syncFavButttonStatus(MOCK_USER_ID, PUBLICATION_ID, setAlreadyFavorited);
       axios
-        .get(URL_PUBLICATIONS)
+        .get(URL_PUBLICATION_BY_ID)
         .then((resInfos) => {
           if (resInfos.status === 200) {
             const selectedPublication = resInfos.data.filter(
-              (pub) => pub.id === MOCK_PUBLICATION_ID
-            )[0];
+              (pub) => pub.id === PUBLICATION_ID
+            )[0]
             console.log(
               "Load success of publication data",
               selectedPublication
-            );
-            setPubsInfos(selectedPublication);
+            )
+            setPubsInfos(selectedPublication)
+            setDownloadCount(pubInfos.downloadNumber)
             axios
               .get(URL_DOWNLOAD + "/" + selectedPublication.file, {
                 responseType: "arraybuffer", // We don't download as a blob directly, as it will be downloaded as application/octed-stream which is invalid for iframes
@@ -393,10 +433,10 @@ function ViewPublication(props) {
   return (
     <div>
       <div className="App">
-        {pubInfos ? (
+        {!pubInfos && timeoutReached ? (
           <Grid>
             <InfoPhrase
-              downloadCount={pubInfos.downloadNumber}
+              downloadCount={downloadCount}
               author={pubInfos.userId.name}
               date={pubInfos.date}
             />
@@ -420,6 +460,8 @@ function ViewPublication(props) {
                     pubInfos={pubInfos}
                     alreadyFavorited={alreadyFavorited}
                     setAlreadyFavorited={setAlreadyFavorited}
+                    downloadCount={downloadCount}
+                    setDownloadCount={setDownloadCount}
                     item
                   />
                 </Grid>
@@ -442,7 +484,11 @@ function ViewPublication(props) {
                   onClick={() => {
                     histo.push({
                       pathname: "/viewPublication",
-                      publicationId: MOCK_PUBLICATION_ID,
+                      search:
+                        "?" +
+                        new URLSearchParams({
+                          publicationId: PUBLICATION_ID,
+                        }).toString(),
                     });
                   }}
                 >
