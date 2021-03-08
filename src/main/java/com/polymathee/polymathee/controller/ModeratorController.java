@@ -2,6 +2,7 @@ package com.polymathee.polymathee.controller;
 
 import com.polymathee.polymathee.dao.LikeTable;
 import com.polymathee.polymathee.dao.Moderator;
+import com.polymathee.polymathee.dao.User;
 import com.polymathee.polymathee.dto.LikeTableDto;
 import com.polymathee.polymathee.dto.ModeratorDto;
 import com.polymathee.polymathee.services.AWSService;
@@ -9,6 +10,7 @@ import com.polymathee.polymathee.services.ModeratorService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
 @Controller
+@Slf4j
 @SwaggerDefinition(tags = {@Tag(name = "/api",description = "Api File")})
 public class ModeratorController {
 
@@ -39,10 +42,8 @@ public class ModeratorController {
 
     @PostMapping(POST_LOGIN)
     @ApiOperation(value = "Post login", consumes = "application/json")
-    public ResponseEntity<Boolean> addLogin(@RequestBody ModeratorDto moderatorDto) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        Boolean bool;
-        bool = moderatorService.ComparePassword(moderatorDto.getPassword(),moderatorDto.getUsername());
-        return new ResponseEntity<>(bool, HttpStatus.OK);
+    public ResponseEntity<User> addLogin(@RequestBody ModeratorDto moderatorDto) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        return new ResponseEntity<>(moderatorService.ComparePassword(moderatorDto.getPassword(),moderatorDto.getUsername()), HttpStatus.OK);
     }
 
 
