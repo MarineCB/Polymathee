@@ -11,7 +11,7 @@ public interface LikeTableService {
 
     List<LikeTable> getFavorisByUserId(Integer id);
 
-    void deleteLikeTable(int publicationId);
+    void deleteLikeTable(Integer publicationId);
 
     LikeTable saveLike(LikeTableDto likeTableDto);
 }
