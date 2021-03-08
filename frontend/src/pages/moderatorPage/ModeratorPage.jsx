@@ -6,11 +6,8 @@ import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericPublicationTile from '../../components/genericPublicationTile/GenericPublicationTile';
+import ReportedPublication from '../../components/publication/ReportedPublication';
 
-
-
-
-  
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
   
@@ -66,10 +63,16 @@ const ModeratorPage = () => {
                     status: 'To_Treat',
                 }
             });
-            console.log("this is test", fetchPendingPublications);
             setPendingPublications(fetchPendingPublications.data);
         }
+
+        async function getReportedComments(strikeNumber) {
+            const fetchReportedComments = await axios.get(`/api/comments/reports/${strikeNumber}`);
+            console.log(fetchReportedComments);
+        }
         getPendingPublications();
+        getReportedComments(1);
+
     },[]);
 
     
@@ -82,25 +85,21 @@ const ModeratorPage = () => {
                 textColor="primary"
                 centered
             >
-                <Tab label="Pending Publications" {...a11yProps(0)}/>
-                <Tab label="Check Commentaries" {...a11yProps(1)}/>
-                <Tab label="Check Publications" {...a11yProps(2)}/>
+                <Tab label="Publications en attente" {...a11yProps(0)}/>
+                <Tab label="Commentaires signalés" {...a11yProps(1)}/>
+                <Tab label="Publications signalées" {...a11yProps(2)}/>
             </Tabs>
             <TabPanel value={value} index={0}>
-                
                 {
                    pendingPublications? pendingPublications.map((publication) => {
-                        return(
-                            
-                                <GenericPublicationTile key={publication.id} publication={publication} />
-                            
+                        return(  
+                            <GenericPublicationTile key={publication.id} publication={publication} />
                         );
                     }) : <div></div>
                 }
-        
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <div>Item Two</div>
+                <ReportedPublication />
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <div>Item Two</div>
