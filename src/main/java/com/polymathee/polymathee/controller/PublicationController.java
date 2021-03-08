@@ -23,14 +23,14 @@ import java.util.List;
 public class PublicationController {
 
     private static final String GET_PUBLICATIONS = "/api/publications";
-
     private static final String GET_PUBLICATIONS_ID_USER = "/api/publications/user/{id}";
     private static final String GET_PUBLICATIONS_BY_ID = "/api/publications/{id}";
     private static final String GET_PUBLICATIONS_BY_LIKE_NUMBER_DESC = "/api/publications/like";
     private static final String GET_PUBLICATIONS_BY_DATE = "/api/publications/date";
+    private static final String GET_PUBLICATIONS_BY_REPORT = "/api/publication/report/{report}";
     private static final String GET_PUBLICATIONS_BY_USER_AND_TAG = "/api/publications/filter/{user_name}/{tags}";
     private static final String GET_ALL_TAGS = "/api/publication/tags";
-
+    private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/{status}";
 
 
     private static final String POST_PUBLICATION ="/api/publication";
@@ -63,12 +63,9 @@ public class PublicationController {
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-
-
-
     @GetMapping(GET_PUBLICATIONS_BY_ID)
     @ApiOperation(value = "Get Publication by  ID", consumes = "application/json")
-    public ResponseEntity<Publication> getPublicationsById(@PathVariable(value="id") int id) {
+    public ResponseEntity<Publication> getPublicationsById(@PathVariable("id") Integer id) {
         Publication publi = publicationService.getPublicationsById(id);
         return new ResponseEntity<>(publi, HttpStatus.OK);
     }
@@ -76,20 +73,24 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_ID_USER)
     @ApiOperation(value = "Get Publication by User ID", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublicationsById(@PathVariable Integer id) {
+    public ResponseEntity<List<Publication>> getAllPublicationsById(@PathVariable("id") Integer id) {
         List<Publication> publiList = publicationService.getPublicationsByUserId(id);
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-/*
     @GetMapping(GET_PUBLICATIONS_BY_STATUS)
     @ApiOperation(value = "Get Publication by status", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByStatus(@PathVariable(value="status") StateEnum status) {
+    public ResponseEntity<List<Publication>> getPublicationsByStatus(@RequestParam("status") StateEnum status) {
         List<Publication> listPubli = publicationService.getPublicationsByStatus(status);
         return new ResponseEntity<>(listPubli, HttpStatus.OK);
     }
 
- */
+    @GetMapping(GET_PUBLICATIONS_BY_REPORT)
+    @ApiOperation(value = "Get Publication by report desc", consumes = "application/json")
+    public ResponseEntity<List<Publication>> getPublicationsByReport(@PathVariable(value="report") int report) {
+        List<Publication> listPubli = publicationService.getPubliReport(report);
+        return new ResponseEntity<>(listPubli, HttpStatus.OK);
+    }
 
     @GetMapping(GET_PUBLICATIONS_BY_LIKE_NUMBER_DESC)
     @ApiOperation(value = "Get Publication by like number desc", consumes = "application/json")
