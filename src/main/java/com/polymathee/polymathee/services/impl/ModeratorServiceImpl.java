@@ -1,8 +1,10 @@
 package com.polymathee.polymathee.services.impl;
 
 import com.polymathee.polymathee.dao.Moderator;
+import com.polymathee.polymathee.dao.User;
 import com.polymathee.polymathee.dto.ModeratorDto;
 import com.polymathee.polymathee.repositories.ModeratorRepository;
+import com.polymathee.polymathee.repositories.UserRepository;
 import com.polymathee.polymathee.services.ModeratorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.util.List;
 
 @Service
@@ -25,6 +21,9 @@ public class ModeratorServiceImpl implements ModeratorService {
 
     @Autowired
     private ModeratorRepository moderatorrepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -45,23 +44,28 @@ public class ModeratorServiceImpl implements ModeratorService {
         return moderator;
     }
 
-    public Boolean ComparePassword(String password, String UserName) {
+    public User ComparePassword(String password, String UserName) {
 
-        Boolean bool = null;
         List<Moderator> mod;
         mod = moderatorrepository.findAll();
 
+        User user = new User();
+
+        log.info(UserName);
+
         for (Moderator moderator : mod) {
-
+            log.info(moderator.getUsername());
             if (UserName.equals(moderator.getUsername())) {
-
-                bool = passwordEncoder.matches(password, moderator.getPassword());
-
-            } else if (!UserName.equals(moderator.getUsername())) {
-                bool =  false;
+                if(passwordEncoder.matches(password, moderator.getPassword())) {
+                    log.info(moderator.getUsername());
+                    user = userRepository.findUserByEmail(moderator.getUsername());
+                    log.info(user.getEmail());
+                } else {
+                    return null;
+                }
             }
         }
-        return bool;
+        return user;
     }
 
 
