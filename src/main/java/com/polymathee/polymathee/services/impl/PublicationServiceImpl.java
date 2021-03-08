@@ -1,5 +1,6 @@
 package com.polymathee.polymathee.services.impl;
 
+import com.polymathee.polymathee.dao.Commentary;
 import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dao.User;
 import com.polymathee.polymathee.dto.PublicationDto;
@@ -237,4 +238,6 @@ public class PublicationServiceImpl implements PublicationService {
         }
         return newList;
     }
+
+
 }

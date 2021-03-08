@@ -261,7 +261,7 @@ function MyPublications() {
                 <PublicationTileFav
                   key={publication.id}
                   publication={publication}
-                  loadFavoritedPublications={loadFavoritedPublications}
+                  loadFavoritedPublications={()=>loadFavoritedPublications(setPubsFav,setLoadedFav,MOCK_USER_ID)}
                   setDelPubDialogMsg={setDelPubDialogMsg}
                   setSnackbarMsg={setSnackbarMsg}
                 />

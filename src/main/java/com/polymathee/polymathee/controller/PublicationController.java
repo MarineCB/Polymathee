@@ -1,6 +1,7 @@
 package com.polymathee.polymathee.controller;
 
 
+import com.polymathee.polymathee.dao.Commentary;
 import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dto.PublicationDto;
 import com.polymathee.polymathee.dto.PublicationUpdateDto;
@@ -25,21 +26,21 @@ public class PublicationController {
     private static final String GET_PUBLICATIONS = "/api/publications";
     private static final String GET_PUBLICATIONS_ID_USER = "/api/publications/user/{id}";
     private static final String GET_PUBLICATIONS_BY_ID = "/api/publications/{id}";
-    private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/{status}";
     private static final String GET_PUBLICATIONS_BY_LIKE_NUMBER_DESC = "/api/publications/like";
     private static final String GET_PUBLICATIONS_BY_DATE = "/api/publications/date";
     private static final String GET_PUBLICATIONS_BY_REPORT = "/api/publication/report/{report}";
     private static final String GET_PUBLICATIONS_BY_USER_AND_TAG = "/api/publications/filter/{user_name}/{tags}";
     private static final String GET_ALL_TAGS = "/api/publication/tags";
-
+    private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/status/{status}";
 
 
     private static final String POST_PUBLICATION ="/api/publication";
 
     private static final String PUT_PUBLICATION ="/api/publication/{publiId}";
+    private static final String PUT_PUBLICATION_REPORT = "/api/report/publication/{publiId}";
     private static final String PUT_PUBLICATION_STATUS ="/api/status/publication/{publiId}/{status}";
-
-    private static final String DELETE_PUBLICATION ="/api/publication/{publiId}";
+    private static final String PUT_PUBLICATION_DOWNLOADNUMBER="/api/download/publication/{publiId}";
+    private static final String DELETE_PUBLICATION ="/api/publication/{publiId}/{userId}";
 
 
     @Autowired
@@ -53,8 +54,14 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS)
     @ApiOperation(value = "Get all Publications", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublications() {
-        List<Publication> publiList = publicationService.getPublicationList();
+    public ResponseEntity<List<Publication>> getAllPublications(@RequestParam(value="status",required = false) StateEnum status) {
+
+        List<Publication> publiList = null;
+        if(status !=  null) {
+            publiList = publicationService.getPublicationsByStatus(status);
+        } else {
+            publiList = publicationService.getPublicationList();
+        }
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
@@ -73,10 +80,9 @@ public class PublicationController {
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-
     @GetMapping(GET_PUBLICATIONS_BY_STATUS)
     @ApiOperation(value = "Get Publication by status", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByStatus(@RequestParam("status") StateEnum status) {
+    public ResponseEntity<List<Publication>> getPublicationsByStatus(@PathVariable("status") StateEnum status) {
         List<Publication> listPubli = publicationService.getPublicationsByStatus(status);
         return new ResponseEntity<>(listPubli, HttpStatus.OK);
     }
@@ -104,8 +110,8 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_BY_USER_AND_TAG)
     @ApiOperation(value = "Get Publication by tags", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByTags(@RequestParam(value="user_name",required = false)
-           String user, @RequestParam(value="tags", required = false) String tag) {
+    public ResponseEntity<List<Publication>> getPublicationsByTags(@PathVariable(value="user_name",required = false)
+           String user, @PathVariable(value="tags", required = false) String tag) {
         List<Publication> publi = publicationService.getPubliTagUser(tag,user);
         return new ResponseEntity<>(publi, HttpStatus.OK);
     }
@@ -143,14 +149,28 @@ public class PublicationController {
 
     @DeleteMapping(DELETE_PUBLICATION)
     @ApiOperation(value = "Delete publication by ID", consumes = "application/json")
-    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") int publiId) {
+    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") Integer publiId,
+           @PathVariable("userId") Integer userId) {
         commentaryService.deleteComment(publiId);
-        likeService.deleteLikeTable(publiId);
+        likeService.deleteLikeTable(publiId, userId);
         publicationService.deletePubli(publiId);    
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
 
+    @PutMapping(PUT_PUBLICATION_DOWNLOADNUMBER)
+    @ApiOperation(value = "Put publication downloadNumber", consumes = "application/json")
+    public ResponseEntity<Publication> updateDownloadNumber(@PathVariable(value="publiId")
+                                                                    int publiId){
+        Publication updatedPublication = publicationService.updatePubicationDownloadNumber(publiId);
+        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
+    }
 
+    @PutMapping(PUT_PUBLICATION_REPORT)
+    @ApiOperation(value = "Put publication report", consumes = "application/json")
+    public ResponseEntity<Publication> updatePublicationReport(@PathVariable("publiId") Integer id){
+        Publication updatedPublication = publicationService.updateReport(id);
+        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
+    }
 
 }
