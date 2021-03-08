@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
 import { withRouter } from "react-router-dom";
-import Moment from "moment";
 import {
   Box,
   Card,
@@ -13,6 +12,9 @@ import {
 import { Favorite, GetApp } from "@material-ui/icons";
 import Tag from "../tag/Tag";
 import { makeStyles } from "@material-ui/core/styles";
+import { PublicationContext } from "../../store/PublicationContext";
+import { useHistory } from "react-router-dom";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,21 +43,33 @@ function extractContent(s) {
   return span.textContent;
 }
 
-function PublicationList({ publications }) {
+function PublicationList() {
+  const history = useHistory();
   const classes = useStyles();
 
-  const listItems = publications.map((publication, index) => {
+  const [Publications] = useContext(PublicationContext);
+  const listItems = Publications.map((publication, index) => {
     const tags = publication.tags.split(",");
 
     return (
-      <Box flexGrow={1} key={index} m={2}>
-        <Card>
+      <Box flexGrow={1} key={index} m={3}>
+        <Card
+          onClick={() => {
+            history.push({
+              pathname: "/viewPublication",
+              publicationId: publication.id,
+            });
+          }}
+          style={{ cursor: "pointer" }}
+        >
           <ListItem>
             <ListItemText
               primary={publication.title}
               secondary={
                 <React.Fragment>
-                  {Moment(publication.date).format("DD-MM-YYYY hh:mm")}
+                  {new Date(publication.date).toLocaleDateString() +
+                    " " +
+                    new Date(publication.date).toLocaleTimeString()}
                 </React.Fragment>
               }
             />
