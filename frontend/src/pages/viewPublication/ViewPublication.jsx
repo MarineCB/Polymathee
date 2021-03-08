@@ -405,10 +405,6 @@ function ViewPublication(props) {
         .then((resInfos) => {
           if (resInfos.status === 200) {
             const selectedPublication = resInfos.data;
-            console.log(
-              "Load success of publication data",
-              selectedPublication
-            );
             setPubsInfos(selectedPublication);
             setDownloadCount(selectedPublication.downloadNumber);
             axios

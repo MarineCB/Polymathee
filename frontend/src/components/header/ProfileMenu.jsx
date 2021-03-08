@@ -1,4 +1,3 @@
-import user_logo from "./user.png";
 import {useState, useContext} from "react";
 import "./ProfileMenu.css";
 import Menu from '@material-ui/core/Menu';
@@ -6,6 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { UserContext } from "../../store/UserContext";
 import {GoogleLogin} from 'react-google-login';
 import { useHistory } from "react-router-dom";
+import { AccountCircle } from "@material-ui/icons";
 
 const ProfileMenu = () => {
     const history = useHistory();
@@ -45,9 +45,8 @@ const ProfileMenu = () => {
 
     return(
         <div>
-            <button className="profile-button" onClick={handleClick}>
-                <img src={user_logo} alt="profile_logo" height={35}/>
-            </button>
+            <AccountCircle className="profile-button" onClick={handleClick} fontSize="large"/>
+            
             <Menu
             id="simple-menu"
             anchorEl={anchorEl}

@@ -7,7 +7,6 @@ import {
   TextField,
   CardContent,
   CardHeader,
-  Link,
 } from "@material-ui/core";
 import "./Login.css";
 import { useHistory } from "react-router-dom";
@@ -31,10 +30,6 @@ function Login() {
   const{setIsConnected, setName, setEmail, setUserId, setRole, setAuthToken} = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
-  function GoToSignup(e) {
-    history.push("/signup");
-  }
 
   async function getUserInfo() {
       const res = await axios.post('/api/login', {
@@ -83,17 +78,12 @@ function Login() {
               type="password"
               onChange={e => setPassword(e.target.value)}
             ></TextField>
-
-            <Link onClick={GoToSignup}>S'inscrire</Link>
             <Grid
               style={{ marginTop: 15 }}
               container
               justify="space-between"
               alignItems="flex-end"
             >
-              <Link color="primary">
-                Mot de passe oublié ?{" "}
-              </Link>
               <Button variant="contained" color="secondary" onClick={handleSignIn}>
                 OK
               </Button>

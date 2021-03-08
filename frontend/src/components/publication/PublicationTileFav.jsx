@@ -37,7 +37,6 @@ function PublicationTileFav({
   loadFavoritedPublications,
 }) {
   publication = publication.publicationId;
-  console.log(publication)
   const classes = useStyles();
   const history = useHistory();
   return (

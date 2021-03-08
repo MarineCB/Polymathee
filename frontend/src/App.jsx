@@ -64,7 +64,7 @@ export default function App() {
         <PublicationProvider>
           <Switch>
             <Route exact path="/homepage" component={Homepage} />
-            <Route exact path="/login" component={Login} />
+            <Route exact path="/loginAdmin" component={Login} />
             <Route exact path="/signup" component={Signup} />
             <Route
               exact

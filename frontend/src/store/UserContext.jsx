@@ -54,6 +54,7 @@ export const UserWrapper = (props) => {
         setUserId('');
         setRole('');
         setStrikeNumber('');
+        setIsConnected(false);
     }
 
     
