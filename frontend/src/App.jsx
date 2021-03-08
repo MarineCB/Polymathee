@@ -9,6 +9,7 @@ import ViewPublication from './pages/viewPublication/ViewPublication';
 import MyPublication from './pages/myPublications/MyPublications'
 import { ThemeProvider } from '@material-ui/styles';
 import { Box, createMuiTheme, CssBaseline } from '@material-ui/core';
+import { PublicationProvider } from './store/PublicationContext';
 
 export const theme = createMuiTheme({
   palette: {
@@ -56,6 +57,7 @@ export default function App() {
       <CssBaseline/>
       <Box height="100%">
         <AppBar/>
+        <PublicationProvider>
         <Switch>
           <Route exact path='/'component={Homepage}/>
           <Route exact path='/login'component={Login}/>
@@ -64,6 +66,7 @@ export default function App() {
           <Route exact path='/viewPublication'component={ViewPublication}/>
           <Route exact path='/myPublications'component={MyPublication}/>
         </Switch>
+        </PublicationProvider>
       </Box>
     </ThemeProvider>
   );
