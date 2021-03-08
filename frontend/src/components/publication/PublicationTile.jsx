@@ -12,7 +12,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { ZoomIn, Edit, Delete } from "@material-ui/icons";
 import axios from "axios";
-const useStyles = makeStyles(() => ({
+export const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     justifyContent: "center",
@@ -125,7 +125,7 @@ function askDeletePublication(
  * Returns the publication status
  * @param {String} status
  */
-function GetInfoForPublicationStatus(status) {
+export function GetInfoForPublicationStatus(status) {
   const classes = useStyles();
   switch (status) {
     case "Saved":
