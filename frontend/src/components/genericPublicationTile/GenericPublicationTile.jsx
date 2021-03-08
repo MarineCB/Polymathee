@@ -20,7 +20,7 @@ const GenericPublicationTile = ({publication}) => {
         if(publication) {
             setInfos(GetInfoForPublicationStatus(publication.status));
         }
-    },[]);
+    },[]); // eslint-disable-line react-hooks/exhaustive-deps
 
     function GetInfoForPublicationStatus(status) {
         switch (status) {
