@@ -2,8 +2,10 @@ package com.polymathee.polymathee.controller;
 
 import com.polymathee.polymathee.dao.CommentInteraction;
 import com.polymathee.polymathee.dao.Commentary;
+import com.polymathee.polymathee.dao.Publication;
 import com.polymathee.polymathee.dto.CommentInteractionDto;
 import com.polymathee.polymathee.dto.CommentaryDto;
+import com.polymathee.polymathee.dto.PublicationUpdateDto;
 import com.polymathee.polymathee.services.CommentaryInteractionService;
 import com.polymathee.polymathee.services.CommentaryService;
 import io.swagger.annotations.ApiOperation;
@@ -23,9 +25,11 @@ public class CommentController {
 
     private static final String GET_COMMENTARIES = "/api/comments";
     private static final String GET_COMMENTS_BY_ID_PUBLICATION = "/api/comments/{id}";
-    private static final String POST_COMMENTARY ="/api/commentary";
-    private static final String DELETE_COMMENTARY ="/api/comment/{commentId}";
+    private static final String GET_COMMENTS_BY_UPVOTE = "/api/comments/upvote";
+    private static final String POST_COMMENT ="/api/comment";
+    private static final String DELETE_COMMENT ="/api/comment/{commentId}";
     private static final String POST_VOTE = "/api/vote";
+    private static final String PUT_COMMENT_REPORT = "/api/report/comment/{commentId}";
 
     @Autowired
     private CommentaryService commentaryService;
@@ -49,9 +53,10 @@ public class CommentController {
         return new ResponseEntity<>(commentlist, HttpStatus.OK);
     }
 
+
     //POSTS
 
-    @PostMapping(POST_COMMENTARY)
+    @PostMapping(POST_COMMENT)
     @ApiOperation(value = "Post commentary", consumes = "application/json")
     public ResponseEntity<Commentary> addComment(@RequestBody CommentaryDto commentaryDto){
         Commentary commentary = commentaryService.saveComment(commentaryDto);
@@ -65,9 +70,15 @@ public class CommentController {
         return new ResponseEntity<>(commentInteraction, HttpStatus.OK);
     }
 
+    @PutMapping(PUT_COMMENT_REPORT)
+    @ApiOperation(value = "Put commentary report", consumes = "application/json")
+    public ResponseEntity<Commentary> updateCommentReport(@PathVariable("commentId") Integer id){
+        Commentary updatedCommentary = commentaryService.updateReport(id);
+        return new ResponseEntity<>(updatedCommentary, HttpStatus.OK);
+    }
     //DELETES
 
-    @DeleteMapping(DELETE_COMMENTARY)
+    @DeleteMapping(DELETE_COMMENT)
     @ApiOperation(value = "Delete commentary", consumes = "application/json")
     public ResponseEntity<Boolean> deleteComment(@PathVariable("commentId") int commentId ) {
         commentaryService.DeleteCommentById(commentId);

@@ -80,6 +80,18 @@ function reportPublication(publication, userId, setReportButtonDisabled) {
   })
 }
 
+async function incrementDownloadCount() {
+  try{
+    const result = await axios.put("api/publication/CHANGEME QUICK")
+    if(result) {
+      return true
+    }
+    return false
+  }catch(e) {
+    console.error(e)
+    return false
+  }
+}
 
 function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
   const classes = useStyles();
@@ -100,7 +112,7 @@ function PublicationActions({ pdfFile, objectURL, setObjectURL, publication }) {
           link.href = url;
           link.download = pdfFile.path;
           link.dispatchEvent(new MouseEvent("click"));
-
+          incrementDownloadCount()
           setDownloadEnabled(false);
           setTimeout(() => {
             setDownloadEnabled(true);

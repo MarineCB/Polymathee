@@ -56,9 +56,9 @@ public class FavorisController {
 
     @DeleteMapping(DELETE_FAVORIS)
     @ApiOperation(value = "Delete favoris", consumes = "application/json")
-    public ResponseEntity<Boolean> deleteFavoris(@PathVariable("userId") int UserId,
-        @PathVariable("publicationId") int PublicationId ) {
-        likeService.deleteLikeTable(PublicationId);
+    public ResponseEntity<Boolean> deleteFavoris(@PathVariable("userId") int userId,
+        @PathVariable("publicationId") int publicationId ) {
+        likeService.deleteLikeTable(publicationId);
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 }

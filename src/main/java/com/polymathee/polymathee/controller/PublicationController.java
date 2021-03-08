@@ -37,7 +37,7 @@ public class PublicationController {
 
     private static final String PUT_PUBLICATION ="/api/publication/{publiId}";
     private static final String PUT_PUBLICATION_STATUS ="/api/status/publication/{publiId}/{status}";
-
+    private static final String PUT_PUBLICATION_DOWNLOADNUMBER="/api/download/publication/{publiId}";
     private static final String DELETE_PUBLICATION ="/api/publication/{publiId}";
 
 
@@ -146,14 +146,20 @@ public class PublicationController {
 
     @DeleteMapping(DELETE_PUBLICATION)
     @ApiOperation(value = "Delete publication by ID", consumes = "application/json")
-    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") int PubliId) {
-        commentaryService.deleteComment(PubliId);
-        likeService.deleteLikeTable(PubliId);
-        publicationService.deletePubli(PubliId);
+    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") int publiId) {
+        commentaryService.deleteComment(publiId);
+        likeService.deleteLikeTable(publiId);
+        publicationService.deletePubli(publiId);    
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
 
-
+    @PutMapping(PUT_PUBLICATION_DOWNLOADNUMBER)
+    @ApiOperation(value = "Put publication downloadNumber", consumes = "application/json")
+    public ResponseEntity<Publication> updateDownloadNumber(@PathVariable(value="publiId")
+                                                                    int publiId){
+        Publication updatedPublication = publicationService.updatePubicationDownloadNumber(publiId);
+        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
+    }
 
 }

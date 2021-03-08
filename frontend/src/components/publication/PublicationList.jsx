@@ -1,5 +1,6 @@
-import React, {useContext} from "react";
+import React from "react";
 import { withRouter } from "react-router-dom";
+import Moment from "moment";
 import {
   Box,
   Card,
@@ -12,7 +13,6 @@ import {
 import { Favorite, GetApp } from "@material-ui/icons";
 import Tag from "../tag/Tag";
 import { makeStyles } from "@material-ui/core/styles";
-import { PublicationContext } from "../../store/PublicationContext";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,22 +41,21 @@ function extractContent(s) {
   return span.textContent;
 }
 
-function PublicationList() {
+function PublicationList({ publications }) {
   const classes = useStyles();
 
-  const [Publications] = useContext(PublicationContext);
-  const listItems = Publications.map((publication, index) => {
+  const listItems = publications.map((publication, index) => {
     const tags = publication.tags.split(",");
 
     return (
       <Box flexGrow={1} key={index} m={2}>
-        <Card style={{ cursor: "pointer" }}>
+        <Card>
           <ListItem>
             <ListItemText
               primary={publication.title}
               secondary={
                 <React.Fragment>
-                  {new Date(publication.date).toLocaleDateString() +" "+ new Date(publication.date).toLocaleTimeString()}
+                  {Moment(publication.date).format("DD-MM-YYYY hh:mm")}
                 </React.Fragment>
               }
             />
@@ -111,9 +110,9 @@ function PublicationList() {
                 </Grid>
               </Box>
               <Box>
-                {tags.map((t, index) => (
+                {tags.map((t, index2) => (
                   <Tag
-                    key={`${t}${index}`}
+                    key={`${t}${index2}`}
                     label={t}
                     tagSize="small"
                     variant="default"

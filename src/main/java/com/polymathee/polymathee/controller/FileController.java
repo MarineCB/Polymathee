@@ -16,8 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 @SwaggerDefinition(tags = {@Tag(name = "/api",description = "Api File")})
 public class FileController {
 
-    private static final String UPLOAD_FILE = "/api/upload";
+    private static final String UPLOAD_FILE = "/api/upload/{id}";
     private static final String GET_FILE = "/api/download/{fileName}";
+    private static final String DELETE_FILE = "/api/delete/{id}";
+
 
     @Autowired
     private AWSService awsService;
@@ -40,10 +42,23 @@ public class FileController {
     //POSTS
 
     @PostMapping(UPLOAD_FILE)
-    @ApiOperation(value = "Post PDF file", consumes = "application/pdf")
-    public ResponseEntity<String> uploadFile(@RequestPart(value = "file") final MultipartFile multipartFile) {
-        awsService.uploadFile(multipartFile);
-        final String response = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @ApiOperation(value = "Post PDF file with publication_id param", consumes = "application/pdf")
+    public ResponseEntity<String> uploadFile(@RequestPart(value = "file") final MultipartFile multipartFile,
+        @PathVariable("id") int id) {
+        try {
+            awsService.uploadFile(multipartFile,id);
+            final String response = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch(Throwable t) {
+            System.out.println(t);
+            return new ResponseEntity<>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(DELETE_FILE)
+    @ApiOperation(value = "Delete file on S3", consumes = "application/json")
+    public ResponseEntity<Boolean> deleteComment(@PathVariable("id") int id ) {
+        awsService.deleteFile(id);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 }
