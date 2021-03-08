@@ -15,6 +15,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { PublicationContext } from "../../store/PublicationContext";
 import { useHistory } from "react-router-dom";
 
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -56,6 +57,7 @@ function PublicationList() {
           onClick={() => {
             history.push({
               pathname: "/viewPublication",
+              publicationId: publication.id,
               search:
                 "?" +
                 new URLSearchParams({
