@@ -58,7 +58,10 @@ export const UserWrapper = (props) => {
         setStrikeNumber('');
     }
 
-    const value = { authToken, setAuthToken, name, userId, role, strikeNumber, email, logout, isConnected}
+    
+
+
+    const value = { authToken, setAuthToken, name, userId, role, strikeNumber, email, logout, isConnected, setIsConnected}
     return (
         <UserContext.Provider value={value}>
             {props.children}

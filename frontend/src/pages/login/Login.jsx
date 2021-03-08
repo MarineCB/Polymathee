@@ -12,8 +12,9 @@ import {
 import "./Login.css";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import {useState} from "react";
+import {useState, useContext} from "react";
 import axios from 'axios';
+import {UserContext} from "../../store/UserContext";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles(() => ({
 function Login() {
   const classes = useStyles();
   const history = useHistory();
-
+  const{setIsConnected, setName, setEmail, setUserId, setRole} = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -41,7 +42,6 @@ function Login() {
         "moderator_username": `${password}`,
         });
       console.log("this is res", res);
-      return res;
   }
 
   const handleSignIn = () => {
