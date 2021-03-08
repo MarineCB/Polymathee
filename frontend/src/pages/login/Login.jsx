@@ -12,6 +12,8 @@ import {
 import "./Login.css";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
+import {useState} from "react";
+import axios from 'axios';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -26,10 +28,28 @@ function Login() {
   const classes = useStyles();
   const history = useHistory();
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
   function GoToSignup(e) {
     history.push("/signup");
   }
 
+  async function getUserInfo() {
+      const res = await axios.post('/api/login', {
+        "moderator_password": `${username}`,
+        "moderator_username": `${password}`,
+        });
+      console.log("this is res", res);
+      return res;
+  }
+
+  const handleSignIn = () => {
+    getUserInfo();
+  }
+
+    console.log("username", username);
+    console.log("pwd", password)
   return (
     <div className="App">
     <div className={classes.root}>
@@ -48,10 +68,12 @@ function Login() {
             <TextField
               style={{ padding: 10 }}
               placeholder="Identifiant"
+              onChange={e => setUsername(e.target.value)}
             ></TextField>
             <TextField
               style={{ padding: 10 }}
               placeholder="Mot de passe"
+              onChange={e => setPassword(e.target.value)}
             ></TextField>
 
             <Link onClick={GoToSignup}>S'inscrire</Link>
@@ -64,7 +86,7 @@ function Login() {
               <Link color="primary">
                 Mot de passe oublié ?{" "}
               </Link>
-              <Button variant="contained" color="secondary">
+              <Button variant="contained" color="secondary" onClick={handleSignIn}>
                 OK
               </Button>
             </Grid>
