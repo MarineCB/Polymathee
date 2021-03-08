@@ -1,11 +1,17 @@
 
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import GenericPublicationTile from '../../components/genericPublicationTile/GenericPublicationTile';
 
+
+
+
+  
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
   
@@ -43,11 +49,31 @@ function TabPanel(props) {
 
 const ModeratorPage = () => {
     const [value, setValue] = useState(0);
+    const [pendingPublications, setPendingPublications] = useState();
+    const [checkCommentaries, setCheckCommentaries] = useState();
+    const [checkPublications, setCheckPublications] = useState();
+    const[publiTest, setPubliTest] = useState();
 
     const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+        setValue(newValue);
+    };
 
+
+    
+    useEffect(() => {
+        async function getPendingPublications() {
+            const fetchPendingPublications = await axios.get('/api/publications/{status}', {
+                params: {
+                    status: 'To_Treat',
+                }
+            });
+            console.log("this is test", fetchPendingPublications);
+            setPendingPublications(fetchPendingPublications.data);
+        }
+        getPendingPublications();
+    },[]);
+
+    
     return(
         <div>
             <Tabs
@@ -62,7 +88,14 @@ const ModeratorPage = () => {
                 <Tab label="Check Publications" {...a11yProps(2)}/>
             </Tabs>
             <TabPanel value={value} index={0}>
-                Item One
+                {
+                   pendingPublications? pendingPublications.map((publication) => {
+                        return(
+                            <GenericPublicationTile key={publication.id} publication={publication} />
+                        );
+                    }) : <div></div>
+                }
+                {publiTest && <GenericPublicationTile publication={publiTest}/>}
             </TabPanel>
             <TabPanel value={value} index={1}>
                 Item Two
