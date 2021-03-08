@@ -55,7 +55,7 @@ setup:
     - apt-get update -y && apt-get install -y default-jre
     - java -version
     - echo 'Compiling java classes'
-    - sh mvnw compile
+    - sh mvnw clean test
     - echo 'Folder structure after compile'
     - ls -a
     - echo 'Running tests & creating coverage report for frontend'
@@ -89,3 +89,7 @@ include:
 sast:
     rules:
       - if: '$CI_COMMIT_BRANCH == "master"'
+      - if: $CI_MERGE_REQUEST_IID    # Add the job to MR pipelines
+      - if: $CI_OPEN_MERGE_REQUESTS  # If it's a branch pipeline with open MRs, don't add it to a *branch* pipeline
+        when: never
+      - if: $CI_COMMIT_BRANCH
