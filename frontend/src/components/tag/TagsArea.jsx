@@ -38,7 +38,9 @@ function TagsArea(props) {
           inputProps={{ maxLength: 20 }} // we don't want the tags to be too long
           value={text}
           onChange={(event) => {
-            setText(event.target.value);
+            if(!event.target.contains.endsWith(',')) {
+              setText(event.target.value);
+            }
           }}
           onKeyPress={(e) => handleKeyPress({ event: e, text: text })}
           InputProps={{

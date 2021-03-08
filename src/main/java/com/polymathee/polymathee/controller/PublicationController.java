@@ -38,8 +38,6 @@ public class PublicationController {
 
     private static final String PUT_PUBLICATION ="/api/publication/{publiId}";
     private static final String PUT_PUBLICATION_STATUS ="/api/status/publication/{publiId}/{status}";
-    private static final String PUT_PUBLICATION_DOWNLOADNUMBER="/api/download/publication/{publiId}";
-    private static final String PUT_PUBLICATION_REPORT="/api/report/publication/{publiId}";
 
     private static final String DELETE_PUBLICATION ="/api/publication/{publiId}";
 
@@ -78,7 +76,7 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_BY_STATUS)
     @ApiOperation(value = "Get Publication by status", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByStatus(@PathVariable("status") StateEnum status) {
+    public ResponseEntity<List<Publication>> getPublicationsByStatus(@RequestParam("status") StateEnum status) {
         List<Publication> listPubli = publicationService.getPublicationsByStatus(status);
         return new ResponseEntity<>(listPubli, HttpStatus.OK);
     }
@@ -127,11 +125,9 @@ public class PublicationController {
         return new ResponseEntity<>(publication, HttpStatus.OK);
     }
 
-    // PUT Publication
-
     @PutMapping(PUT_PUBLICATION)
     @ApiOperation(value = "Put publication", consumes = "application/json")
-    public ResponseEntity<Publication> updatePubli(@RequestParam("publiId") Integer id,
+    public ResponseEntity<Publication> updatePubli(@PathVariable("publiId") Integer id,
            @RequestBody PublicationUpdateDto publi){
         Publication updatedPublication = publicationService.updatePublicationById(id, publi);
         return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
@@ -139,34 +135,18 @@ public class PublicationController {
 
     @PutMapping(PUT_PUBLICATION_STATUS)
     @ApiOperation(value = "Put publication status", consumes = "application/json")
-    public ResponseEntity<Publication> updatePubliStatus(@RequestParam(value="publiId")
-           int publiId, @RequestParam(value="status") StateEnum status){
+    public ResponseEntity<Publication> updatePubliStatus(@PathVariable(value="publiId")
+           int publiId, @PathVariable(value="status") StateEnum status){
         Publication updatedPublication = publicationService.updatePubicationPublished(publiId,status);
-        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
-    }
-
-    @PutMapping(PUT_PUBLICATION_DOWNLOADNUMBER)
-    @ApiOperation(value = "Put publication downloadNumber", consumes = "application/json")
-    public ResponseEntity<Publication> updateDownloadNumber(@PathVariable(value="publiId")
-                                                                 int publiId){
-        Publication updatedPublication = publicationService.updatePubicationDownloadNumber(publiId);
-        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
-    }
-
-    @PutMapping(PUT_PUBLICATION_REPORT)
-    @ApiOperation(value = "Put publication report", consumes = "application/json")
-    public ResponseEntity<Publication> updateReport(@PathVariable(value="publiId")
-                                                                    int publiId){
-        Publication updatedPublication = publicationService.updateReport(publiId);
         return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
     }
 
     @DeleteMapping(DELETE_PUBLICATION)
     @ApiOperation(value = "Delete publication by ID", consumes = "application/json")
-    public ResponseEntity<Boolean> deletePubli(@RequestParam("publiId") int PubliId) {
-        commentaryService.deleteComment(PubliId);
-        likeService.deleteLikeTable(PubliId);
-        publicationService.deletePubli(PubliId);
+    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") int publiId) {
+        commentaryService.deleteComment(publiId);
+        likeService.deleteLikeTable(publiId);
+        publicationService.deletePubli(publiId);    
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 

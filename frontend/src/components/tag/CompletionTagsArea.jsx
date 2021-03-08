@@ -1,0 +1,114 @@
+import React from "react";
+import { withRouter } from "react-router-dom";
+import axios from "axios";
+import { Box, Grid, TextField, CircularProgress } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/lab";
+import Tag from "./Tag";
+
+function CompletionTagsArea(props) {
+  let tags = props.tags;
+  let setTags = props.setTags;
+  let deleteTag = props.deleteTags;
+  // eslint-disable-next-line
+  const [text, setText] = React.useState("");
+
+  const [open, setOpen] = React.useState(false);
+  const [options, setOptions] = React.useState([]);
+  const loading = open && options.length === 0;
+  const url = props.url;
+  React.useEffect(() => {
+    let active = true;
+
+    if (!loading) {
+      return undefined;
+    }
+
+    (async () => {
+      const response = await axios.get(url);
+      const tags = response.data;
+      if (active) {
+        if (url.includes("publication"))
+          setOptions(Object.keys(tags).map((index) => tags[index]));
+        else if (url.includes("user"))
+          setOptions(Object.keys(tags).map((index) => tags[index].name));
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [loading, url]);
+
+  React.useEffect(() => {
+    if (!open) {
+      setOptions([]);
+    }
+  }, [open]);
+
+  return (
+    <Box p={2}>
+      <Grid container>
+        {tags.map((t, index) => (
+          <Tag
+            key={`${t.label}${index}`}
+            label={t.label}
+            tagSize={props.tagSize}
+            onDelete={() => {
+              deleteTag(t.label);
+            }}
+          />
+        ))}
+      </Grid>
+      <div>
+        <Autocomplete
+          style={{ marginTop: 30 }}
+          open={open}
+          onOpen={() => {
+            setOpen(true);
+          }}
+          onClose={() => {
+            setOpen(false);
+          }}
+          onChange={(event) => {
+            if (
+              event.target.textContent !== "" &&
+              event.target.textContent !== undefined
+            ) {
+              setText(event.target.textContent);
+              setTags({ label: event.target.textContent });
+              setText("");
+            }
+          }}
+          getOptionSelected={(option, value) => option === value}
+          getOptionLabel={(option) => option}
+          options={options}
+          loading={loading}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              label={props.label}
+              color="secondary"
+              variant="outlined"
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <React.Fragment>
+                    {loading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </React.Fragment>
+                ),
+              }}
+            />
+          )}
+        />
+      </div>
+    </Box>
+  );
+}
+
+export default withRouter(CompletionTagsArea);

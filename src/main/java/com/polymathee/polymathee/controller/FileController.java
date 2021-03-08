@@ -28,7 +28,7 @@ public class FileController {
 
     @GetMapping(GET_FILE)
     @ApiOperation(value = "Download PDF file", consumes = "application/pdf")
-    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam("fileName") String fileName) {
+    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable("fileName") String fileName) {
         byte[] data = awsService.downloadFile(fileName);
         ByteArrayResource resource = new ByteArrayResource(data);
         return ResponseEntity
@@ -45,9 +45,14 @@ public class FileController {
     @ApiOperation(value = "Post PDF file with publication_id param", consumes = "application/pdf")
     public ResponseEntity<String> uploadFile(@RequestPart(value = "file") final MultipartFile multipartFile,
         @PathVariable("id") int id) {
-        awsService.uploadFile(multipartFile,id);
-        final String response = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            awsService.uploadFile(multipartFile,id);
+            final String response = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch(Throwable t) {
+            System.out.println(t);
+            return new ResponseEntity<>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping(DELETE_FILE)
