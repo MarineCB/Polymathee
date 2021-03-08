@@ -32,8 +32,15 @@ const ProfileMenu = () => {
         history.push('/homepage');  
     }
 
-    const handleProfileClick = () => {
+    const handleMyPublications = () => {
+        handleClose();
         history.push('/myPublications');
+        
+    }
+
+    const handleCreatePublicationClick = () => {
+        handleClose();
+        history.push('/createpublication');
     }
 
     return(
@@ -61,10 +68,15 @@ const ProfileMenu = () => {
                     ) : (
                         <div>
                         {
-                            role === 'student' && (
-                                <MenuItem onClick={handleProfileClick}>
-                                 Mes Publications
+                            role === 'Student' && (
+                                <div>
+                                    <MenuItem onClick={handleMyPublications}>
+                                    Mes Publications
+                                    </MenuItem>
+                                    <MenuItem onClick={handleCreatePublicationClick}>
+                                    Créer Publication
                                 </MenuItem>
+                               </div>
                             )
                         }    
                         <MenuItem onClick={ProfileMenuLogout}>
