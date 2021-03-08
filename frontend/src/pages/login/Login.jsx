@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
 function Login() {
   const classes = useStyles();
   const history = useHistory();
-  const{setIsConnected, setName, setEmail, setUserId, setRole} = useContext(UserContext);
+  const{setIsConnected, setName, setEmail, setUserId, setRole, setAuthToken} = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -38,18 +38,25 @@ function Login() {
 
   async function getUserInfo() {
       const res = await axios.post('/api/login', {
-        "moderator_password": `${username}`,
-        "moderator_username": `${password}`,
+        "moderator_password": `${password}`,
+        "moderator_username": `${username}`,
         });
-      console.log("this is res", res);
+      const data = res.data;
+      if(data) {
+        setIsConnected(true);
+        setEmail(data.email);
+        setUserId(data.id);
+        setName(data.name);
+        setRole(data.role);
+        setAuthToken('');
+      }
   }
 
   const handleSignIn = () => {
     getUserInfo();
+    history.push('/moderatorPage');
   }
 
-    console.log("username", username);
-    console.log("pwd", password)
   return (
     <div className="App">
     <div className={classes.root}>
@@ -73,6 +80,7 @@ function Login() {
             <TextField
               style={{ padding: 10 }}
               placeholder="Mot de passe"
+              type="password"
               onChange={e => setPassword(e.target.value)}
             ></TextField>
 

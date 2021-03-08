@@ -26,15 +26,13 @@ export const UserWrapper = (props) => {
             setIsConnected(true);           
             const decoded = jwt_decode(authToken);
             setEmail(decoded.email);
-        } else {
-            setIsConnected(false);
-        }
+        } 
     },[authToken]);
 
 
     useEffect(() => {
         async function getUserInfo() {
-            if(email) {
+            if(email && authToken) {
                 const result = await axios.get(`/api/user/email`, {
                     params: { 
                         email: `${email}`,
@@ -46,8 +44,8 @@ export const UserWrapper = (props) => {
                 setStrikeNumber(result.data.strikeNumber);
             }
         }
-        getUserInfo();
-    },[email]);
+        getUserInfo(); // eslint-disable-next-line
+    },[email]); 
 
     const logout = () => {
         window.localStorage.setItem('myToken', '');
@@ -61,7 +59,7 @@ export const UserWrapper = (props) => {
     
 
 
-    const value = { authToken, setAuthToken, name, userId, role, strikeNumber, email, logout, isConnected, setIsConnected}
+    const value = { authToken, setAuthToken, name, userId, role, strikeNumber, email, logout, isConnected, setIsConnected, setEmail, setUserId, setRole,setName}
     return (
         <UserContext.Provider value={value}>
             {props.children}

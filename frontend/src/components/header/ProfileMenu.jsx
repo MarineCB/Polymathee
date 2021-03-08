@@ -5,9 +5,10 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { UserContext } from "../../store/UserContext";
 import {GoogleLogin} from 'react-google-login';
+import { useHistory } from "react-router-dom";
 
 const ProfileMenu = () => {
-
+    const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
 
      const handleClick = (event) => {
@@ -17,7 +18,7 @@ const ProfileMenu = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const {setAuthToken, logout, isConnected, name, userId, email, role, strikeNumber} = useContext(UserContext);
+    const {setAuthToken, logout, isConnected, role} = useContext(UserContext);
 
     const responseGoogle = (response) => {
       window.localStorage.setItem('myToken', response.tokenId);
@@ -28,10 +29,12 @@ const ProfileMenu = () => {
     const ProfileMenuLogout = () => {
         handleClose();
         logout();  
-        window.location.reload();  
+        history.push('/homepage');  
     }
 
-    console.log("data : ", name, userId, role, strikeNumber, email);
+    const handleProfileClick = () => {
+        history.push('/myPublications');
+    }
 
     return(
         <div>
@@ -57,9 +60,13 @@ const ProfileMenu = () => {
                     </MenuItem>
                     ) : (
                         <div>
-                        <MenuItem onClick={handleClose}>
-                            Profile
-                        </MenuItem>
+                        {
+                            role === 'student' && (
+                                <MenuItem onClick={handleProfileClick}>
+                                 Mes Publications
+                                </MenuItem>
+                            )
+                        }    
                         <MenuItem onClick={ProfileMenuLogout}>
                             Logout
                         </MenuItem>
