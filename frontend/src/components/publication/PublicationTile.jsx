@@ -12,7 +12,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { ZoomIn, Edit, Delete } from "@material-ui/icons";
 import axios from "axios";
-const useStyles = makeStyles(() => ({
+export const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     justifyContent: "center",
@@ -125,7 +125,7 @@ function askDeletePublication(
  * Returns the publication status
  * @param {String} status
  */
-function GetInfoForPublicationStatus(status) {
+export function GetInfoForPublicationStatus(status) {
   const classes = useStyles();
   switch (status) {
     case "Saved":
@@ -219,7 +219,11 @@ function PublicationTile({
     >
       <Grid container alignItems="center" item>
         <Grid item xs={3}>
-          <Tooltip  title={"Créee le " + new Date(publication.date).toLocaleDateString()}>
+          <Tooltip
+            title={
+              "Créee le " + new Date(publication.date).toLocaleDateString()
+            }
+          >
             <Typography variant="h6">{publication.title}</Typography>
           </Tooltip>
         </Grid>
@@ -246,7 +250,11 @@ function PublicationTile({
               onClick={() => {
                 history.push({
                   pathname: "/viewPublication",
-                  publicationId: publication.id,
+                  search:
+                    "?" +
+                    new URLSearchParams({
+                      publicationId: publication.id,
+                    }).toString(),
                 });
               }}
             >

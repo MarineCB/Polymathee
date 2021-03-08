@@ -7,7 +7,7 @@ function PublicationProvider(props){
 	
 	const [Publications, setPublications] = useState([]);
 	useEffect(() => {
-		axios.get("api/publications/%7Bstatus%7D?status=Published").then((res) => {
+		axios.get("api/publications/status/Published").then((res) => {
 		setPublications(res.data);
 	  })}, []);
 	

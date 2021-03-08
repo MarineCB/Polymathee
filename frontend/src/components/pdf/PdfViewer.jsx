@@ -13,7 +13,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function PdfViewer({pdfFile,height,objectURL,setObjectURL}) {
+function PdfViewer({pdfFile,height}) {
   const classes = useStyles();
   const [numPages, setNumPages] = React.useState(null);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -73,22 +73,22 @@ function PdfViewer({pdfFile,height,objectURL,setObjectURL}) {
           <Page className={"PDFPage"} height={height} pageNumber={pageNumber} />
         </Document>
       </Grid>
-      
-      <Box p={2} item>
-        <Button onClick={previousPage} disabled={isFirstPage()}>Previous</Button>
-        <Button onClick={nextPage} disabled={isLastPage()}>Next</Button>
-        <Chip label={`Page ${pageNumber} / ${numPages}`}></Chip>
-        <Tooltip title="Mode plein écran" aria-label="fullscreen">
+      <Box p={2}>
+      <Tooltip title="Mode plein écran" aria-label="fullscreen">
         <IconButton
         color="secondary"
         variant="contained"
         className={classes.button}
         onClick={() => {
-          if (pdfFile.objectURL !== null) {
+          if (pdfFile instanceof Blob) {
+            pdfFile.pdfFile = pdfFile
+          }
+          const url = window.URL.createObjectURL(pdfFile.pdfFile);
+          if (url !== null) {
               var ifrm = document.createElement(
                 'iframe'
               );
-              ifrm.setAttribute("src", pdfFile.objectURL);
+              ifrm.setAttribute("src",url);
               ifrm.setAttribute("allowfullscreen", true);
               ifrm.setAttribute("id", "IFRAME");
               ifrm.setAttribute("webkitallowfullscreen", true);
@@ -112,7 +112,13 @@ function PdfViewer({pdfFile,height,objectURL,setObjectURL}) {
         <Fullscreen />
       </IconButton>
       </Tooltip>
-      </Box>
+  
+        <Button onClick={previousPage} disabled={isFirstPage()}>Previous</Button>
+        <Button onClick={nextPage} disabled={isLastPage()}>Next</Button>
+        <Chip label={`Page ${pageNumber} / ${numPages}`}></Chip>
+              {/* Fullscreen button */}
+
+     </Box>
     </Grid>
   );
 }

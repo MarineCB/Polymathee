@@ -58,7 +58,7 @@ public class FavorisController {
     @ApiOperation(value = "Delete favoris", consumes = "application/json")
     public ResponseEntity<Boolean> deleteFavoris(@PathVariable("userId") int userId,
         @PathVariable("publicationId") int publicationId ) {
-        likeService.deleteLikeTable(publicationId);
+        likeService.deleteLikeTable(publicationId, userId);
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 }
