@@ -11,8 +11,19 @@ import {
 } from "@material-ui/core";
 import "./Login.css";
 import { useHistory } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(() => ({
+  root: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "80%",
+  },
+}));
 
 function Login() {
+  const classes = useStyles();
   const history = useHistory();
 
   function GoToSignup(e) {
@@ -20,7 +31,8 @@ function Login() {
   }
 
   return (
-    <div className="center">
+    <div className="App">
+    <div className={classes.root}>
       <Card
         color="primary"
         raised
@@ -59,6 +71,7 @@ function Login() {
           </FormControl>
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 }
