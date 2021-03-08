@@ -2,7 +2,6 @@
 import {useState, useEffect} from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -25,7 +24,7 @@ function TabPanel(props) {
       >
         {value === index && (
           <Box p={3}>
-            <Typography>{children}</Typography>
+            <div>{children}</div>
           </Box>
         )}
       </div>
@@ -50,9 +49,9 @@ function TabPanel(props) {
 const ModeratorPage = () => {
     const [value, setValue] = useState(0);
     const [pendingPublications, setPendingPublications] = useState();
-    const [checkCommentaries, setCheckCommentaries] = useState();
-    const [checkPublications, setCheckPublications] = useState();
-    const[publiTest, setPubliTest] = useState();
+    // const [checkCommentaries, setCheckCommentaries] = useState();
+    // const [checkPublications, setCheckPublications] = useState();
+    // const[publiTest, setPubliTest] = useState();
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -88,19 +87,23 @@ const ModeratorPage = () => {
                 <Tab label="Check Publications" {...a11yProps(2)}/>
             </Tabs>
             <TabPanel value={value} index={0}>
+                
                 {
                    pendingPublications? pendingPublications.map((publication) => {
                         return(
-                            <GenericPublicationTile key={publication.id} publication={publication} />
+                            
+                                <GenericPublicationTile key={publication.id} publication={publication} />
+                            
                         );
                     }) : <div></div>
                 }
+        
             </TabPanel>
             <TabPanel value={value} index={1}>
-                Item Two
+                <div>Item Two</div>
             </TabPanel>
             <TabPanel value={value} index={2}>
-                Item Three
+                <div>Item Two</div>
             </TabPanel>
         </div>
     );

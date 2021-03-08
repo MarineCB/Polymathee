@@ -1,7 +1,5 @@
 import {useState, useEffect} from 'react';
-import { makeStyles } from "@material-ui/core/styles";
 import {
-    Box,
     Card,
     Grid,
     Button,
@@ -11,86 +9,7 @@ import {
 import { ZoomIn, HighlightOff, Check } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
 import axios from 'axios';
-
-const useStyles = makeStyles(() => ({
-    root: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "80%",
-    },
-    parallelogramDone: {
-      background: "green",
-      // Distord shape
-      transform: "skewX(-20deg)",
-      minHeight: "20px",
-      minWidth: "20px",
-      marginRight: 5,
-    },
-    parallelogramProcessing: {
-      background: "orange",
-      // Distord shape
-      transform: "skewX(-20deg)",
-      minHeight: "20px",
-      minWidth: "20px",
-      marginRight: 5,
-    },
-    parallelogramInvalid: {
-      background: "red",
-      // Distord shape
-      transform: "skewX(-20deg)",
-      minHeight: "20px",
-      minWidth: "20px",
-      marginRight: 5,
-    },
-    parallelogramEmpty: {
-      background: "#E8E8E8",
-      // Distord shape
-      transform: "skewX(-20deg)",
-      minHeight: "20px",
-      minWidth: "20px",
-      marginRight: 5,
-    },
-    publicationCard: {
-      padding: 10,
-      margin: 20,
-      border: "1px solid #E5E5E5",
-    },
-  }));
-
-function ProgressRects({ publicationInfo }) {
-    const rects = [];
-    const classes = useStyles();
-    for (let i = 0; i < 3; i++) {
-        if (i < publicationInfo.step) {
-        rects.push(
-            <Box
-            key={i}
-            variant="contained"
-            className={classes.parallelogramDone}
-            />
-        );
-        } else if (i > publicationInfo.step) {
-        rects.push(
-            <Box
-            key={i}
-            variant="contained"
-            className={classes.parallelogramEmpty}
-            />
-        );
-        } else {
-        // Show current status color
-        rects.push(
-            <Box key={i} variant="contained" className={publicationInfo.class} />
-        );
-        }
-    }
-    return (
-        <Grid container justify="flex-end" alignItems="center" item xs={5}>
-        {rects}
-        </Grid>
-    );
-}
+import {useStyles} from '../publication/PublicationTile';
 
 const GenericPublicationTile = ({publication}) => {
     const classes = useStyles();
@@ -142,6 +61,7 @@ const GenericPublicationTile = ({publication}) => {
 
     async function updatePublication(id, status) {
         const res = await axios.put(`/api/status/publication/${id}/${status}`);
+        console.log(res);
         window.location.reload();
     }
 
@@ -152,12 +72,12 @@ const GenericPublicationTile = ({publication}) => {
         >
             <Grid container alignItems="center" item>
                 <Grid item xs={3}>
-                    <Tooltip  title={"Créee le " + new Date(publication.date).toLocaleDateString()}>
-                        <Typography variant="h6">{publication.title}</Typography>
+                    <Tooltip  title={`Créee le ${new Date(publication.date).toLocaleDateString()}`}>
+                        <Typography>{publication.title}</Typography>
                     </Tooltip>
                 </Grid>
                 <Grid item xs={3}>
-                    {infos ? <Typography>{infos.msg}</Typography> : <Typography>info</Typography>}
+                    {infos && <Typography>{infos.msg}</Typography>}
                 </Grid>
                 <Grid item xs={3}>
                     <Button
