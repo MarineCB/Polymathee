@@ -155,6 +155,14 @@ public class PublicationServiceImpl implements PublicationService {
     }
 
     @Override
+    public List<Publication> getPubliReport(int report){
+
+        List<Publication> publiTagList = publicationRepository.findPubliByReportDesc(report);
+
+        return publiTagList;
+    }
+
+    @Override
     public Publication updatePublicationById(Integer id, PublicationUpdateDto publication) {
         Optional<Publication> publicationUpdate = publicationRepository.findById(id);
 

@@ -175,7 +175,6 @@ function Landing() {
         </Box>
         <Box m={6}>
           <Typography
-            textAlign="center"
             variant="h5"
             style={{ fontWeight: "bold" }}
           >

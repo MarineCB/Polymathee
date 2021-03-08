@@ -1,5 +1,6 @@
 package com.polymathee.polymathee.repositories;
 
+import com.polymathee.polymathee.dao.Commentary;
 import com.polymathee.polymathee.dao.Publication;
 
 import com.polymathee.polymathee.enums.StateEnum;
@@ -33,6 +34,9 @@ public interface PublicationRepository extends CrudRepository<Publication, Integ
 
     List<Publication> findPublicationByStatus(StateEnum Status);
 
+    @Query("Select c from Commentary c where c.report > :report ORDER BY c.report DESC")
+    List<Publication> findCommentByReportDesc(int report);
+
     @Query("SELECT s FROM Publication s WHERE s.tags LIKE :tag AND s.status = 'Published'")
     List<Publication> findPubliByTagAndStatus(String tag);
 
@@ -45,6 +49,8 @@ public interface PublicationRepository extends CrudRepository<Publication, Integ
     @Query("UPDATE Publication p SET  p.file = :file  WHERE p.id = :id")
     void updateFileById(int id, String file);
 
+    @Query("Select p from Publication p where p.report > :report ORDER BY p.report DESC")
+    List<Publication> findPubliByReportDesc(int report);
 
 
 
