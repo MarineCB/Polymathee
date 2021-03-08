@@ -14,7 +14,7 @@ import { PublicationProvider } from "./store/PublicationContext";
 import RedirectToNotFound from "./RedirectToNotFound";
 import NotFound from "./pages/notFound/NotFound";
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     light: {
       main: "#FFFAFA",

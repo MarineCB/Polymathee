@@ -11,8 +11,10 @@ import com.polymathee.polymathee.services.CommentaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentaryServiceImpl implements CommentaryService {
@@ -63,5 +65,26 @@ public class CommentaryServiceImpl implements CommentaryService {
     @Override
     public void DeleteCommentById(int id){
         commentaryRepository.deleteById(id);
+    }
+
+    @Override
+    public Commentary updateReport(Integer id) {
+        Optional<Commentary> commentaryUpdate = commentaryRepository.findById(id);
+
+        if(commentaryUpdate.isPresent()){
+            Commentary newCommentary = commentaryUpdate.get();
+            newCommentary.setReport(newCommentary.getReport()+1);
+            return commentaryRepository.save(newCommentary);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public List<Commentary> SortByCommentUpvote(Integer id) {
+        List<Commentary> comments ;
+        comments = commentaryRepository.SortByUpvote();
+            return comments;
+
     }
 }
