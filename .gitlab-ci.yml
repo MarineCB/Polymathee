@@ -88,4 +88,4 @@ include:
 - template: Security/SAST.gitlab-ci.yml
 sast:
     rules:
-      - if: '$CI_COMMIT_BRANCH == "master"'
+      - if: $CI_COMMIT_BRANCH == "master"
