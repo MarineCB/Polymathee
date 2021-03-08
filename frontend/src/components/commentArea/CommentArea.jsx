@@ -46,7 +46,7 @@ function sendComment(publicationId, personalCom, comments, setComments) {
     user_id: TEST_USER_ID,
   };
 
-  const POST_COMMENT_URL = "/api/commentary";
+  const POST_COMMENT_URL = "/api/comment";
   axios
     .post(POST_COMMENT_URL, data)
     .then((res) => {
@@ -75,7 +75,7 @@ function loadComments(publicationId, setComments) {
 // Report a comment that is inappropriate
 async function reportAction(commentId) {
   try{
-    await axios.put('api/report/comment/')
+    await axios.put('api/report/comment/' + commentId)
   }catch(e) {
     console.error(e)
   }
@@ -185,7 +185,7 @@ function CommentArea({ publicationId, userId }) {
                     publicationId={publicationId}
                     setComments={setComments}
                     userId={TEST_USER_ID}
-                    reportAction={reportAction}
+                    reportAction={() =>reportAction(curCommentData.id)}
                   />
                   {index < comments.length - 1 ? (
                     <Divider variant="inset" component="li" />

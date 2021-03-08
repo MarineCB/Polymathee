@@ -3,6 +3,8 @@ import { useHistory, withRouter } from "react-router-dom";
 import CommentArea from "../../components/commentArea/CommentArea";
 import { useEffect } from "react";
 import axios from "axios";
+import queryString from "query-string";
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
@@ -87,7 +89,7 @@ async function incrementDownloadCount(
   setDownloadCount
 ) {
   try {
-    const result = await axios.put("api/publication/download/" + publicationId);
+    const result = await axios.put("api/download/publication/" + publicationId);
     if (result.status === 200) {
       setDownloadCount(downloadCount + 1);
     }
@@ -117,15 +119,15 @@ function PublicationActions({
         disabled={!downloadEnabled}
         onClick={async () => {
           // Download the file
-          const url = window.URL.createObjectURL(pdfFile);
-          setObjectURL(url);
-          link.href = url;
-          link.download = pdfFile.path;
-          link.dispatchEvent(new MouseEvent("click"));
-          incrementDownloadCount(downloadCount, setDownloadCount);
-          setDownloadEnabled(false);
+          const url = window.URL.createObjectURL(pdfFile)
+          setObjectURL(url)
+          link.href = url
+          link.download = pdfFile.path
+          link.dispatchEvent(new MouseEvent("click"))
+          incrementDownloadCount(publication.id,downloadCount, setDownloadCount)
+          setDownloadEnabled(false)
           setTimeout(() => {
-            setDownloadEnabled(true);
+            setDownloadEnabled(true)
           }, 1000);
         }}
       >
@@ -167,7 +169,7 @@ function RightSide({
     setLikeNumber(pubInfos.likeNumber + 1);
   };
   const decrementFavNumber = () => {
-    setLikeNumber(pubInfos.likeNumber + 1);
+    setLikeNumber(pubInfos.likeNumber);
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -248,7 +250,9 @@ function RightSide({
                   variant="contained"
                 >
                   <Tooltip title="Ajouter cette publication aux favoris">
-                    <FavoriteBorderOutlined />
+                    <Badge badgeContent={likeNumber}>
+                      <FavoriteBorderOutlined />
+                    </Badge>
                   </Tooltip>
                 </IconButton>
               )}
@@ -302,14 +306,14 @@ function LeftSide(pdfFile, objectURL, setObjectURL) {
 /**
  * Set if the favorite button is in add or remove from favorites mode
  */
-function syncFavButttonStatus(userId, publication, setAlreadyFavorited) {
+function  syncFavButttonStatus(userId, publicationId, setAlreadyFavorited) {
   const URL_FAVORIS_FOR_USER = "/api/favoris/" + userId;
   axios
     .get(URL_FAVORIS_FOR_USER)
     .then((res) => {
       let alreadyFav = false;
       res.data.forEach((f) => {
-        if (f.publicationId.id === publication.id) {
+        if (f.publicationId.id === parseInt(publicationId)) {
           alreadyFav = true;
         }
       });
@@ -373,19 +377,17 @@ function ViewPublication(props) {
   const histo = useHistory();
   const [objectURL, setObjectURL] = React.useState(null);
   const [alreadyFavorited, setAlreadyFavorited] = React.useState(false);
-
+  const TIMEOUT_DELAY = 10000 // The time to load a publication before an error message is displayed
   const [downloadCount, setDownloadCount] = React.useState();
   const [timeoutReached, setTimeoutReached] = React.useState(false);
   setTimeout(() => {
     setTimeoutReached(true);
-  }, 6000);
+  }, TIMEOUT_DELAY);
   //let publicationId = props.location.publicationId
+  let params = queryString.parse(props.location.search);
 
-  if (
-    props.match.params.publicationId !== null &&
-    props.match.params.publicationId !== undefined
-  ) {
-    PUBLICATION_ID = props.match.params.publicationId;
+  if (params.publicationId !== null && params.publicationId !== undefined) {
+    PUBLICATION_ID = params.publicationId;
   }
   const URL_PUBLICATION_BY_ID = "/api/publications/" + PUBLICATION_ID;
   useEffect(() => {
@@ -395,15 +397,13 @@ function ViewPublication(props) {
         .get(URL_PUBLICATION_BY_ID)
         .then((resInfos) => {
           if (resInfos.status === 200) {
-            const selectedPublication = resInfos.data.filter(
-              (pub) => pub.id === PUBLICATION_ID
-            )[0]
+            const selectedPublication = resInfos.data;
             console.log(
               "Load success of publication data",
               selectedPublication
-            )
-            setPubsInfos(selectedPublication)
-            setDownloadCount(pubInfos.downloadNumber)
+            );
+            setPubsInfos(selectedPublication);
+            setDownloadCount(selectedPublication.downloadNumber);
             axios
               .get(URL_DOWNLOAD + "/" + selectedPublication.file, {
                 responseType: "arraybuffer", // We don't download as a blob directly, as it will be downloaded as application/octed-stream which is invalid for iframes
@@ -419,12 +419,12 @@ function ViewPublication(props) {
                 setPdfFile(blob);
               })
               .catch((err) => {
-                console.error(err);
+                console.error("Could not load pdf file is " + err.status);
               });
           }
         })
         .catch((err) => {
-          console.error("Could not load pdf file is " + err.status);
+          console.error(err);
         });
     }
   }, []);
@@ -433,71 +433,81 @@ function ViewPublication(props) {
   return (
     <div>
       <div className="App">
-        {!pubInfos && timeoutReached ? (
-          <Grid>
-            <InfoPhrase
-              downloadCount={downloadCount}
-              author={pubInfos.userId.name}
-              date={pubInfos.date}
-            />
-            <Card raised style={{ margin: "30px" }}>
-              <Grid style={{ padding: "20px" }}>
-                <Grid container justify="center" direction="row">
-                  <LeftSide
-                    sm={6}
-                    xs={6}
-                    pdfFile={pdfFile}
-                    objectURL={objectURL}
-                    setObjectURL={setObjectURL}
-                    item
+        {(() => {
+          if (pubInfos !== undefined)
+            return (
+              <Grid>
+                <InfoPhrase
+                  downloadCount={downloadCount}
+                  author={pubInfos.userId.name}
+                  date={pubInfos.date}
+                />
+                <Card raised style={{ margin: "30px" }}>
+                  <Grid style={{ padding: "20px" }}>
+                    <Grid container justify="center" direction="row">
+                      <LeftSide
+                        sm={6}
+                        xs={6}
+                        pdfFile={pdfFile}
+                        objectURL={objectURL}
+                        setObjectURL={setObjectURL}
+                        item
+                      />
+                      <RightSide
+                        sm={6}
+                        xs={6}
+                        pdfFile={pdfFile}
+                        objectURL={objectURL}
+                        setObjectURL={setObjectURL}
+                        pubInfos={pubInfos}
+                        alreadyFavorited={alreadyFavorited}
+                        setAlreadyFavorited={setAlreadyFavorited}
+                        downloadCount={downloadCount}
+                        setDownloadCount={setDownloadCount}
+                        item
+                      />
+                    </Grid>
+                  </Grid>
+                </Card>
+                <div className={classes.comments}>
+                  <CommentArea
+                    publicationId={pubInfos.id}
+                    userId={MOCK_USER_ID}
                   />
-                  <RightSide
-                    sm={6}
-                    xs={6}
-                    pdfFile={pdfFile}
-                    objectURL={objectURL}
-                    setObjectURL={setObjectURL}
-                    pubInfos={pubInfos}
-                    alreadyFavorited={alreadyFavorited}
-                    setAlreadyFavorited={setAlreadyFavorited}
-                    downloadCount={downloadCount}
-                    setDownloadCount={setDownloadCount}
-                    item
-                  />
-                </Grid>
+                </div>
               </Grid>
-            </Card>
-            <div className={classes.comments}>
-              <CommentArea publicationId={pubInfos.id} userId={MOCK_USER_ID} />
-            </div>
-          </Grid>
-        ) : (
-          <Box m={2}>
-            <Card>
-              <CardContent>
-                <Typography>
-                  Echec de chargement de la publication, veuillez réessayer
-                </Typography>
-                <Button
-                  style={{ marginTop: "20px" }}
-                  variant="outlined"
-                  onClick={() => {
-                    histo.push({
-                      pathname: "/viewPublication",
-                      search:
-                        "?" +
-                        new URLSearchParams({
-                          publicationId: PUBLICATION_ID,
-                        }).toString(),
-                    });
-                  }}
-                >
-                  Recharger la page
-                </Button>
-              </CardContent>
-            </Card>
-          </Box>
-        )}
+            );
+          else if (timeoutReached) {
+            return (
+              <Box m={2}>
+                <Card>
+                  <CardContent>
+                    <Typography>
+                      Echec de chargement de la publication, veuillez réessayer
+                    </Typography>
+                    <Button
+                      style={{ marginTop: "20px" }}
+                      variant="outlined"
+                      onClick={() => {
+                        histo.push({
+                          pathname: "/viewPublication",
+                          search:
+                            "?" +
+                            new URLSearchParams({
+                              publicationId:
+                                params.publicationId || PUBLICATION_ID,
+                            }).toString(),
+                        });
+                      }}
+                    >
+                      Recharger la page
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Box>
+            );
+          }
+        })()}
       </div>
     </div>
   );

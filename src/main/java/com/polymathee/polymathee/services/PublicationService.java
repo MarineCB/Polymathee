@@ -27,4 +27,6 @@ public interface PublicationService {
     List<String> getAllTags();
     Publication updatePubicationDownloadNumber(Integer id);
     Publication updateReport(Integer id);
+    List<Publication> getPubliReport(int report);
+
 }

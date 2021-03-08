@@ -30,7 +30,7 @@ public class PublicationController {
     private static final String GET_PUBLICATIONS_BY_REPORT = "/api/publication/report/{report}";
     private static final String GET_PUBLICATIONS_BY_USER_AND_TAG = "/api/publications/filter/{user_name}/{tags}";
     private static final String GET_ALL_TAGS = "/api/publication/tags";
-    private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/{status}";
+    private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/status/{status}";
 
 
     private static final String POST_PUBLICATION ="/api/publication";
@@ -80,7 +80,7 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_BY_STATUS)
     @ApiOperation(value = "Get Publication by status", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByStatus(@RequestParam("status") StateEnum status) {
+    public ResponseEntity<List<Publication>> getPublicationsByStatus(@PathVariable("status") StateEnum status) {
         List<Publication> listPubli = publicationService.getPublicationsByStatus(status);
         return new ResponseEntity<>(listPubli, HttpStatus.OK);
     }
