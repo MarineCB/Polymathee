@@ -5,12 +5,12 @@ import {
     Card,
     Grid,
     Button,
-    IconButton,
     Tooltip,
     Typography
   } from "@material-ui/core";
-import { ZoomIn, Edit, HighlightOff, Check } from "@material-ui/icons";
+import { ZoomIn, HighlightOff, Check } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
+import axios from 'axios';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -139,6 +139,12 @@ const GenericPublicationTile = ({publication}) => {
         }
       }
 
+
+    async function updatePublication(id, status) {
+        const res = await axios.put(`/api/status/publication/${id}/${status}`);
+        window.location.reload();
+    }
+
     return(
         <Card
             key={publication.id}
@@ -171,7 +177,7 @@ const GenericPublicationTile = ({publication}) => {
                 <Button
                         startIcon={<Check />}
                         onClick={() => {
-                            console.log("je valide ce taff chacal")
+                            updatePublication(publication.id, 'Published')
                         }}
                     >
                         Valider
@@ -179,7 +185,7 @@ const GenericPublicationTile = ({publication}) => {
                     <Button
                         startIcon={<HighlightOff />}
                         onClick={() => {
-                            console.log("nul nul nul")
+                            updatePublication(publication.id, 'Rejected')
                         }}
                     >
                         Refuser

@@ -95,7 +95,6 @@ const ModeratorPage = () => {
                         );
                     }) : <div></div>
                 }
-                {publiTest && <GenericPublicationTile publication={publiTest}/>}
             </TabPanel>
             <TabPanel value={value} index={1}>
                 Item Two
