@@ -22,14 +22,13 @@ import java.util.List;
 @SwaggerDefinition(tags = {@Tag(name = "/api",description = "Api Publication")})
 public class PublicationController {
 
-    private static final String GET_PUBLICATION = "/api/publication";
     private static final String GET_PUBLICATIONS = "/api/publications";
-
     private static final String GET_PUBLICATIONS_ID_USER = "/api/publications/user/{id}";
     private static final String GET_PUBLICATIONS_BY_ID = "/api/publications/{id}";
     private static final String GET_PUBLICATIONS_BY_STATUS = "/api/publications/{status}";
     private static final String GET_PUBLICATIONS_BY_LIKE_NUMBER_DESC = "/api/publications/like";
     private static final String GET_PUBLICATIONS_BY_DATE = "/api/publications/date";
+    private static final String GET_PUBLICATIONS_BY_REPORT = "/api/publication/report/{report}";
     private static final String GET_PUBLICATIONS_BY_USER_AND_TAG = "/api/publications/filter/{user_name}/{tags}";
     private static final String GET_ALL_TAGS = "/api/publication/tags";
 
@@ -39,8 +38,6 @@ public class PublicationController {
 
     private static final String PUT_PUBLICATION ="/api/publication/{publiId}";
     private static final String PUT_PUBLICATION_STATUS ="/api/status/publication/{publiId}/{status}";
-    private static final String PUT_PUBLICATION_DOWNLOADNUMBER="/api/download/publication/{publiId}";
-    private static final String PUT_PUBLICATION_REPORT="/api/report/publication/{publiId}";
 
     private static final String DELETE_PUBLICATION ="/api/publication/{publiId}";
 
@@ -61,19 +58,9 @@ public class PublicationController {
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
 
-    /*@GetMapping(GET_PUBLICATION)
-    @ApiOperation(value = "Get Publications Filter", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublication(Filter publicationFilter)
-            throws UnsupportedEncodingException {
-        String filter = URLDecoder.decode(publicationFilter.getFilter(), "utf-8");
-        List<Publication> publiList = publicationService.getPublicationsFilter(filter);
-        return new ResponseEntity<>(publiList, HttpStatus.OK);
-    }*/
-
-
     @GetMapping(GET_PUBLICATIONS_BY_ID)
     @ApiOperation(value = "Get Publication by  ID", consumes = "application/json")
-    public ResponseEntity<Publication> getPublicationsById(@RequestParam(value="id") int id) {
+    public ResponseEntity<Publication> getPublicationsById(@PathVariable("id") Integer id) {
         Publication publi = publicationService.getPublicationsById(id);
         return new ResponseEntity<>(publi, HttpStatus.OK);
     }
@@ -81,7 +68,7 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_ID_USER)
     @ApiOperation(value = "Get Publication by User ID", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getAllPublicationsById(@RequestParam Integer id) {
+    public ResponseEntity<List<Publication>> getAllPublicationsById(@PathVariable("id") Integer id) {
         List<Publication> publiList = publicationService.getPublicationsByUserId(id);
         return new ResponseEntity<>(publiList, HttpStatus.OK);
     }
@@ -89,8 +76,15 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_BY_STATUS)
     @ApiOperation(value = "Get Publication by status", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByStatus(@RequestParam(value="status") StateEnum status) {
+    public ResponseEntity<List<Publication>> getPublicationsByStatus(@RequestParam("status") StateEnum status) {
         List<Publication> listPubli = publicationService.getPublicationsByStatus(status);
+        return new ResponseEntity<>(listPubli, HttpStatus.OK);
+    }
+
+    @GetMapping(GET_PUBLICATIONS_BY_REPORT)
+    @ApiOperation(value = "Get Publication by report desc", consumes = "application/json")
+    public ResponseEntity<List<Publication>> getPublicationsByReport(@PathVariable(value="report") int report) {
+        List<Publication> listPubli = publicationService.getPubliReport(report);
         return new ResponseEntity<>(listPubli, HttpStatus.OK);
     }
 
@@ -131,11 +125,9 @@ public class PublicationController {
         return new ResponseEntity<>(publication, HttpStatus.OK);
     }
 
-    // PUT Publication
-
     @PutMapping(PUT_PUBLICATION)
     @ApiOperation(value = "Put publication", consumes = "application/json")
-    public ResponseEntity<Publication> updatePubli(@RequestParam("publiId") Integer id,
+    public ResponseEntity<Publication> updatePubli(@PathVariable("publiId") Integer id,
            @RequestBody PublicationUpdateDto publi){
         Publication updatedPublication = publicationService.updatePublicationById(id, publi);
         return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
@@ -143,34 +135,18 @@ public class PublicationController {
 
     @PutMapping(PUT_PUBLICATION_STATUS)
     @ApiOperation(value = "Put publication status", consumes = "application/json")
-    public ResponseEntity<Publication> updatePubliStatus(@RequestParam(value="publiId")
-           int publiId, @RequestParam(value="status") StateEnum status){
+    public ResponseEntity<Publication> updatePubliStatus(@PathVariable(value="publiId")
+           int publiId, @PathVariable(value="status") StateEnum status){
         Publication updatedPublication = publicationService.updatePubicationPublished(publiId,status);
-        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
-    }
-
-    @PutMapping(PUT_PUBLICATION_DOWNLOADNUMBER)
-    @ApiOperation(value = "Put publication downloadNumber", consumes = "application/json")
-    public ResponseEntity<Publication> updateDownloadNumber(@PathVariable(value="publiId")
-                                                                 int publiId){
-        Publication updatedPublication = publicationService.updatePubicationDownloadNumber(publiId);
-        return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
-    }
-
-    @PutMapping(PUT_PUBLICATION_REPORT)
-    @ApiOperation(value = "Put publication report", consumes = "application/json")
-    public ResponseEntity<Publication> updateReport(@PathVariable(value="publiId")
-                                                                    int publiId){
-        Publication updatedPublication = publicationService.updateReport(publiId);
         return new ResponseEntity<>(updatedPublication, HttpStatus.OK);
     }
 
     @DeleteMapping(DELETE_PUBLICATION)
     @ApiOperation(value = "Delete publication by ID", consumes = "application/json")
-    public ResponseEntity<Boolean> deletePubli(@RequestParam("publiId") int PubliId) {
-        commentaryService.deleteComment(PubliId);
-        likeService.deleteLikeTable(PubliId);
-        publicationService.deletePubli(PubliId);
+    public ResponseEntity<Boolean> deletePubli(@PathVariable("publiId") int publiId) {
+        commentaryService.deleteComment(publiId);
+        likeService.deleteLikeTable(publiId);
+        publicationService.deletePubli(publiId);    
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 

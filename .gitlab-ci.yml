@@ -38,6 +38,8 @@ setup:
   script:
     #- if [ -z "$MYSQL_DATABASE" ]; then echo "Env variable not set MYSQL_DATABASE"; exit 1 ; fi
     #- if [ -z "$MYSQL_PASS" ]; then echo "Env variable not set MYSQL_PASS"; exit 1 ; fi
+    - if [ -z "$SONAR_HOST_URL" ]; then echo "Env variable not set SONAR_HOST_URL"; exit 1 ; fi
+    - if [ -z "$SONAR_TOKEN" ]; then echo "Env variable not set SONAR_TOKEN"; exit 1 ; fi
     - mysql -V
     - echo "Execute this script in all jobs that don't already have a before_script section."
     - apt -y update 

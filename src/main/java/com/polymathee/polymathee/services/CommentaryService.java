@@ -11,6 +11,8 @@ public interface CommentaryService {
 
     List<Commentary> getCommentaryByIdPublication(Integer id);
 
+    List<Commentary> getCommentaryByIdUser(Integer id);
+
     Commentary saveComment(CommentaryDto commentaryDto);
 
     void deleteComment(int comment);
@@ -20,4 +22,6 @@ public interface CommentaryService {
     Commentary updateReport(Integer id);
 
     List<Commentary> SortByCommentUpvote(Integer id);
+
+    List<Commentary> GetCommentReport(Integer number);
 }

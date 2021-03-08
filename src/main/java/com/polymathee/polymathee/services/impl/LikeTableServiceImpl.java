@@ -37,7 +37,7 @@ public class LikeTableServiceImpl implements LikeTableService {
     }
 
     @Override
-    public void deleteLikeTable(int publicationId) {
+    public void deleteLikeTable(Integer publicationId) {
         likeRepository.deleteFavoris(publicationId);
     }
 

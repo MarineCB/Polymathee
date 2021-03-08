@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Homepage() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -43,7 +43,7 @@ function Homepage() {
     setOpen(false);
   };
 
-  const [Publications, SetPublications] = useContext(PublicationContext);
+  const [publications, setPublications] = useContext(PublicationContext);
   const [tags, _setTags] = React.useState([]);
   const [users, _setUsers] = React.useState([]);
   const [order, setOrder] = React.useState("");
@@ -67,13 +67,13 @@ function Homepage() {
   const handleChange = (event) => {
     setOrder(event.target.value);
     if (event.target.value === "like") {
-      SetPublications(
-        Publications.sort(function (a, b) {
+      setPublications(
+        publications.sort(function (a, b) {
           return b.likeNumber - a.likeNumber;
         })
       );
     } else if (event.target.value === "date") {
-      Publications.sort(function (a, b) {
+      publications.sort(function (a, b) {
         return new Date(b.date) - new Date(a.date);
       });
     }
@@ -97,11 +97,10 @@ function Homepage() {
     if (tagsString !== undefined && tagsString !== "")
       url += "&tags=" + tagsString;
     const response = await axios.get(url);
-    SetPublications(response.data);
-    //ApplyChange()
+    setPublications(response.data);
   };
 
-  useEffect(() => {}, [Publications]);
+  useEffect(() => {}, [publications]);
 
   return (
     <Grid style={{ maxHeight: "10vh" }} container justify="center">
@@ -158,7 +157,7 @@ function Homepage() {
             <br />
             <Divider />
             <Box p={3} minWidth="70%">
-              <FormLabel component="legend">Order by</FormLabel>
+              <FormLabel component="legend">Trier par</FormLabel>
               <RadioGroup
                 aria-label="gender"
                 name="gender1"
@@ -173,7 +172,7 @@ function Homepage() {
                 <FormControlLabel
                   value="like"
                   control={<Radio size="small" />}
-                  label="Like"
+                  label="J'aime"
                 />
               </RadioGroup>
             </Box>
@@ -191,7 +190,7 @@ function Homepage() {
         </Slide>
       </Box>
       <Box flexGrow={1} maxWidth="60%">
-        <PublicationList />
+        <PublicationList  publications={publications}/>
       </Box>
     </Grid>
   );
