@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function Login() {
+function Login({role}) {
   const classes = useStyles();
   const history = useHistory();
   const{setIsConnected, setName, setEmail, setUserId, setRole, setAuthToken} = useContext(UserContext);
@@ -45,11 +45,66 @@ function Login() {
         setRole(data.role);
         setAuthToken('');
       }
+      if(data.role === 'Administrator') history.push('/adminPage');
+      else history.push('/moderatorPage');
   }
 
   const handleSignIn = () => {
     getUserInfo();
-    history.push('/moderatorPage');
+  }
+
+  async function createModerator() {
+    const res = await axios.post('/api/moderator', {
+        "moderator_password": `${password}`,
+        "moderator_username": `${username}`,
+    });
+    console.log("is modo created ", res);
+    history.push('/adminPage');
+  }
+
+  const handleSignUp = () => {
+      createModerator();
+  }
+
+  if(role === 'Administrator') {
+    return (
+      <Card
+      color="primary"
+        raised
+        style={{ borderRadius: 30 }}
+        >
+           <CardHeader
+          style={{ marginBottom: 0 }}
+          color="inherit"
+          title="Créer Modérateur"
+        />
+        <CardContent>
+          <FormControl style={{ minWidth: 400, margin: 15 }}>
+            <TextField
+              style={{ padding: 10 }}
+              placeholder="Identifiant"
+              onChange={e => setUsername(e.target.value)}
+            ></TextField>
+            <TextField
+              style={{ padding: 10 }}
+              placeholder="Mot de passe"
+              type="password"
+              onChange={e => setPassword(e.target.value)}
+            ></TextField>
+            <Grid
+              style={{ marginTop: 15 }}
+              container
+              justify="space-between"
+              alignItems="flex-end"
+            >
+              <Button variant="contained" color="secondary" onClick={handleSignUp}>
+                OK
+              </Button>
+            </Grid>
+          </FormControl>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
