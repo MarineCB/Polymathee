@@ -1,6 +1,6 @@
 import "./App.css";
 import { Switch, Route } from "react-router-dom";
-import ModeratorPAge from './pages/moderatorPage/ModeratorPage';
+import ModeratorPage from './pages/moderatorPage/ModeratorPage';
 import Homepage from "./pages/homepage/Homepage";
 import Login from "./pages/login/Login";
 import Signup from "./pages/signup/Signup";
@@ -15,6 +15,7 @@ import { PublicationProvider } from "./store/PublicationContext";
 import RedirectToNotFound from "./RedirectToNotFound";
 import NotFound from "./pages/notFound/NotFound";
 import {UserWrapper} from './store/UserContext';
+import AdminPage from './pages/adminPage/AdminPage';
 
 export const theme = createMuiTheme({
   palette: {
@@ -73,7 +74,8 @@ export default function App() {
             />
             <Route exact path="/viewPublication" component={ViewPublication} />
             <Route exact path="/myPublications" component={MyPublication} />
-            <Route exact path='/moderatorPage' component={ModeratorPAge}/>
+            <Route exact path="/moderatorPage" component={ModeratorPage}/>
+            <Route exact path="/adminPage" component={AdminPage}/>
             <Route component={RedirectToNotFound} />
           </Switch>
         </PublicationProvider>
