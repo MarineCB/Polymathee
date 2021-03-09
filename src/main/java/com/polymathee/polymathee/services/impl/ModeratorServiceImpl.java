@@ -68,5 +68,14 @@ public class ModeratorServiceImpl implements ModeratorService {
         return user;
     }
 
+    public List<Moderator> getAllModerator(){
+ 
+        return moderatorrepository.findAll();
+    }
+
+    public void deleteModerator(int id){
+        moderatorrepository.deleteById(id);
+    }
+
 
 }
