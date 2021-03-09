@@ -4,7 +4,7 @@ import { Card, Typography, Grid, Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { ZoomIn } from "@material-ui/icons";
 import axios from "axios";
-const MOCK_USER_ID = 2; // TODO : remove for prod
+
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -35,6 +35,7 @@ function PublicationTileFav({
   publication,
   onClick,
   loadFavoritedPublications,
+  userId
 }) {
   publication = publication.publicationId;
   const classes = useStyles();
@@ -55,7 +56,7 @@ function PublicationTileFav({
             <Button
               onClick={() => {
                 removeFavAndSync(
-                  MOCK_USER_ID,
+                  userId,
                   publication.id,
                   loadFavoritedPublications
                 );

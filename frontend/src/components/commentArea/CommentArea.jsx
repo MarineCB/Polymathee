@@ -18,12 +18,6 @@ import Comment from "../commentArea/Comment";
 import axios from "axios";
 import {  ErrorOutlineRounded, Send } from "@material-ui/icons";
 const MAX_COMMENT_LENGTH = 500;
-let TEST_USER_ID = 2;
-
-
-
-
-
 
 /**
  * Sorting function for the comments
@@ -33,7 +27,7 @@ let TEST_USER_ID = 2;
 const upvoteSort = (a,b)=>parseFloat(b.upvote) - parseFloat(a.upvote)
 
 
-function sendComment(publicationId, personalCom, comments, setComments) {
+function sendComment(publicationId, personalCom, comments, setComments, userId) {
 
   const data = {
     "commentary-date": Date.now(),
@@ -42,7 +36,7 @@ function sendComment(publicationId, personalCom, comments, setComments) {
     commentary_report: 0,
     commentary_upvote: 0,
     publication_id: publicationId,
-    user_id: TEST_USER_ID,
+    user_id: userId,
   };
 
   const POST_COMMENT_URL = "/api/comment";
@@ -82,12 +76,6 @@ async function reportAction(commentId) {
 function CommentArea({ publicationId, userId }) {
   const [comments, setComments] = React.useState([]);
   const [personalCom, setPersonalCom] = React.useState("");
-
-  if (!userId) {
-    console.warn(
-      "Using mock user id because no id was provided " + TEST_USER_ID
-    );
-  }
   useEffect(() => {
     loadComments(publicationId, setComments);
   }, [publicationId]);
@@ -98,7 +86,7 @@ function CommentArea({ publicationId, userId }) {
         <Grid style={{ margin: "20px" }}>
           <Card raised style={{ marginBlock: "20px" }}>
             <Grid container justify="center" alignItems="center">
-              <Box width="100%" m={2}>
+             {userId && (<Box width="100%" m={2}>
                 <FormControl fullWidth variant="outlined">
                   <OutlinedInput
                     color="secondary"
@@ -119,7 +107,7 @@ function CommentArea({ publicationId, userId }) {
                             publicationId,
                             personalCom,
                             comments,
-                            setComments
+                            setComments, userId
                           );
                           setPersonalCom("");
                         }}
@@ -134,7 +122,8 @@ function CommentArea({ publicationId, userId }) {
                     }
                   />
                 </FormControl>
-              </Box>
+              </Box>)
+              }
               <Box display={personalCom.length > 0 ? "block" : "none"}>
                 <Button
                   style={{ marginRight: "5px" }}
@@ -146,7 +135,8 @@ function CommentArea({ publicationId, userId }) {
                       publicationId,
                       personalCom,
                       comments,
-                      setComments
+                      setComments, 
+                      userId
                     );
                     setPersonalCom("");
                   }}
@@ -182,7 +172,7 @@ function CommentArea({ publicationId, userId }) {
                     loadComments={loadComments}
                     publicationId={publicationId}
                     setComments={setComments}
-                    userId={TEST_USER_ID}
+                    userId={userId}
                     reportAction={() =>reportAction(curCommentData.id)}
                   />
                   {index < comments.length - 1 ? (
