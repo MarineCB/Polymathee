@@ -54,11 +54,10 @@ function Login({role}) {
   }
 
   async function createModerator() {
-    const res = await axios.post('/api/moderator', {
+    await axios.post('/api/moderator', {
         "moderator_password": `${password}`,
         "moderator_username": `${username}`,
     });
-    console.log("is modo created ", res);
     history.push('/adminPage');
   }
 

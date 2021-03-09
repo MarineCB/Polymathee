@@ -51,6 +51,7 @@ const ModeratorPage = ({ role }) => {
   const [reportedComments, setReportedComments] = useState();
   const [reportedPublications, setReportedPublications] = useState();
   const [allUsers, setAllUsers] = useState();
+  const [allModerators, setAllModerators] = useState();
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -90,10 +91,19 @@ const ModeratorPage = ({ role }) => {
       setAllUsers(tmpArr);
     }
 
+    async function getAllModerators() {
+        const res = await axios.get('/api/moderator');
+        setAllModerators(res.data);
+    }
+
     getPendingPublications();
     getReportedPublications(1);
     getReportedComments(0);
-    if (role) getAllUsers();
+    
+    if (role) {
+        getAllUsers();
+        getAllModerators();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -127,6 +137,9 @@ const ModeratorPage = ({ role }) => {
         )}
         {role === "Administrator" && (
           <Tab label="Créer un Modérateur" {...a11yProps(4)} />
+        )}
+        {role === "Administrator" && (
+          <Tab label="Supprimer un Modérateur" {...a11yProps(5)} />
         )}
       </Tabs>
       <TabPanel value={value} index={0}>
@@ -200,6 +213,24 @@ const ModeratorPage = ({ role }) => {
       {role === "Administrator" && (
         <TabPanel value={value} index={4}>
           <Login role='Administrator' />
+        </TabPanel>
+      )}
+      {role === "Administrator" && (
+        <TabPanel value={value} index={5}>
+          <List>
+            {allModerators ? (
+              allModerators.map((modo) => {
+                return (
+                  <div key={modo.id}>
+                    <UserList user={modo} isModo={true} />
+                    <Divider />
+                  </div>
+                );
+              })
+            ) : (
+              <div></div>
+            )}
+          </List>
         </TabPanel>
       )}
     </div>
