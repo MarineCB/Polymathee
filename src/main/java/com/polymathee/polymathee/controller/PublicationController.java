@@ -110,8 +110,8 @@ public class PublicationController {
 
     @GetMapping(GET_PUBLICATIONS_BY_USER_AND_TAG)
     @ApiOperation(value = "Get Publication by tags", consumes = "application/json")
-    public ResponseEntity<List<Publication>> getPublicationsByTags(@PathVariable(value="user_name",required = false)
-           String user, @PathVariable(value="tags", required = false) String tag) {
+    public ResponseEntity<List<Publication>> getPublicationsByTags(@RequestParam(value="user_name",required = false)
+           String user, @RequestParam(value="tags", required = false) String tag) {
         List<Publication> publi = publicationService.getPubliTagUser(tag,user);
         return new ResponseEntity<>(publi, HttpStatus.OK);
     }
