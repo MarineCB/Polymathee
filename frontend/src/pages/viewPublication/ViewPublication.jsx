@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useHistory, withRouter } from "react-router-dom";
 import CommentArea from "../../components/commentArea/CommentArea";
 import { useEffect } from "react";
@@ -30,6 +30,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import PdfViewer from "../../components/pdf/PdfViewer";
 import RichTextEditor from "react-rte";
 import Tag from "../../components/tag/Tag";
+import { UserContext } from "../../store/UserContext";
+
 const useStyles = makeStyles(() => ({
   comments: {
     display: "flex",
@@ -45,13 +47,12 @@ const useStyles = makeStyles(() => ({
     marginInline: "2px",
   },
   rte: {
-    maxWidth:"700px",
-    minWidth:"400px"
-  }
+    maxWidth: "700px",
+    minWidth: "400px",
+  },
 }));
-let PUBLICATION_ID = undefined
-let MOCK_USER_ID = 2; // TODO : REPLACE BY REAL VALUE
-let initiallyFavorited
+let PUBLICATION_ID = undefined;
+let initiallyFavorited;
 function PublicationTags({ publication }) {
   return (
     <div>
@@ -104,6 +105,7 @@ function PublicationActions({
   publication,
   downloadCount,
   setDownloadCount,
+  userId,
 }) {
   const classes = useStyles();
   const [downloadEnabled, setDownloadEnabled] = React.useState(true);
@@ -115,22 +117,26 @@ function PublicationActions({
         variant="contained"
         className={classes.button}
         startIcon={<SaveAlt />}
-        disabled={!downloadEnabled}
+        disabled={!downloadEnabled || !userId}
         onClick={async () => {
           // Download the file
-          const url = window.URL.createObjectURL(pdfFile)
-          setObjectURL(url)
-          link.href = url
-          link.download = pdfFile.path
-          link.dispatchEvent(new MouseEvent("click"))
-          incrementDownloadCount(publication.id,downloadCount, setDownloadCount)
-          setDownloadEnabled(false)
+          const url = window.URL.createObjectURL(pdfFile);
+          setObjectURL(url);
+          link.href = url;
+          link.download = pdfFile.path;
+          link.dispatchEvent(new MouseEvent("click"));
+          incrementDownloadCount(
+            publication.id,
+            downloadCount,
+            setDownloadCount
+          );
+          setDownloadEnabled(false);
           setTimeout(() => {
-            setDownloadEnabled(true)
+            setDownloadEnabled(true);
           }, 1000);
         }}
       >
-        Télécharger
+        {!userId ? <div>Veuillez vous connecter</div> : <div>Télécharger</div>}
       </Button>
     </div>
   );
@@ -148,6 +154,51 @@ function InfoPhrase({ author, downloadCount, date }) {
   );
 }
 
+function FavoriteButton({
+  userId,
+  alreadyFavorited,
+  likeNumber,
+  removeFromFavorites,
+  addToFavorites,
+}) {
+  if (userId) {
+    if (alreadyFavorited) {
+      return (
+        <IconButton
+          onClick={() => {
+            removeFromFavorites();
+          }}
+          color="secondary"
+          variant="contained"
+        >
+          <Tooltip title="Retirer de vos favoris">
+            <Badge badgeContent={likeNumber}>
+              <Favorite color="error" />
+            </Badge>
+          </Tooltip>
+        </IconButton>
+      );
+    } else if (!alreadyFavorited) {
+      return (
+        <IconButton
+          onClick={() => {
+            addToFavorites();
+          }}
+          color="secondary"
+          variant="contained"
+        >
+          <Tooltip title="Ajouter cette publication aux favoris">
+            <Badge badgeContent={likeNumber}>
+              <FavoriteBorderOutlined />
+            </Badge>
+          </Tooltip>
+        </IconButton>
+      );
+    }
+  }
+  return <div></div>;
+}
+
 function RightSide({
   pdfFile,
   objectURL,
@@ -157,8 +208,9 @@ function RightSide({
   setAlreadyFavorited,
   downloadCount,
   setDownloadCount,
+  userId,
 }) {
-  const classes = useStyles()
+  const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [reportButtonDisabled, setReportButtonDisabled] = React.useState(false);
   const [likeNumber, setLikeNumber] = React.useState(pubInfos.likeNumber);
@@ -166,17 +218,17 @@ function RightSide({
     setAnchorEl(event.currentTarget);
   };
   const incrementFavNumber = () => {
-    if(initiallyFavorited) {
-      setLikeNumber(pubInfos.likeNumber)
+    if (initiallyFavorited) {
+      setLikeNumber(pubInfos.likeNumber);
     } else {
       setLikeNumber(likeNumber + 1);
     }
   };
   const decrementFavNumber = () => {
-    if(initiallyFavorited) {
-      setLikeNumber(likeNumber-1)
+    if (initiallyFavorited) {
+      setLikeNumber(likeNumber - 1);
     } else {
-      setLikeNumber(pubInfos.likeNumber)
+      setLikeNumber(pubInfos.likeNumber);
     }
   };
   const handleClose = () => {
@@ -186,15 +238,17 @@ function RightSide({
     <div id="top">
       <Grid>
         <Grid container justify="flex-end">
-          <IconButton
-            aria-label="delete"
-            aria-controls="simple-menu"
-            aria-haspopup="true"
-            color="primary"
-            onClick={handleClick}
-          >
-            <MoreVert />
-          </IconButton>
+          {userId && (
+            <IconButton
+              aria-label="delete"
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              color="primary"
+              onClick={handleClick}
+            >
+              <MoreVert />
+            </IconButton>
+          )}
           <Menu
             id="simple-menu"
             anchorEl={anchorEl}
@@ -205,11 +259,7 @@ function RightSide({
             <MenuItem
               disabled={reportButtonDisabled}
               onClick={() => {
-                reportPublication(
-                  pubInfos,
-                  MOCK_USER_ID,
-                  setReportButtonDisabled
-                );
+                reportPublication(pubInfos, userId, setReportButtonDisabled);
                 handleClose();
               }}
             >
@@ -225,45 +275,26 @@ function RightSide({
               </Typography>
             </Grid>
             <Grid item>
-              {alreadyFavorited ? (
-                <IconButton
-                  onClick={() => {
-                    removeFromFavorites(
-                      MOCK_USER_ID,
-                      pubInfos,
-                      setAlreadyFavorited,
-                      decrementFavNumber
-                    );
-                  }}
-                  color="secondary"
-                  variant="contained"
-                >
-                  <Tooltip title="Retirer de vos favoris">
-                    <Badge badgeContent={likeNumber}>
-                      <Favorite color="error" />
-                    </Badge>
-                  </Tooltip>
-                </IconButton>
-              ) : (
-                <IconButton
-                  onClick={() => {
-                    addToFavorites(
-                      MOCK_USER_ID,
-                      pubInfos,
-                      setAlreadyFavorited,
-                      incrementFavNumber
-                    );
-                  }}
-                  color="secondary"
-                  variant="contained"
-                >
-                  <Tooltip title="Ajouter cette publication aux favoris">
-                    <Badge badgeContent={likeNumber}>
-                      <FavoriteBorderOutlined />
-                    </Badge>
-                  </Tooltip>
-                </IconButton>
-              )}
+              <FavoriteButton
+                alreadyFavorited={alreadyFavorited}
+                userId={userId}
+                removeFromFavorites={() =>
+                  removeFromFavorites(
+                    userId,
+                    pubInfos,
+                    setAlreadyFavorited,
+                    decrementFavNumber
+                  )
+                }
+                addToFavorites={() =>
+                  addToFavorites(
+                    userId,
+                    pubInfos,
+                    setAlreadyFavorited,
+                    incrementFavNumber
+                  )
+                }
+              />
             </Grid>
           </Grid>
           <Typography variant="subtitle1" color="textSecondary">
@@ -273,7 +304,10 @@ function RightSide({
           <RichTextEditor
             readOnly
             className={classes.rte}
-            value={RichTextEditor.createValueFromString(  "<div>"+pubInfos.content+"</div>","html"   )}
+            value={RichTextEditor.createValueFromString(
+              "<div>" + pubInfos.content + "</div>",
+              "html"
+            )}
           />{" "}
           {/* <PolymatheeEditor readOnly={Boolean(true)} value={RichTextEditor.createValueFromString(pubInfos.content , 'html')} /> */}
         </CardContent>
@@ -286,6 +320,7 @@ function RightSide({
               publication={pubInfos}
               downloadCount={downloadCount}
               setDownloadCount={setDownloadCount}
+              userId={userId}
             />
           </Grid>
         </Grid>
@@ -310,7 +345,7 @@ function LeftSide(pdfFile, objectURL, setObjectURL) {
 /**
  * Set if the favorite button is in add or remove from favorites mode
  */
-function  syncFavButttonStatus(userId, publicationId, setAlreadyFavorited) {
+function syncFavButttonStatus(userId, publicationId, setAlreadyFavorited) {
   const URL_FAVORIS_FOR_USER = "/api/favoris/" + userId;
   axios
     .get(URL_FAVORIS_FOR_USER)
@@ -322,8 +357,8 @@ function  syncFavButttonStatus(userId, publicationId, setAlreadyFavorited) {
         }
       });
       // We save if the button was loaded as favorited or not
-      if(initiallyFavorited === undefined) {
-        initiallyFavorited = alreadyFav
+      if (initiallyFavorited === undefined) {
+        initiallyFavorited = alreadyFav;
       }
       if (setAlreadyFavorited) {
         setAlreadyFavorited(alreadyFav);
@@ -384,9 +419,10 @@ function ViewPublication(props) {
   const histo = useHistory();
   const [objectURL, setObjectURL] = React.useState(null);
   const [alreadyFavorited, setAlreadyFavorited] = React.useState(false);
-  const TIMEOUT_DELAY = 10000 // The time to load a publication before an error message is displayed
+  const TIMEOUT_DELAY = 10000; // The time to load a publication before an error message is displayed
   const [downloadCount, setDownloadCount] = React.useState();
   const [timeoutReached, setTimeoutReached] = React.useState(false);
+  const { userId } = useContext(UserContext);
   setTimeout(() => {
     setTimeoutReached(true);
   }, TIMEOUT_DELAY);
@@ -399,16 +435,13 @@ function ViewPublication(props) {
   const URL_PUBLICATION_BY_ID = "/api/publications/" + PUBLICATION_ID;
   useEffect(() => {
     if (PUBLICATION_ID !== undefined) {
-      syncFavButttonStatus(MOCK_USER_ID, PUBLICATION_ID, setAlreadyFavorited);
+      if (userId)
+        syncFavButttonStatus(userId, PUBLICATION_ID, setAlreadyFavorited);
       axios
         .get(URL_PUBLICATION_BY_ID)
         .then((resInfos) => {
           if (resInfos.status === 200) {
             const selectedPublication = resInfos.data;
-            console.log(
-              "Load success of publication data",
-              selectedPublication
-            );
             setPubsInfos(selectedPublication);
             setDownloadCount(selectedPublication.downloadNumber);
             axios
@@ -434,7 +467,7 @@ function ViewPublication(props) {
           console.error(err);
         });
     }
-  }, []);
+  }, [userId]);
 
   const classes = useStyles();
   return (
@@ -472,15 +505,13 @@ function ViewPublication(props) {
                         downloadCount={downloadCount}
                         setDownloadCount={setDownloadCount}
                         item
+                        userId={userId}
                       />
                     </Grid>
                   </Grid>
                 </Card>
                 <div className={classes.comments}>
-                  <CommentArea
-                    publicationId={pubInfos.id}
-                    userId={MOCK_USER_ID}
-                  />
+                  <CommentArea publicationId={pubInfos.id} userId={userId} />
                 </div>
               </Grid>
             );

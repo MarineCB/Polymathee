@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import { useHistory, withRouter } from "react-router-dom";
 import { useEffect } from "react";
 import {
@@ -26,7 +26,8 @@ import PublicationTile from "../../components/publication/PublicationTile";
 import axios from "axios";
 import PublicationTileFav from "../../components/publication/PublicationTileFav";
 import { Info, Publish, Search } from "@material-ui/icons";
-const MOCK_USER_ID = 2; // TODO : remove for prod
+import {UserContext} from '../../store/UserContext';
+
 const useStyles = makeStyles((theme) => ({
   icon: {
     marginTop: "30px",
@@ -130,6 +131,7 @@ function NoPublicationsMsg() {
 }
 
 function MyPublications() {
+  const {userId} = useContext(UserContext);
   const classes = useStyles();
   const [pubs, setPubs] = React.useState([]);
   const [pubsFav, setPubsFav] = React.useState([]);
@@ -176,9 +178,9 @@ function MyPublications() {
 
   useEffect(() => {
     // Load all publications
-    loadSubmittedPublications(setPubs, setLoaded, MOCK_USER_ID);
-    loadFavoritedPublications(setPubsFav, setLoadedFav, MOCK_USER_ID);
-  }, []);
+    loadSubmittedPublications(setPubs, setLoaded, userId);
+    loadFavoritedPublications(setPubsFav, setLoadedFav, userId);
+  }, [userId]);
 
   function getFilteredPubs() {
     return curFilter !== undefined
@@ -234,9 +236,10 @@ function MyPublications() {
                       loadSubmittedPublications(
                         setPubs,
                         setLoaded,
-                        MOCK_USER_ID
+                        userId
                       );
                     }}
+                    userId={userId}
                   />
                 ))
               ) : (
@@ -261,9 +264,10 @@ function MyPublications() {
                 <PublicationTileFav
                   key={publication.id}
                   publication={publication}
-                  loadFavoritedPublications={()=>loadFavoritedPublications(setPubsFav,setLoadedFav,MOCK_USER_ID)}
+                  loadFavoritedPublications={()=>loadFavoritedPublications(setPubsFav,setLoadedFav,userId)}
                   setDelPubDialogMsg={setDelPubDialogMsg}
                   setSnackbarMsg={setSnackbarMsg}
+                  userId={userId}
                 />
               ))}
             </List>

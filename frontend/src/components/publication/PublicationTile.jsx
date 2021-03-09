@@ -64,9 +64,10 @@ function deletePublication(
   showSnackbar,
   hideSnackbar,
   reloadPublications,
-  setDelPubDialogVisible
+  setDelPubDialogVisible,
+  userId
 ) {
-  const DELETE_PUB_URL = "api/publication/" + publicationId;
+  const DELETE_PUB_URL = "api/publication/" + publicationId + `/${userId}`;
   setSnackbarMsg("Suppression...");
   showSnackbar();
   axios
@@ -101,7 +102,8 @@ function askDeletePublication(
   showSnackbar,
   hideSnackbar,
   setConfirmDeleteHandler,
-  reloadPublications
+  reloadPublications, 
+  userId
 ) {
   // Configure the handler for deletion
   setConfirmDeleteHandler(() => () => {
@@ -111,7 +113,8 @@ function askDeletePublication(
       showSnackbar,
       hideSnackbar,
       reloadPublications,
-      setDelPubDialogVisible
+      setDelPubDialogVisible,
+      userId
     );
   });
 
@@ -206,6 +209,7 @@ function PublicationTile({
   setDelPubDialogMsg,
   setConfirmDeleteHandler,
   reloadPublications,
+  userId
 }) {
   const classes = useStyles();
   const history = useHistory();
@@ -276,7 +280,8 @@ function PublicationTile({
                   showSnackbar,
                   hideSnackbar,
                   setConfirmDeleteHandler,
-                  reloadPublications
+                  reloadPublications,
+                  userId
                 )
               }
             >
