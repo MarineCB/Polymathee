@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -31,7 +31,8 @@ public class ModeratorController {
 
     private static final String POST_MODERATOR = "/api/moderator";
     private static final String POST_LOGIN = "/api/login";
-
+    private static final String GET_MODERATOR_ALL = "/api/moderator";
+    private static final String DELETE_MODERATOR = "/api/delete/moderator/{id}";
 
     @PostMapping(POST_MODERATOR)
     @ApiOperation(value = "Post moderator", consumes = "application/json")
@@ -46,9 +47,19 @@ public class ModeratorController {
         return new ResponseEntity<>(moderatorService.ComparePassword(moderatorDto.getPassword(),moderatorDto.getUsername()), HttpStatus.OK);
     }
 
+    @GetMapping(GET_MODERATOR_ALL)
+    @ApiOperation(value = "Get moderators", consumes = "application/json")
+    public ResponseEntity<List<Moderator>> getModeratorAll() {
+        List<Moderator> mod = moderatorService.getAllModerator();
+        return new ResponseEntity<>(mod, HttpStatus.OK);
+    }
 
-
-
+    @DeleteMapping(DELETE_MODERATOR)
+    @ApiOperation(value = "Delete moderator by id", consumes = "application/json")
+    public ResponseEntity<Boolean> deleteModerator(@PathVariable("id") int id) {
+        moderatorService.deleteModerator(id);
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
 
 
 

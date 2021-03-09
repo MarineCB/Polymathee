@@ -13,4 +13,7 @@ public interface ModeratorRepository extends CrudRepository<Moderator, Integer>,
     Moderator findModeratorById(Integer id);
 
     List<Moderator> findAll();
+
+
+    Moderator deleteById(int id);
 }
