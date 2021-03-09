@@ -15,8 +15,7 @@ const GenericCommentArea = ({comment}) => {
     const comment_date = new Date(comment.date);
 
     async function deletePublication(commentId) {
-        const requestDeleteComment = await axios.delete(`/api/comment/${commentId}`);
-        console.log('Deleted :', requestDeleteComment);
+        await axios.delete(`/api/comment/${commentId}`);
         window.location.reload();
     }
 

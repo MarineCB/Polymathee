@@ -14,6 +14,7 @@ import { Box, createMuiTheme, CssBaseline } from "@material-ui/core";
 import { PublicationProvider } from "./store/PublicationContext";
 import RedirectToNotFound from "./RedirectToNotFound";
 import NotFound from "./pages/notFound/NotFound";
+import {UserWrapper} from './store/UserContext';
 
 export const theme = createMuiTheme({
   palette: {
@@ -63,7 +64,7 @@ export default function App() {
         <PublicationProvider>
           <Switch>
             <Route exact path="/homepage" component={Homepage} />
-            <Route exact path="/login" component={Login} />
+            <Route exact path="/loginAdmin" component={Login} />
             <Route exact path="/signup" component={Signup} />
             <Route
               exact
@@ -81,15 +82,17 @@ export default function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box height="100%">
-        <Switch>
-          <Route exact path="/" component={Landing} />
-          <Route component={NotFound} path="/notfound" />
-          <Route component={DefaultRoutes} />
-        </Switch>
-      </Box>
-    </ThemeProvider>
+    <UserWrapper>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box height="100%">
+          <Switch>
+            <Route exact path="/" component={Landing} />
+            <Route component={NotFound} path="/notfound" />
+            <Route component={DefaultRoutes} />
+          </Switch>
+        </Box>
+      </ThemeProvider>
+    </UserWrapper>
   );
 }

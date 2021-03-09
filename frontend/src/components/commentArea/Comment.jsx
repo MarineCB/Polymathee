@@ -105,12 +105,13 @@ function Comment({
       <Grid alignItems="center" container justify="flex-end">
         <Typography>{comment.upvote}</Typography>
         <Grid>
-          {liked ? (
-            <IconButton style={{ marginRight: "20px", marginLeft: "5px" }}>
+          {liked? (
+            <IconButton style={{ marginRight: "20px", marginLeft: "5px" }} disabled={!userId}>
               <ThumbUp />
             </IconButton>
           ) : (
             <IconButton
+            disabled={!userId}
               onClick={() => {
                 voteComment(
                   publicationId,
@@ -123,7 +124,7 @@ function Comment({
               }}
               style={{ marginRight: "20px", marginLeft: "5px" }}
             >
-              <ThumbUpAltOutlined />
+              <ThumbUpAltOutlined  disabled={!userId}/>
             </IconButton>
           )}
         </Grid>
@@ -131,10 +132,11 @@ function Comment({
         <Grid style={{ marginRight: "20px", marginLeft: "5px" }}>
           {disliked ? (
             <IconButton>
-              <ThumbDown />
+              <ThumbDown disabled={!userId}/>
             </IconButton>
           ) : (
             <IconButton
+            disabled={!userId}
               onClick={() => {
                 voteComment(
                   publicationId,
@@ -146,16 +148,18 @@ function Comment({
                 );
               }}
             >
-              <ThumbDownAltOutlined />
+              <ThumbDownAltOutlined disabled={!userId}/>
             </IconButton>
           )}
         </Grid>
-        <IconButton
+        {userId &&
+          <IconButton
           onClick={OpenMenu}
           style={{ marginRight: "20px", marginLeft: "5px" }}
         >
           <MoreVert />
         </IconButton>
+        }
         <Menu
           id="simple-menu"
           anchorEl={anchorEl}

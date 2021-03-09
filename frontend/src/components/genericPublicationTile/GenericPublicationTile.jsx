@@ -60,8 +60,7 @@ const GenericPublicationTile = ({publication, task}) => {
 
 
     async function updatePublication(id, status) {
-        const res = await axios.put(`/api/status/publication/${id}/${status}`);
-        console.log(res);
+        await axios.put(`/api/status/publication/${id}/${status}`);
         window.location.reload();
     }
     

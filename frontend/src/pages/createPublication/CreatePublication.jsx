@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useContext } from "react";
 import RichTextEditor from "react-rte";
 import { useHistory, withRouter } from "react-router-dom";
 import { DropzoneAreaBase } from "material-ui-dropzone";
@@ -28,9 +28,10 @@ import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Tag from "../../components/tag/Tag";
 import PolymatheeEditor from "../../components/polymatheeEditor/PolymatheeEditor";
+import {UserContext} from "../../store/UserContext";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-let MOCK_USER_ID = 2; // TODO : replace in prod
+
 
 let editMode = false;
 let editedPdfFileToo = false; // Optimization, the pdf file will only be uploaded when edited
@@ -250,10 +251,10 @@ function savePublication(
   publicationId, // Edit only, publication id for upload for S3
   setLoadingPost,
   publicationSentAction,
-  publicatinSavedAction
+  publicatinSavedAction,
+  userId
 ) {
   // Check submit
-
   var msg = "";
   if (pdfFile === undefined) {
     msg += "\n- Pas de pdf";
@@ -377,7 +378,7 @@ function savePublication(
         publication_status: isDraft ? "Saved" : "To_Treat", // Precise enum values
         publication_tags: tags.map((t) => t.label).join(","), // separate with "," each tag
         publication_title: title,
-        user_id: MOCK_USER_ID,
+        user_id: userId,
       };
       setLoadingPost(true);
       // First POST : All informations but not the PDF
@@ -512,6 +513,7 @@ function CreatePublicationSummary(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [alertDialogMsg, setAlertDialogMsg] = React.useState("");
   const [loadingPost, setLoadingPost] = React.useState(false);
+  const {userId} = useContext(UserContext);
   const handleClose = () => {
     setDialogOpen(false);
   };
@@ -608,7 +610,8 @@ function CreatePublicationSummary(props) {
                         publicationId,
                         setLoadingPost,
                         publicationSentAction, // POST
-                        publicationSavedAction // PUT
+                        publicationSavedAction, // PUT
+                        userId
                       );
                     }}
                   >
@@ -646,7 +649,8 @@ function CreatePublicationSummary(props) {
                         publicationId,
                         setLoadingPost,
                         publicationSentAction, // POST
-                        publicationSavedAction // PUT
+                        publicationSavedAction, // PUT
+                        userId
                       );
                     }}
                   >

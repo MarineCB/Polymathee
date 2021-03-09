@@ -73,7 +73,6 @@ const ModeratorPage = () => {
         async function getReportedComments(strikeNumber) {
             const fetchReportedComments = await axios.get(`/api/comments/reports/${strikeNumber}`);
             setReportedComments(fetchReportedComments.data);
-            console.log(fetchReportedComments.data);
         }
         getPendingPublications();
         getReportedPublications(1);
